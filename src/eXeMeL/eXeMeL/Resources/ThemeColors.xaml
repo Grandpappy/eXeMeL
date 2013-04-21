@@ -1,0 +1,62 @@
+﻿<ResourceDictionary 
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+  >
+
+
+  <Color x:Key="BlackColor">#FF252525</Color>
+  <Color x:Key="WhiteColor">#FFEDEDED</Color>
+  <!--<Color x:Key="WhiteColor">#FF252525</Color>-->
+
+
+  <Color x:Key="NormalForegroundColor">#FF252525</Color> <!--FFFFFFFF-->
+  <Color x:Key="HoverForegroundColor">#FFEDEDED</Color>
+
+  <Color x:Key="Gray2">#FF7F7F7F</Color>
+  <Color x:Key="Gray3">#FFF9F9F9</Color>
+  <Color x:Key="Gray4">#FFD8D8D8</Color>
+  <Color x:Key="Gray5">#FF7e7e7e</Color>
+  <Color x:Key="Gray7">#FF2f2f2f</Color>
+  <Color x:Key="Gray8">#FF454545</Color>
+
+  <Color x:Key="GrayNormal">#FF7D7D7D</Color>
+  <Color x:Key="GrayHover">#FFAAAAAA</Color>
+
+
+
+  <Color x:Key="HighlightDarkColor">#FF58007C</Color>
+  <Color x:Key="HighlightLightColor">#FF58007C</Color>
+
+  <Color x:Key="AccentColor">#CC58007C</Color>
+  <!--60%-->
+  <Color x:Key="AccentColor2">#9958007C</Color>
+  <!--40%-->
+  <Color x:Key="AccentColor3">#6658007C</Color>
+  <!--20%-->
+  <Color x:Key="AccentColor4">#3358007C</Color>
+
+
+  <LinearGradientBrush x:Key="BrandingBrush" EndPoint="0.001,0.5" StartPoint="1.002,0.5">
+    <GradientStop Color="{DynamicResource HighlightDarkColor}" Offset="0"/>
+    <GradientStop Color="#FFFFB519" Offset="1"/>
+  </LinearGradientBrush>
+
+  <SolidColorBrush x:Key="AccentColorBrush"
+                     Color="{StaticResource AccentColor}" />
+
+  <SolidColorBrush x:Key="AccentSelectedColorBrush"
+                     Color="White" />
+
+  <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="{StaticResource Gray8}"/>
+  <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColor}"/>
+  <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}"/>
+  <SolidColorBrush x:Key="Gray2Brush" Color="{StaticResource Gray2}"/>
+  <SolidColorBrush x:Key="Gray3Brush" Color="{StaticResource Gray3}"/>
+  <SolidColorBrush x:Key="Gray4Brush" Color="{StaticResource Gray4}"/>
+  <SolidColorBrush x:Key="Gray5Brush" Color="{StaticResource Gray5}"/>
+  <SolidColorBrush x:Key="Gray7Brush" Color="{StaticResource Gray7}"/>
+  <SolidColorBrush x:Key="Gray8Brush" Color="{StaticResource Gray8}"/>
+  
+  
+</ResourceDictionary>
