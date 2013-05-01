@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eXeMeL.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,11 @@ namespace eXeMeL.View
     public SettingsView()
     {
       InitializeComponent();
+    }
+
+    private void ResetFontSizeButton_Click(object sender, RoutedEventArgs e)
+    {
+      (this.DataContext as Settings).EditorFontSize = Settings.DEFAULT_EDITOR_FONT_SIZE;
     }
   }
 }

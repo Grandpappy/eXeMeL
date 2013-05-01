@@ -25,17 +25,27 @@
 
 
 
-  <Color x:Key="HighlightDarkColor">#FF58007C</Color>
+  <!--<Color x:Key="HighlightDarkColor">#FF58007C</Color>
   <Color x:Key="HighlightLightColor">#FF58007C</Color>
 
   <Color x:Key="AccentColor">#CC58007C</Color>
-  <!--60%-->
   <Color x:Key="AccentColor2">#9958007C</Color>
-  <!--40%-->
   <Color x:Key="AccentColor3">#6658007C</Color>
-  <!--20%-->
-  <Color x:Key="AccentColor4">#3358007C</Color>
+  <Color x:Key="AccentColor4">#3358007C</Color>-->
 
+
+  <Color x:Key="HighlightDarkColor">#FFD4AA00</Color>
+  <Color x:Key="HighlightLightColor">#FFD4AA00</Color>
+
+  <Color x:Key="AccentColor">#CCD4AA00</Color>
+  <!--60%-->
+  <Color x:Key="AccentColor2">#99D4AA00</Color>
+  <!--40%-->
+  <Color x:Key="AccentColor3">#66D4AA00</Color>
+  <!--20%-->
+  <Color x:Key="AccentColor4">#33D4AA00</Color>
+
+  <!--D4AA00-->
 
   <LinearGradientBrush x:Key="BrandingBrush" EndPoint="0.001,0.5" StartPoint="1.002,0.5">
     <GradientStop Color="{DynamicResource HighlightDarkColor}" Offset="0"/>
@@ -48,7 +58,7 @@
   <SolidColorBrush x:Key="AccentSelectedColorBrush"
                      Color="White" />
 
-  <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="{StaticResource Gray8}"/>
+  <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="{StaticResource Gray2}"/>
   <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColor}"/>
   <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}"/>
   <SolidColorBrush x:Key="Gray2Brush" Color="{StaticResource Gray2}"/>

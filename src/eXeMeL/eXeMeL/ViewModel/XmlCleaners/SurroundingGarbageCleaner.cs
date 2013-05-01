@@ -11,7 +11,15 @@ namespace eXeMeL.ViewModel.XmlCleaners
   {
     public override void CleanXml(XmlCleanerContext context)
     {
-      
+      var firstLessThanIndex = context.XmlToClean.IndexOf('<');
+      if (firstLessThanIndex < 0)
+        return;
+
+      var lastGreaterThanIndex = context.XmlToClean.LastIndexOf('>');
+      if (lastGreaterThanIndex < 0)
+        return;
+
+      context.XmlToClean = context.XmlToClean.Substring(firstLessThanIndex, lastGreaterThanIndex - firstLessThanIndex + 1);
     }
   }
 }

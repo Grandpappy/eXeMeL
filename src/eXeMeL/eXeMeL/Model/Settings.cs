@@ -69,8 +69,12 @@ namespace eXeMeL.Model
   [DataContract]
   public class Settings : SettingsBase
   {
+    public const double DEFAULT_EDITOR_FONT_SIZE = 14.667;
+
+
     private bool _WrapEditorText;
     private bool _ShowEditorLineNumbers;
+    private double _EditorFontSize;
 
 
 
@@ -92,11 +96,21 @@ namespace eXeMeL.Model
 
 
 
+    [DataMember]
+    public double EditorFontSize
+    {
+      get { return _EditorFontSize; }
+      set { _EditorFontSize = value; NotifyPropertyChanged("EditorFontSize"); }
+    }
+
+
+
     public Settings()
       : base()
     {
       this.ShowEditorLineNumbers = true;
       this.WrapEditorText = false;
+      this.EditorFontSize = DEFAULT_EDITOR_FONT_SIZE;
     }
   }
 }

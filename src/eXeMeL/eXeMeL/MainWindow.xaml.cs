@@ -1,7 +1,10 @@
 ﻿using eXeMeL.Messages;
 using eXeMeL.ViewModel;
 using GalaSoft.MvvmLight.Messaging;
+using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Folding;
 using MahApps.Metro.Controls;
+using MvvmFoundation.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,51 +27,76 @@ namespace eXeMeL
   /// </summary>
   public partial class MainWindow : MetroWindow
   {
+    private FoldingManager FoldingManager { get; set; }
+    private XmlFoldingStrategy FoldingStrategy { get; set; }
     private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
+    private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
 
 
 
     public MainWindow()
     {
       this.Closing += MainWindow_Closing;
+      this.Loaded += MainWindow_Loaded;
+      this.DataContextChanged += MainWindow_DataContextChanged;
+
       InitializeComponent();
 
       //DataObject.AddPastingHandler(this.AvalonEditor, PasteHandler);
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
       //this.AvalonEditor.KeyDown += AvalonEditor_KeyDown;
+
+      this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
+      this.FoldingStrategy = new XmlFoldingStrategy();
     }
 
 
 
-    //private void PasteHandler(object sender, DataObjectPastingEventArgs e)
-    //{
-    //  //var formats = e.DataObject.GetFormats(true);
-    //  //formats[0] == 
-    //}
+    private void MainWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+      //this.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+
+      this.TextDocumentObserver = 
+        new PropertyObserver<TextDocument>(this.ViewModel.Editor.Document)
+          .RegisterHandler(x => x.Text, HandleChangedDocumentText);
+
+      HandleChangedDocumentText(this.ViewModel.Editor.Document);
+    }
 
 
-    //void AvalonEditor_KeyDown(object sender, KeyEventArgs e)
-    //{
-      
-    //}
+    
+    private void HandleChangedDocumentText(TextDocument document)
+    {
+      if (this.FoldingManager != null && this.FoldingStrategy != null)
+      { 
+        this.FoldingStrategy.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
+      }
+    }
+
+
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+      this.ViewModel.Editor.RefreshCommand.Execute(null);
+    }
 
 
 
     private void AvalonEditor_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-      if (e.Key == Key.V && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-      {
-        var cleanText = this.ViewModel.Editor.CleanXmlIfPossible(Clipboard.GetText());
-        Clipboard.SetText(cleanText);
-      }
+      //if (e.Key == Key.V && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+      //{
+      //  var cleanText = this.ViewModel.Editor.CleanXmlIfPossible(Clipboard.GetText());
+      //  Clipboard.SetText(cleanText);
+      //}
     }
 
 
 
     private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-      Messenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
+      GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
     }
 
 

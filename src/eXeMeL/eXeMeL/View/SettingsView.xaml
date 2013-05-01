@@ -24,6 +24,11 @@
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+
       </Grid.RowDefinitions>
       
       <Grid.ColumnDefinitions>
@@ -36,6 +41,36 @@
       
       <MahApps:ToggleSwitch Grid.Column="0" Grid.Row="1" IsChecked="{Binding ShowEditorLineNumbers}" Header="Line Numbers"/>
       <MahApps:ToggleSwitch Grid.Column="2" Grid.Row="1" IsChecked="{Binding WrapEditorText}" Header="Wrap Editor Text"/>
+      
+      <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Margin="10,20,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Column="0" Grid.Row="0" Text="Font Size" FontFamily="Segoe UI" FontSize="16" Margin="0,0,10,0" Opacity="0.65"/>
+        <Slider Grid.Column="1" Grid.Row="0" Value="{Binding EditorFontSize}" Minimum="12" Maximum="30" Focusable="False"/>
+
+        <Button Grid.Column="1" Grid.Row="1" x:Name="ResetFontSizeButton" Content="Reset Font Size" HorizontalAlignment="Right" Margin="0,5,0,0" Foreground="{DynamicResource WhiteBrush}" Click="ResetFontSizeButton_Click"/>
+      </Grid>
+      
+      
+
+      <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="3" Margin="0,40,0,0" FontFamily="Segoe UI" FontSize="18" Opacity="0.9">
+        <Run Text="Makes use of "/>
+        <LineBreak/>
+        <Run Text="  AvalonEdit"/>
+        <LineBreak/>
+        <Run Text="  MVVMLight"/>
+        <LineBreak/>
+        <Run Text="  MVVMFoundation"/>
+        <LineBreak/>
+        <Run Text="  MahApps"/>
+      </TextBlock>
     </Grid>
   </ScrollViewer>
 </UserControl>

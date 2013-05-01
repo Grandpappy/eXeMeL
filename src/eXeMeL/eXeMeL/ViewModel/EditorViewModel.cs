@@ -1,4 +1,5 @@
-﻿using eXeMeL.Model;
+﻿using eXeMeL.Messages;
+using eXeMeL.Model;
 using eXeMeL.ViewModel.XmlCleaners;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -29,7 +30,7 @@ namespace eXeMeL.ViewModel
 
     public Settings Settings { get; private set; }
     public ICommand CopyCommand { get; private set; }
-    public ICommand PasteCommand { get; private set; }
+    public ICommand RefreshCommand { get; private set; }
 
 
 
@@ -39,41 +40,70 @@ namespace eXeMeL.ViewModel
       this.Settings = settings;
 
       this.CopyCommand = new RelayCommand(CopyCommand_Execute);
-      this.PasteCommand = new RelayCommand(PasteCommand_Execute);
+      this.RefreshCommand = new RelayCommand(RefreshCommand_Execute);
       this.Cleaners = new List<XmlCleanerBase>()
         {
           new TrimCleaner(),
+          new NewLineCleaner(),
           new SurroundingGarbageCleaner(),
+          new VisualStudioCleaner(),
+          new AddedRootCleaner(),
           new FormatCleaner()
         };
 
-      //if (IsInDesignMode)
-      //{
-      //this.Document = new TextDocument() { Text = this.ParsedXml.ToString() };
-      this.Document = new TextDocument() { Text = "<Root IsValue=\"true\"><FirstChild Name=\"Robby\" Address=\"1521 Greenway Dr\"><Toys>All of them</Toys></FirstChild></Root>" };
 
-      //}
-      //else
-      //{
-      //  // Code runs "for real"
-      //}
+      if (IsInDesignMode)
+      {
+        this.Document = new TextDocument() { Text = "<Root IsValue=\"true\"><FirstChild Name=\"Robby\" Address=\"1521 Greenway Dr\"><Toys>All of them</Toys></FirstChild></Root>" };
+      }
+      else
+      {
+        this.Document = new TextDocument();
+      }
     }
 
 
 
-    public string CleanXmlIfPossible(string xml)
+    async public Task<string> CleanXmlIfPossibleAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
         return xml;
 
       var context = new XmlCleanerContext() { XmlToClean = xml };
 
-      foreach (var cleaner in this.Cleaners)
-      {
-        cleaner.CleanXml(context);
-      }
+      await CleanXml(context);
 
       return context.XmlToClean;
+    }
+
+
+
+    private async Task CleanXml(XmlCleanerContext context)
+    {
+      await Task.Run(() =>
+        {
+          foreach (var cleaner in this.Cleaners)
+          {
+            cleaner.CleanXml(context);
+
+            if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
+            {
+              this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage(context.ErrorMessage));
+              return;
+            }
+          }
+
+          if (context.ParsedXml != null)
+          {
+            this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("XML parsed correctly"));
+          }
+          else
+          {
+            this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
+          }
+        });
+
+      return;
     }
 
 
@@ -96,9 +126,18 @@ namespace eXeMeL.ViewModel
 
 
 
-    private void PasteCommand_Execute()
+    async private void SetDocumentTextFromClipboard()
     {
-      this.Document.Text = CleanXmlIfPossible(Clipboard.GetText());
+      var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
+
+      this.Document.Text = text;
+    }
+
+
+
+    private void RefreshCommand_Execute()
+    {
+      SetDocumentTextFromClipboard();
     }
 
 
