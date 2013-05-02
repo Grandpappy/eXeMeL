@@ -5,7 +5,7 @@ namespace eXeMeL.ViewModel.XmlCleaners
 {
   internal class VisualStudioVBScriptCleaner : XmlCleanerBase
   {
-    private const string DOUBLE_QUOTE_REGEX = "(=)?(\"\")(\\s)?";
+    private const string DOUBLE_QUOTE_REGEX = "(=)?(\"\")(\\s|/\\s?>)?";
     private const string DOUBLE_QUOTE = "\"\"";
     private const string SINGLE_QUOTE = "\"";
 
