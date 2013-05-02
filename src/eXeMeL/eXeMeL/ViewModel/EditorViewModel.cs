@@ -47,6 +47,7 @@ namespace eXeMeL.ViewModel
           new NewLineCleaner(),
           new SurroundingGarbageCleaner(),
           new VisualStudioCleaner(),
+          new VisualStudioVBScriptCleaner(),
           new AddedRootCleaner(),
           new FormatCleaner()
         };

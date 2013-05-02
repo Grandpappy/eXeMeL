@@ -119,6 +119,7 @@
     <Compile Include="ViewModel\XmlCleaners\NewLineCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\SurroundingGarbageCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
+    <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
     <Compile Include="View\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
