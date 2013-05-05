@@ -31,8 +31,8 @@ namespace eXeMeL.ViewModel
     public Settings Settings { get; private set; }
     public ICommand CopyCommand { get; private set; }
     public ICommand RefreshCommand { get; private set; }
-
-
+    public EditorFindViewModel FindViewModel { get; private set; }
+    public event EventHandler RefreshComplete;
 
 
     public EditorViewModel(Settings settings)
@@ -61,6 +61,8 @@ namespace eXeMeL.ViewModel
       {
         this.Document = new TextDocument();
       }
+
+      this.FindViewModel = new EditorFindViewModel(this.Document);
     }
 
 
@@ -127,18 +129,24 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void SetDocumentTextFromClipboard()
+    async private Task SetDocumentTextFromClipboardAsync()
     {
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
       this.Document.Text = text;
+
+      var handler = RefreshComplete;
+      if (handler != null)
+      {
+        handler(this, EventArgs.Empty);
+      }
     }
 
 
 
-    private void RefreshCommand_Execute()
+    async private void RefreshCommand_Execute()
     {
-      SetDocumentTextFromClipboard();
+      await SetDocumentTextFromClipboardAsync();
     }
 
 

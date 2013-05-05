@@ -14,7 +14,9 @@
   ShowTitleBar="False"
   Icon="Assets\eXeMeL Icon.ico"
   d:DesignWidth="742" d:DesignHeight="577"
+  Name="ControlRoot"
   >
+
 
   <MahApps:MetroWindow.Resources>
     <ResourceDictionary>
@@ -23,37 +25,17 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
         <ResourceDictionary Source="Resources/ThemeColors.xaml"/>
+        <ResourceDictionary Source="Resources/CommonStyles.xaml"/>
+        <ResourceDictionary Source="Resources/Icons.xaml"/>
       </ResourceDictionary.MergedDictionaries>
-
-
-      <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_settings">
-        <Ellipse Width="4" Height="4" Canvas.Left="22" Canvas.Top="22" Stretch="Fill" Fill="{DynamicResource BlackBrush}" />
-        <Path Width="19.6504" Height="19.6504" Canvas.Left="14.1748" Canvas.Top="14.1748" Stretch="Fill" Fill="{DynamicResource BlackBrush}" Data="F1 M 24.69,17.5542L 27.9094,14.793C 28.5138,15.05 29.0876,15.3647 29.6241,15.7302L 29.0458,19.93L 33.2747,20.2541C 33.5166,20.8524 33.7023,21.4794 33.8252,22.1286L 30.4458,24.69L 33.207,27.9094C 32.95,28.5137 32.6353,29.0876 32.2698,29.6241L 28.07,29.0458L 27.7459,33.2747C 27.1476,33.5166 26.5206,33.7023 25.8714,33.8252L 23.3099,30.4458L 20.0906,33.207C 19.4862,32.95 18.9124,32.6353 18.3759,32.2698L 18.9542,28.0699L 14.7253,27.7459C 14.4834,27.1476 14.2977,26.5206 14.1748,25.8713L 17.5542,23.3099L 14.793,20.0906C 15.05,19.4862 15.3647,18.9124 15.7302,18.3759L 19.93,18.9542L 20.2541,14.7252C 20.8524,14.4834 21.4794,14.2977 22.1286,14.1748L 24.69,17.5542 Z M 24,20C 21.7909,20 20,21.7909 20,24C 20,26.2091 21.7909,28 24,28C 26.2091,28 28,26.2091 28,24C 28,21.7909 26.2091,20 24,20 Z " />
-      </Canvas>
-
-
-      <Canvas x:Key="EditorIconCanvas" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
-        <Path Width="38" Height="34.8333" Canvas.Left="19" Canvas.Top="20.5833" Stretch="Fill" Fill="#FF000000" Data="F1 M 19,20.5833L 57,20.5833L 57,26.9167L 19,26.9167L 19,20.5833 Z M 19,30.0833L 57,30.0833L 57,36.4167L 19,36.4167L 19,30.0833 Z M 19,39.5833L 57,39.5833L 57,45.9167L 19,45.9167L 19,39.5833 Z M 19,49.0833L 57,49.0833L 57,55.4167L 19,55.4167L 19,49.0833 Z "/>
-      </Canvas>
-
-      <Canvas x:Key="NavigateXmlCanvas" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
-        <Path Width="43.5" Height="44.25" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="#FF000000" Data="F1 M 48,61.25L 36.5,50.5L 48,39.75L 48,45.25L 41.75,50.5L 48,55.75L 48,61.25 Z M 52,61.25L 52,55.75L 58.25,50.5L 52,45.25L 52,39.75L 63.5,50.5L 52,61.25 Z M 20,17L 42.25,17L 55,29.75L 55,41.5L 52,38.5L 52,34L 38,34L 38,21L 24,21L 24,55L 39.5,55L 43.75,59L 20,59L 20,17 Z M 42,22.25L 42,30L 49.75,30L 42,22.25 Z "/>
-      </Canvas>
-
-      <Canvas x:Key="CopyIcon" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
-        <Path Width="39" Height="44" Canvas.Left="20" Canvas.Top="15" Stretch="Fill" Fill="#FF000000" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L 59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L 46,25.25 Z "/>
-      </Canvas>
-
-      <Canvas x:Key="RefreshIcon" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
-        <Path Width="34.8333" Height="41.1667" Canvas.Left="20.5833" Canvas.Top="17.4167" Stretch="Fill" Fill="#FF000000" Data="F1 M 38,20.5833C 42.9908,20.5833 47.4912,22.6825 50.6667,26.046L 50.6667,17.4167L 55.4166,22.1667L 55.4167,34.8333L 42.75,34.8333L 38,30.0833L 46.8512,30.0833C 44.6768,27.6539 41.517,26.125 38,26.125C 31.9785,26.125 27.0037,30.6068 26.2296,36.4167L 20.6543,36.4167C 21.4543,27.5397 28.9148,20.5833 38,20.5833 Z M 38,49.875C 44.0215,49.875 48.9963,45.3932 49.7703,39.5833L 55.3457,39.5833C 54.5457,48.4603 47.0852,55.4167 38,55.4167C 33.0092,55.4167 28.5088,53.3175 25.3333,49.954L 25.3333,58.5833L 20.5833,53.8333L 20.5833,41.1667L 33.25,41.1667L 38,45.9167L 29.1487,45.9167C 31.3231,48.3461 34.483,49.875 38,49.875 Z "/>
-      </Canvas>
-
+    
       <Style x:Key="SectionHeaderStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{DynamicResource LabelTextBrush}"/>
         <Setter Property="FontSize" Value="26.667"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
       </Style>
 
+      
     </ResourceDictionary>
   </MahApps:MetroWindow.Resources>
 
@@ -65,31 +47,25 @@
 
 
 
-
   <MahApps:MetroWindow.WindowCommands>
     <MahApps:WindowCommands>
 
-      <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Replace all text with what's in the clipboard (F5)" >
+      <Button 
+        Command="{Binding Editor.RefreshCommand}" 
+        ToolTip="Replace all text with what's in the clipboard (F5)"
+        >
         <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20">
-            <Rectangle.Fill>
-              <VisualBrush Stretch="Uniform" Visual="{StaticResource RefreshIcon}" />
-            </Rectangle.Fill>
-          </Rectangle>
-          
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource RefreshIconBrush}"/>
           <TextBlock Text="refresh" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
         </StackPanel>
       </Button>
 
-      <Button Command="{Binding Editor.CopyCommand}" ToolTip="Copy all text to the clipboard">
+      <Button 
+        Command="{Binding Editor.CopyCommand}" 
+        ToolTip="Copy all text to the clipboard" 
+        >
         <StackPanel Orientation="Horizontal" Background="Transparent">
-
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}">
-            <Rectangle.OpacityMask>
-              <VisualBrush Visual="{StaticResource CopyIcon}" Stretch="Uniform" />
-            </Rectangle.OpacityMask>
-          </Rectangle>
-
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource CopyIconBrush}"/>
           <TextBlock Text="copy all" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
         </StackPanel>
       </Button>
@@ -123,6 +99,8 @@
   
   <MahApps:MetroWindow.InputBindings>
     <KeyBinding Key="F5" Command="{Binding Editor.RefreshCommand}"/>
+    <KeyBinding Modifiers="Control" Key="F" Command="{Binding FocusOnFindControlCommand, ElementName=ControlRoot}"/>
+    <KeyBinding Key="Escape" Command="{Binding ResetFocusCommand, ElementName=ControlRoot}"/>
   </MahApps:MetroWindow.InputBindings>
 
 
@@ -132,11 +110,13 @@
       <RowDefinition/>
       <RowDefinition Height="28"/>
     </Grid.RowDefinitions>
+    
     <Border Grid.Row="2">
       <Border.Background>
         <SolidColorBrush Color="{DynamicResource AccentColor}"/>
       </Border.Background>
     </Border>
+    
     <Border Grid.Row="1">
       <Grid>
         <Grid.RowDefinitions>
@@ -160,8 +140,18 @@
             </Rectangle>
 
             <TextBlock Text="Editor" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,0,0,0" Style="{DynamicResource SectionHeaderStyle}"/>
+            
+            <Grid
+              x:Name="EditorToolContainer" 
+              HorizontalAlignment="Right" 
+              VerticalAlignment="Top" 
+              Height="40" 
+              Width="400" 
+             >
+             <views:EditorFindView x:Name="EditorFindControl" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            </Grid>
 
-            <!--FontSize="14.667"-->
+
             <avalonEdit:TextEditor
               x:Name="AvalonEditor"
               Margin="0,50,0,0"
@@ -175,7 +165,15 @@
               ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
               WordWrap="{Binding Settings.WrapEditorText}"
               Background="{x:Null}"
-            />
+              >
+              <avalonEdit:TextEditor.Options>
+                <avalonEdit:TextEditorOptions
+                  EnableHyperlinks="False"
+                  EnableEmailHyperlinks="False"
+                  AllowScrollBelowDocument="True"
+                  />
+              </avalonEdit:TextEditor.Options>
+            </avalonEdit:TextEditor>
           </Grid>
         </Border>
 
@@ -250,7 +248,9 @@
     <Border Grid.Row="2" Background="{DynamicResource AccentColorBrush}" Padding="5,0">
       <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="2*"/>
+          <ColumnDefinition Width="4*"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>

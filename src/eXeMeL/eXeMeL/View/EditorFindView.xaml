@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="eXeMeL.View.EditorFindView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d" >
+  
+  
+  <UserControl.InputBindings>
+    <KeyBinding Key="F3" Command="{Binding FindViewModel.FindNextCommand}"/>
+    <KeyBinding Modifiers="Shift" Key="F3" Command="{Binding FindViewModel.FindPreviousCommand}"/>
+  </UserControl.InputBindings>
+  
+  
+  <Grid>
+    <StackPanel Orientation="Horizontal">
+      <TextBox 
+        x:Name="FindSearchText" 
+        Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}" 
+        MahApps:TextboxHelper.ClearTextButton="True" 
+        MahApps:TextboxHelper.SelectAllOnFocus="True" 
+        MahApps:TextboxHelper.Watermark="Find..." 
+        Width="200" 
+        Margin="0,0,10,0" 
+        FontSize="14" 
+        PreviewKeyDown="FindSearchText_PreviewKeyDown"
+        IsTabStop="False"
+        />
+      
+      <Button 
+        x:Name="FindNextButton" 
+        Command="{Binding FindViewModel.FindNextCommand}" 
+        Style="{DynamicResource IconButtonStyle}"
+        Background="{DynamicResource FindNextIconBrush}"
+        HorizontalAlignment="Center" 
+        VerticalAlignment="Center" 
+        ToolTip="Find Next (F3)"
+        Margin="0,0,10,0" 
+        />
+
+      <Button 
+        x:Name="FindPreviousButton" 
+        Command="{Binding FindViewModel.FindPreviousCommand}" 
+        Style="{DynamicResource IconButtonStyle}"
+        Background="{DynamicResource FindPreviousIconBrush}"
+        HorizontalAlignment="Center" 
+        VerticalAlignment="Center" 
+        ToolTip="Find Previous (Shift F3)"
+        />
+    </StackPanel>
+  </Grid>
+</UserControl>
