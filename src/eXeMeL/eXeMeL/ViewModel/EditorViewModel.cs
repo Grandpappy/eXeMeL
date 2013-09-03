@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.Command;
 using ICSharpCode.AvalonEdit.Document;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -154,6 +155,45 @@ namespace eXeMeL.ViewModel
     private void CopyCommand_Execute()
     {
       Clipboard.SetText(this.Document.Text);
+    }
+
+
+
+    public async void OpenFileAsync(string filePath)
+    {
+      try
+      {
+        if (!File.Exists(filePath))
+          return;
+
+        this.Document.Text = await LoadFileContentsAsync(filePath);
+
+        RaiseRefreshComplete();
+
+        this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
+      }
+      catch (Exception ex)
+      {
+        this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
+      }
+    }
+
+
+
+    private void RaiseRefreshComplete()
+    {
+      var handler = RefreshComplete;
+      if (handler != null)
+      {
+        handler(this, EventArgs.Empty);
+      }
+    }
+
+
+
+    private async Task<string> LoadFileContentsAsync(string filePath)
+    {
+      return await Task<string>.Run(() => { return File.ReadAllText(filePath); } );
     }
   }
 }

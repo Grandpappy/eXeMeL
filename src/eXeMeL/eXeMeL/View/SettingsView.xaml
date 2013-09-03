@@ -7,6 +7,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
   mc:Ignorable="d" 
   d:DesignHeight="300" d:DesignWidth="300"
+  Foreground="White"
   Width="350">
 
   <UserControl.Resources>
@@ -39,8 +40,8 @@
 
       <TextBlock Text="Editor Settings" Style="{StaticResource SettingGroupHeaderStyle}"/>
       
-      <MahApps:ToggleSwitch Grid.Column="0" Grid.Row="1" IsChecked="{Binding ShowEditorLineNumbers}" Header="Line Numbers"/>
-      <MahApps:ToggleSwitch Grid.Column="2" Grid.Row="1" IsChecked="{Binding WrapEditorText}" Header="Wrap Editor Text"/>
+      <MahApps:ToggleSwitch Grid.Column="0" Grid.Row="1" IsChecked="{Binding ShowEditorLineNumbers}" Header="Line Numbers" Foreground="White"/>
+      <MahApps:ToggleSwitch Grid.Column="2" Grid.Row="1" IsChecked="{Binding WrapEditorText}" Header="Wrap Editor Text" Foreground="White"/>
       
       <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Margin="10,20,0,0">
         <Grid.ColumnDefinitions>

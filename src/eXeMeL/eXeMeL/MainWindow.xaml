@@ -6,6 +6,7 @@
   xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
   ResizeMode="CanResize"
   SaveWindowPosition="True"
   mc:Ignorable="d" 
@@ -14,7 +15,8 @@
   ShowTitleBar="False"
   Icon="Assets\eXeMeL Icon.ico"
   d:DesignWidth="742" d:DesignHeight="577"
-  Name="ControlRoot"
+  x:Name="ControlRoot"
+  GlowBrush="#FFD4AA00"
   >
 
 
@@ -85,14 +87,20 @@
 
 
   <MahApps:MetroWindow.Flyouts>
-    <MahApps:Flyout
-      x:Name="SettingsFlyout"
-      Header="Settings"
-      IsOpen="False"
-      Background="{DynamicResource SettingsBackgroundBrush}"
-      >
-      <views:SettingsView DataContext="{Binding Settings}"/>
-    </MahApps:Flyout>
+    <MahApps:FlyoutsControl>
+      <MahApps:FlyoutsControl.Items>
+        <MahApps:Flyout
+            x:Name="SettingsFlyout"
+            Header="Settings"
+            IsOpen="False"
+            Background="{DynamicResource SettingsBackgroundBrush}"
+            >
+          <views:SettingsView DataContext="{Binding Settings}"/>
+        </MahApps:Flyout>
+      </MahApps:FlyoutsControl.Items>
+    </MahApps:FlyoutsControl>
+    
+    
   </MahApps:MetroWindow.Flyouts>
   
   
@@ -104,7 +112,40 @@
   </MahApps:MetroWindow.InputBindings>
 
 
-  <Grid>
+  <Grid Background="#00000000">
+    <i:Interaction.Triggers>
+      <i:EventTrigger EventName="DragLeave">
+        <ei:GoToStateAction StateName="NoDragDrop"/>
+      </i:EventTrigger>
+      <i:EventTrigger EventName="DragEnter">
+        <ei:GoToStateAction StateName="DragOver"/>
+      </i:EventTrigger>
+      <i:EventTrigger EventName="Drop">
+        <ei:GoToStateAction StateName="NoDragDrop"/>
+      </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="DragDropStates">
+        <VisualStateGroup.Transitions>
+          <VisualTransition GeneratedDuration="0:0:0.2"/>
+        </VisualStateGroup.Transitions>
+        <VisualState x:Name="NoDragDrop"/>
+        <VisualState x:Name="DragOver">
+          <Storyboard>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="FileDragDropIndicator">
+              <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="FileDragDropIndicator">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.IsHitTestVisible)" Storyboard.TargetName="FileDragDropIndicator">
+              <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+            </BooleanAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+    
     <Grid.RowDefinitions>
       <RowDefinition Height="40"/>
       <RowDefinition/>
@@ -148,7 +189,7 @@
               Height="40" 
               Width="400" 
              >
-             <views:EditorFindView x:Name="EditorFindControl" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+              <views:EditorFindView x:Name="EditorFindControl" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
 
 
@@ -181,7 +222,7 @@
           <Grid>
             <Button HorizontalAlignment="Stretch" Margin="-5,0,-5,-5">
               <Button.Template>
-                <ControlTemplate TargetType="Button">
+                <ControlTemplate TargetType="{x:Type Button}">
                   <Border Background="{DynamicResource Gray4Brush}" Padding="5,0,5,5">
                     <VisualStateManager.VisualStateGroups>
                       <VisualStateGroup x:Name="CommonStates">
@@ -247,6 +288,15 @@
 
     <Border Grid.Row="2" Background="{DynamicResource AccentColorBrush}" Padding="5,0">
       <Grid VerticalAlignment="Center">
+      
+        <Grid.Resources>
+          <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+          </Style>
+        </Grid.Resources>
+
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="4*"/>
           <ColumnDefinition Width="*"/>
@@ -254,17 +304,14 @@
           <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-      
-        <Grid.Resources>
-          <Style TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}"/>
-            <Setter Property="FontSize" Value="14"/>
-          </Style>
-        </Grid.Resources>
 
         <TextBlock Grid.Row="0" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
       </Grid>
     </Border>
+    <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">
+      <Rectangle.Fill>
+        <SolidColorBrush Color="{DynamicResource AccentColor3}"/>
+      </Rectangle.Fill>
+    </Rectangle>
   </Grid>
 </MahApps:MetroWindow>

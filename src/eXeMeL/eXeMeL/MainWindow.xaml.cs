@@ -43,6 +43,8 @@ namespace eXeMeL
       this.Closing += MainWindow_Closing;
       this.Loaded += MainWindow_Loaded;
       this.DataContextChanged += MainWindow_DataContextChanged;
+      this.AllowDrop = true;
+      this.Drop += MainWindow_Drop;
       this.FocusOnFindControlCommand = new RelayCommand(FocusOnFindControlCommand_Executed);
       this.ResetFocusCommand = new RelayCommand(ResetFocusCommand_Executed);
 
@@ -52,6 +54,17 @@ namespace eXeMeL
 
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
+    }
+
+
+    
+    private void MainWindow_Drop(object sender, DragEventArgs e)
+    {
+      if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
+      {
+        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        this.ViewModel.Editor.OpenFileAsync(files[0]);
+      }
     }
 
 
@@ -101,7 +114,14 @@ namespace eXeMeL
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-      this.ViewModel.Editor.RefreshCommand.Execute(null);
+      if (StartupOptions.InitialFilePath == null)
+      {
+        this.ViewModel.Editor.RefreshCommand.Execute(null);
+      }
+      else
+      {
+        this.ViewModel.Editor.OpenFileAsync(StartupOptions.InitialFilePath);
+      }
     }
 
 
