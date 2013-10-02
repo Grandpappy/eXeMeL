@@ -161,6 +161,11 @@ namespace eXeMeL
 
     private void FocusOnFindControlCommand_Executed()
     {
+      if (!string.IsNullOrEmpty(this.AvalonEditor.SelectedText))
+      { 
+        GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<SetSearchTextMessage>(new SetSearchTextMessage(this.AvalonEditor.SelectedText));
+      }
+      
       this.EditorFindControl.Focus();
     }
 

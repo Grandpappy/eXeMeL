@@ -21,8 +21,6 @@ namespace eXeMeL.ViewModel
 
 
     private TextDocument Document { get; set; }
-    //private DispatcherTimer AutoFindTimer { get; set; }
-    
 
     private string _currentFindValue;
     private int _matchCount;
@@ -45,9 +43,6 @@ namespace eXeMeL.ViewModel
         this.Matches = null;
 
         PerformFindNextSearch();
-
-        //this.AutoFindTimer.Stop();
-        //this.AutoFindTimer.Start();
       }
     }
 
@@ -158,18 +153,22 @@ namespace eXeMeL.ViewModel
       this.FindNextCommand = new RelayCommand(FindNextCommand_Execute, FindNextCommand_CanExecute);
       this.FindPreviousCommand = new RelayCommand(FindPreviousCommand_Execute, FindPreviousCommand_CanExecute);
 
-      InitializeAutoFindTimer();
+      this.MessengerInstance.Register<SetSearchTextMessage>(this, HandleSetFindTextMessage);
 
       this.SearchText = string.Empty;
     }
 
 
+       
+    #endregion
 
-    private void InitializeAutoFindTimer()
+
+    #region Message Handling
+
+
+    private void HandleSetFindTextMessage(SetSearchTextMessage message)
     {
-      //this.AutoFindTimer = new DispatcherTimer();
-      //this.AutoFindTimer.Interval = 250.Milliseconds();
-      //this.AutoFindTimer.Tick += AutoFindTimer_Tick;
+      this.SearchText = message.SearchText;
     }
 
 
