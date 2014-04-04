@@ -23,7 +23,7 @@
   <MahApps:MetroWindow.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
         <ResourceDictionary Source="Resources/ThemeColors.xaml"/>
@@ -124,6 +124,7 @@
         <ei:GoToStateAction StateName="NoDragDrop"/>
       </i:EventTrigger>
     </i:Interaction.Triggers>
+    
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="DragDropStates">
         <VisualStateGroup.Transitions>
@@ -206,7 +207,14 @@
               ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
               WordWrap="{Binding Settings.WrapEditorText}"
               Background="{x:Null}"
+              MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
               >
+              <avalonEdit:TextEditor.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
+                  <MenuItem Header="View Decoded XML" Command="{Binding ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand}"/>
+                </ContextMenu>
+              </avalonEdit:TextEditor.ContextMenu>
               <avalonEdit:TextEditor.Options>
                 <avalonEdit:TextEditorOptions
                   EnableHyperlinks="False"

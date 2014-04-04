@@ -51,12 +51,13 @@ namespace eXeMeL
       InitializeComponent();
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
+      this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
 
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
     }
 
-
+    
     
     private void MainWindow_Drop(object sender, DragEventArgs e)
     {
@@ -77,6 +78,7 @@ namespace eXeMeL
 
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SelectTextInEditorMessage>(this, HandleSelectTextInEditorMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<UnselectTextInEditorMessage>(this, HandleUnselectTextInEditorMessage);
+      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<DocumentTextReplacedMessage>(this, HandleDocumentTextReplacedMessage);
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
 
@@ -101,7 +103,15 @@ namespace eXeMeL
     }
 
 
-    
+
+    private void HandleDocumentTextReplacedMessage(DocumentTextReplacedMessage obj)
+    {
+      this.AvalonEditor.ScrollToHome();
+      this.AvalonEditor.CaretOffset = 0;
+    }
+
+
+
     private void HandleChangedDocumentText(TextDocument document)
     {
       if (this.FoldingManager != null && this.FoldingStrategy != null)
@@ -141,6 +151,24 @@ namespace eXeMeL
       //  var cleanText = this.ViewModel.Editor.CleanXmlIfPossible(Clipboard.GetText());
       //  Clipboard.SetText(cleanText);
       //}
+    }
+
+
+
+    private void AvalonEditor_CaretPositionChanged(object sender, EventArgs e)
+    {
+      this.ViewModel.Editor.CaretPosition = this.AvalonEditor.TextArea.Caret.Position;
+    }
+
+
+    
+    private void AvalonEditor_TextAreaMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+      var position = this.AvalonEditor.GetPositionFromPoint(e.GetPosition(this.AvalonEditor));
+      if (position.HasValue)
+      {
+        this.AvalonEditor.TextArea.Caret.Position = position.Value;
+      }
     }
 
 

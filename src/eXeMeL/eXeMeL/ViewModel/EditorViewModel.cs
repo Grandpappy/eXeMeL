@@ -4,6 +4,7 @@ using eXeMeL.ViewModel.XmlCleaners;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Web;
+using eXeMeL.Utilities;
+
 
 namespace eXeMeL.ViewModel
 {
@@ -27,13 +31,15 @@ namespace eXeMeL.ViewModel
       set { this.Set(() => Document, ref _Document, value); }
     }
 
-
-
     public Settings Settings { get; private set; }
     public ICommand CopyCommand { get; private set; }
     public ICommand RefreshCommand { get; private set; }
+    public ICommand CopyDecodedXmlFromCursorPositionCommand { get; private set; }
+    public ICommand ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand { get; private set; }
     public EditorFindViewModel FindViewModel { get; private set; }
     public event EventHandler RefreshComplete;
+    public TextViewPosition CaretPosition { get; set; }
+
 
 
     public EditorViewModel(Settings settings)
@@ -42,6 +48,8 @@ namespace eXeMeL.ViewModel
 
       this.CopyCommand = new RelayCommand(CopyCommand_Execute);
       this.RefreshCommand = new RelayCommand(RefreshCommand_Execute);
+      this.CopyDecodedXmlFromCursorPositionCommand = new RelayCommand(CopyDecodedXmlFromCursorPositionCommand_Execute, CopyDecodedXmlFromCursorPositionCommand_CanExecute);
+      this.ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand = new RelayCommand(ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand_Execute);
       this.Cleaners = new List<XmlCleanerBase>()
         {
           new TrimCleaner(),
@@ -134,7 +142,7 @@ namespace eXeMeL.ViewModel
     {
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
-      this.Document.Text = text;
+      ReplaceDocumentText(text);
 
       var handler = RefreshComplete;
       if (handler != null)
@@ -145,9 +153,58 @@ namespace eXeMeL.ViewModel
 
 
 
+    private void ReplaceDocumentText(string newText)
+    {
+      this.Document.Text = newText;
+      this.MessengerInstance.Send(new DocumentTextReplacedMessage());
+    }
+
+
+
     async private void RefreshCommand_Execute()
     {
       await SetDocumentTextFromClipboardAsync();
+    }
+
+
+
+    async private void CopyDecodedXmlFromCursorPositionCommand_Execute()
+    {
+      var decodedText = await GetDecodedTextAtCaretPositionAsync();
+      if (decodedText != null)
+      {
+        Clipboard.SetText(decodedText);
+      }
+    }
+
+
+
+    private bool CopyDecodedXmlFromCursorPositionCommand_CanExecute()
+    {
+      return true;
+    }
+
+
+
+    async private void ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand_Execute()
+    {
+      var decodedText = await GetDecodedTextAtCaretPositionAsync();
+      if (decodedText != null)
+      {
+        var cleanedText = await CleanXmlIfPossibleAsync(decodedText);
+        ReplaceDocumentText(cleanedText);
+      }
+    }
+
+
+
+    private async Task<string> GetDecodedTextAtCaretPositionAsync()
+    {
+      var searchUtility = new EncodedXmlExtractor(this.Document.Text);
+      var caretOffset = this.Document.GetOffset(this.CaretPosition.Location);
+
+      var decodedText = await searchUtility.GetDecodedXmlAroundIndexAsync(caretOffset);
+      return decodedText;
     }
 
 
@@ -166,7 +223,8 @@ namespace eXeMeL.ViewModel
         if (!File.Exists(filePath))
           return;
 
-        this.Document.Text = await LoadFileContentsAsync(filePath);
+        var fileContents = await LoadFileContentsAsync(filePath);
+        ReplaceDocumentText(fileContents);
 
         RaiseRefreshComplete();
 
@@ -195,5 +253,7 @@ namespace eXeMeL.ViewModel
     {
       return await Task<string>.Run(() => { return File.ReadAllText(filePath); } );
     }
+
+    
   }
 }
