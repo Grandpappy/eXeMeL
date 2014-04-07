@@ -27,15 +27,19 @@ namespace eXeMeL
       var arguments = AppDomain.CurrentDomain.SetupInformation.ActivationArguments;
       if (arguments != null && arguments.ActivationData != null && arguments.ActivationData.Length > 0)
       {
-        var fileName = arguments.ActivationData[0];
-        var uri = new Uri(fileName);
-        StartupOptions.InitialFilePath = uri.LocalPath;
+        // This is causing the application manifest to load!
+        //var fileName = arguments.ActivationData[0];
+        //var uri = new Uri(fileName);
+        //StartupOptions.InitialFilePath = uri.LocalPath;
+        
+        StartupOptions.InitialFilePath = arguments.ActivationData[0];
       }
-      else
-      if (e.Args.Length > 0)
-      {
-        StartupOptions.InitialFilePath = e.Args[0];
-      }
+      // This is causing the application manifest to load!
+      //else
+      //if (e.Args.Length > 0)
+      //{
+      //  StartupOptions.InitialFilePath = e.Args[0];
+      //}
     }
   }
 }
