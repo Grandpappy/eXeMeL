@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace eXeMeL
 {
@@ -33,6 +34,8 @@ namespace eXeMeL
     private XmlFoldingStrategy FoldingStrategy { get; set; }
     private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
+    private PropertyObserver<EditorViewModel> EditorObserver { get; set; }
+    private bool IgnoreNextTextChange { get; set; }
 
     public ICommand FocusOnFindControlCommand { get; private set; }
     public ICommand ResetFocusCommand { get; private set; }
@@ -51,14 +54,32 @@ namespace eXeMeL
       InitializeComponent();
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
+      this.AvalonEditor.TextArea.DocumentChanged += TextArea_DocumentChanged;
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
-
+      this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
+      
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
+
+      this.IgnoreNextTextChange = false;
     }
 
-    
-    
+
+
+    private void AvalonEditor_TextChanged(object sender, EventArgs e)
+    {
+      if (!this.IgnoreNextTextChange)
+      {
+        this.ViewModel.Editor.ClearSnapshotsAfterDocument(this.AvalonEditor.TextArea.Document);
+      }
+      else
+      {
+        this.IgnoreNextTextChange = false;
+      }
+    }
+
+
+
     private void MainWindow_Drop(object sender, DragEventArgs e)
     {
       if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
@@ -81,11 +102,31 @@ namespace eXeMeL
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<DocumentTextReplacedMessage>(this, HandleDocumentTextReplacedMessage);
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
+      this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
     }
 
 
+
+    private void TextArea_DocumentChanged(object sender, EventArgs e)
+    {
+      this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
+    }
+
+    
+
+    private void Editor_PropertyChanging(object sender, PropertyChangingEventArgs e)
+    {
+      if (e.PropertyName == "Document")
+      {
+        FoldingManager.Uninstall(this.FoldingManager);
+        this.FoldingManager = null;
+        this.IgnoreNextTextChange = true;
+      };
+    }
+   
+    
 
     private void HandleSelectTextInEditorMessage(SelectTextInEditorMessage message)
     {
@@ -110,7 +151,7 @@ namespace eXeMeL
       this.AvalonEditor.CaretOffset = 0;
     }
 
-
+    
 
     private void HandleChangedDocumentText(TextDocument document)
     {

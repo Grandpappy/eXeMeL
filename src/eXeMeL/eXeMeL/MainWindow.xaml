@@ -174,34 +174,51 @@
         <Border Grid.Column="0" Margin="0" Padding="5,0,5,5" DataContext="{Binding Editor}">
 
           <Grid>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <Rectangle Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,5,5" Fill="{DynamicResource AccentColorBrush}">
-              <Rectangle.OpacityMask>
-                <VisualBrush Visual="{StaticResource EditorIconCanvas}" Stretch="Fill" />
-              </Rectangle.OpacityMask>
-            </Rectangle>
+            <Grid Grid.Row="0" Height="40" >
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Editor" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="45,0,0,0" Style="{DynamicResource SectionHeaderStyle}"/>
-            
-            <Grid
-              x:Name="EditorToolContainer" 
-              HorizontalAlignment="Right" 
-              VerticalAlignment="Top" 
-              Height="40" 
-              Width="400" 
-             >
-              <views:EditorFindView x:Name="EditorFindControl" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+              <Rectangle Grid.Column="0" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,10,5,5" Fill="{DynamicResource AccentColorBrush}">
+                <Rectangle.OpacityMask>
+                  <VisualBrush Visual="{StaticResource EditorIconCanvas}" Stretch="Fill" />
+                </Rectangle.OpacityMask>
+              </Rectangle>
+
+              <TextBlock Grid.Column="1" Text="Editor" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Style="{DynamicResource SectionHeaderStyle}"/>
+              
+              <views:EditorSnapshotView 
+                x:Name="EditorSnapshotControl" 
+                Grid.Column="2" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Center"
+                />
+              <views:EditorFindView 
+                x:Name="EditorFindControl" 
+                Grid.Column="3" 
+                Margin="20,0,0,0"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Center"
+                />
             </Grid>
-
 
             <avalonEdit:TextEditor
               x:Name="AvalonEditor"
-              Margin="0,50,0,0"
+              Grid.Row="1"
+              Margin="0,15,0,0"
               FontFamily="Consolas" 
               FontSize="{Binding Settings.EditorFontSize}" 
               SyntaxHighlighting="XML" 
               BorderThickness="1" 
-              Document="{Binding Document}" 
+              Document="{Binding Document}"
               VerticalScrollBarVisibility="Auto" 
               HorizontalScrollBarVisibility="Auto"
               ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
@@ -211,8 +228,8 @@
               >
               <avalonEdit:TextEditor.ContextMenu>
                 <ContextMenu>
+                  <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
                   <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
-                  <MenuItem Header="View Decoded XML" Command="{Binding ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand}"/>
                 </ContextMenu>
               </avalonEdit:TextEditor.ContextMenu>
               <avalonEdit:TextEditor.Options>
@@ -313,7 +330,7 @@
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="5" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
       </Grid>
     </Border>
     <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">

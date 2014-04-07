@@ -120,6 +120,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Messages\ActivateSnapshotMessage.cs" />
     <Compile Include="Messages\ApplicationClosingMessage.cs" />
     <Compile Include="Messages\DisplayApplicationStatusMessage.cs" />
     <Compile Include="Messages\GoToTopOfDocumentMessage.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\XmlParser.cs" />
     <Compile Include="ViewModel\EditorFindViewModel.cs" />
+    <Compile Include="ViewModel\DocumentSnapshot.cs" />
     <Compile Include="ViewModel\EditorViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
@@ -142,6 +144,9 @@
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
     <Compile Include="View\EditorFindView.xaml.cs">
       <DependentUpon>EditorFindView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\EditorSnapshotView.xaml.cs">
+      <DependentUpon>EditorSnapshotView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
@@ -176,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\EditorFindView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\EditorSnapshotView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

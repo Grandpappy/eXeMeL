@@ -42,7 +42,7 @@ namespace eXeMeL.ViewModel
         this.Set(() => SearchText, ref _currentFindValue, value);
         this.Matches = null;
 
-        PerformFindNextSearch();
+        PerformFindNextSearchAsync();
       }
     }
 
@@ -187,12 +187,12 @@ namespace eXeMeL.ViewModel
 
     async private void FindNextCommand_Execute()
     {
-      await PerformFindNextSearch();
+      await PerformFindNextSearchAsync();
     }
 
 
 
-    private async Task PerformFindNextSearch()
+    async private Task PerformFindNextSearchAsync()
     {
       if (IsSearchNeeded())
       {
@@ -255,7 +255,7 @@ namespace eXeMeL.ViewModel
       if (IsSearchTextValidForAutomaticSearching())
         return;
 
-      await PerformFindNextSearch();
+      await PerformFindNextSearchAsync();
       //this.AutoFindTimer.Stop();
     }
 

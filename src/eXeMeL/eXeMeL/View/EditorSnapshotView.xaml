@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="eXeMeL.View.EditorSnapshotView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:vm="clr-namespace:eXeMeL.ViewModel"
+             mc:Ignorable="d" 
+             Name="ControlRoot"
+             d:DesignHeight="40" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance Type=vm:EditorViewModel, IsDesignTimeCreatable=True}"
+      >
+	<UserControl.Resources>
+		<DataTemplate x:Key="SnapshotDataTemplate">
+			<Border Margin="2,0">
+        <Button 
+          x:Name="SelectSnapshotButton" 
+          Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}" 
+          CommandParameter="{Binding}"
+          Content="{Binding Identifier}" 
+          MinWidth="30" Height="30"
+          Focusable="False"
+          >
+          <Button.ToolTip>
+            <StackPanel Orientation="Vertical">
+              <TextBlock Text="Go to this snapshot" FontWeight="Bold"/>
+              <TextBlock Text="{Binding Document.Text}" Margin="10,10,5,0" MaxWidth="400" MaxHeight="200" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Button.ToolTip>
+        </Button>
+      </Border>
+		</DataTemplate>
+	</UserControl.Resources>
+  
+  <Grid >
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
+
+    <ItemsControl 
+      x:Name="SnapshotItemsControl"
+      Grid.Column="0" 
+      HorizontalAlignment="Right" VerticalAlignment="Center"
+      ItemsSource="{Binding Snapshots}" ItemTemplate="{DynamicResource SnapshotDataTemplate}" BorderThickness="0,0,10,0"
+      
+      >
+		  <ItemsControl.ItemsPanel>
+			  <ItemsPanelTemplate>
+				  <StackPanel Orientation="Horizontal"/>
+			  </ItemsPanelTemplate>
+		  </ItemsControl.ItemsPanel>
+      
+      <ItemsControl.Style>
+        <Style TargetType="ItemsControl">
+          <Setter Property="Visibility" Value="Visible"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Snapshots.Count}" Value="1">
+              <Setter Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ItemsControl.Style>
+	  </ItemsControl>
+
+    <Button 
+      Grid.Column="1"
+      Style="{DynamicResource IconButtonStyle}"
+      Background="{DynamicResource AddSnapshotBrush}"
+      VerticalAlignment="Center" 
+      ToolTip="Add a new snapshot from this version of the document.  The document's contents and the undo stack will be included in the new snapshot."
+      Command="{Binding CreateSnapshotCommand}" 
+      >
+    </Button>
+  </Grid>
+</UserControl>

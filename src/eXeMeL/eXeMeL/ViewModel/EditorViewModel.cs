@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Web;
 using eXeMeL.Utilities;
+using System.Collections.ObjectModel;
 
 
 namespace eXeMeL.ViewModel
@@ -23,7 +24,7 @@ namespace eXeMeL.ViewModel
   {
     private TextDocument _Document;
     private List<XmlCleanerBase> Cleaners;
-
+    public ObservableCollection<DocumentSnapshot> Snapshots { get; set; }
 
     public TextDocument Document
     {
@@ -35,21 +36,23 @@ namespace eXeMeL.ViewModel
     public ICommand CopyCommand { get; private set; }
     public ICommand RefreshCommand { get; private set; }
     public ICommand CopyDecodedXmlFromCursorPositionCommand { get; private set; }
-    public ICommand ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand { get; private set; }
+    public ICommand DelveIntoDecodedXmlFromCursorPositionCommand { get; private set; }
+    public ICommand CreateSnapshotCommand { get; private set; }
+    public ICommand ChangeToSnapshotCommand { get; private set; }
     public EditorFindViewModel FindViewModel { get; private set; }
     public event EventHandler RefreshComplete;
     public TextViewPosition CaretPosition { get; set; }
 
 
-
-    public EditorViewModel(Settings settings)
+    public EditorViewModel()
     {
-      this.Settings = settings;
-
       this.CopyCommand = new RelayCommand(CopyCommand_Execute);
       this.RefreshCommand = new RelayCommand(RefreshCommand_Execute);
       this.CopyDecodedXmlFromCursorPositionCommand = new RelayCommand(CopyDecodedXmlFromCursorPositionCommand_Execute, CopyDecodedXmlFromCursorPositionCommand_CanExecute);
-      this.ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand = new RelayCommand(ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand_Execute);
+      this.DelveIntoDecodedXmlFromCursorPositionCommand = new RelayCommand(DelveIntoDecodedXmlFromCursorPositionCommand_Execute);
+      this.CreateSnapshotCommand = new RelayCommand(CreateSnapshotCommand_Execute);
+      this.ChangeToSnapshotCommand = new RelayCommand<DocumentSnapshot>(ChangeToSnapshotCommand_Execute);
+      this.Snapshots = new ObservableCollection<DocumentSnapshot>();
       this.Cleaners = new List<XmlCleanerBase>()
         {
           new TrimCleaner(),
@@ -65,17 +68,28 @@ namespace eXeMeL.ViewModel
       if (IsInDesignMode)
       {
         this.Document = new TextDocument() { Text = "<Root IsValue=\"true\"><FirstChild Name=\"Robby\" Address=\"1521 Greenway Dr\"><Toys>All of them</Toys></FirstChild></Root>" };
+        this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "Original"));
+        this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "1"));
+        this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "Current"));
       }
       else
       {
         this.Document = new TextDocument();
       }
 
-      this.FindViewModel = new EditorFindViewModel(this.Document);
+      this.FindViewModel = new EditorFindViewModel(this.Document);   
     }
 
 
 
+    public EditorViewModel(Settings settings)
+      : this()
+    {
+      this.Settings = settings;
+    }
+
+
+    
     async public Task<string> CleanXmlIfPossibleAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
@@ -142,7 +156,7 @@ namespace eXeMeL.ViewModel
     {
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
-      ReplaceDocumentText(text);
+      ReplaceOldDocumentWithNewDocument(text);
 
       var handler = RefreshComplete;
       if (handler != null)
@@ -153,7 +167,26 @@ namespace eXeMeL.ViewModel
 
 
 
-    private void ReplaceDocumentText(string newText)
+    private void ResetSnapshots()
+    {
+      this.Snapshots.Clear();
+      this.Snapshots.Add(new DocumentSnapshot(this.Document));
+      RenameAllSnapshots();
+    }
+
+
+
+    private void ReplaceOldDocumentWithNewDocument(string newText)
+    {
+      this.Document = new TextDocument() { Text = newText };
+      ResetSnapshots();
+
+      this.MessengerInstance.Send(new DocumentTextReplacedMessage());
+    }
+
+
+
+    private void ReplaceCurrentDocumentText(string newText)
     {
       this.Document.Text = newText;
       this.MessengerInstance.Send(new DocumentTextReplacedMessage());
@@ -186,13 +219,14 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void ReplaceEditorContentsWithDecodedXmlFromCursorPositionCommand_Execute()
+    async private void DelveIntoDecodedXmlFromCursorPositionCommand_Execute()
     {
       var decodedText = await GetDecodedTextAtCaretPositionAsync();
       if (decodedText != null)
       {
         var cleanedText = await CleanXmlIfPossibleAsync(decodedText);
-        ReplaceDocumentText(cleanedText);
+        ClearSnapshotsAfterDocument(this.Document);
+        AddNewSnapshotWithNewText(cleanedText);
       }
     }
 
@@ -224,7 +258,7 @@ namespace eXeMeL.ViewModel
           return;
 
         var fileContents = await LoadFileContentsAsync(filePath);
-        ReplaceDocumentText(fileContents);
+        ReplaceOldDocumentWithNewDocument(fileContents);
 
         RaiseRefreshComplete();
 
@@ -249,10 +283,101 @@ namespace eXeMeL.ViewModel
 
 
 
+    #region Snapshot Handling
+
+
+
+    private void CreateSnapshotCommand_Execute()
+    {
+      AddNewSnapshotOfCurrentDocumentText();
+    }
+
+
+
+    private void ChangeToSnapshotCommand_Execute(DocumentSnapshot snapshot)
+    {
+      ChangeToSnapshot(snapshot);
+    }
+
+
+
     private async Task<string> LoadFileContentsAsync(string filePath)
     {
       return await Task<string>.Run(() => { return File.ReadAllText(filePath); } );
     }
+
+
+
+    private void AddNewSnapshotOfCurrentDocumentText()
+    {
+      AddNewSnapshotWithNewText(this.Document.Text);
+    }
+
+
+
+    private void AddNewSnapshotWithNewText(string text)
+    {
+      this.Document = new TextDocument() { Text = text};
+      this.Snapshots.Add(new DocumentSnapshot(this.Document));
+
+      RenameAllSnapshots();
+    }
+
+
+
+    private void RenameAllSnapshots()
+    {
+      var index = 0;
+      foreach (var s in this.Snapshots)
+      {
+        if (index == 0)
+        {
+          s.Identifier = "Original";
+        }
+        else
+        if (index == this.Snapshots.Count - 1)
+        {
+          s.Identifier = "Current";
+        }
+        else
+        {
+          s.Identifier = index.ToString();
+        }
+
+        index += 1;
+      }
+    }
+
+
+
+    private void ChangeToSnapshot(DocumentSnapshot snapshot)
+    {
+      this.Document = snapshot.Document;
+    }
+
+
+
+    internal void ClearSnapshotsAfterDocument(TextDocument textDocument)
+    {
+      if (textDocument == null || this.Snapshots.Count <= 1 || textDocument == this.Snapshots.Last().Document)
+        return;
+
+      var snapshot = this.Snapshots.FirstOrDefault(x => x.Document == textDocument);
+      if (snapshot == null)
+        return;
+
+      var indexOfItemToRemove = this.Snapshots.IndexOf(snapshot) + 1;
+      var itemsToRemove = new List<DocumentSnapshot>();
+      for (var i = indexOfItemToRemove; i < this.Snapshots.Count; i++)
+      {
+        itemsToRemove.Add(this.Snapshots.ElementAt(i));
+      }
+
+      itemsToRemove.ForEach(x => this.Snapshots.Remove(x));
+    }
+
+
+    #endregion
 
     
   }

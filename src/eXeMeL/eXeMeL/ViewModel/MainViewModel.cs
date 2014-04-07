@@ -47,5 +47,6 @@ namespace eXeMeL.ViewModel
     {
       this.Status = message.NewStatus;
     }
+
   }
 }
