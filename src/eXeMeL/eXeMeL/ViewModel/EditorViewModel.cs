@@ -16,21 +16,53 @@ using System.Windows.Input;
 using System.Web;
 using eXeMeL.Utilities;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
 
 
 namespace eXeMeL.ViewModel
 {
   public class EditorViewModel : ViewModelBase
   {
+    private bool _IsContentFromFile;
     private TextDocument _Document;
+    private string _FilePath;
+    private string _FileName;
+
     private List<XmlCleanerBase> Cleaners;
     public ObservableCollection<DocumentSnapshot> Snapshots { get; set; }
+
 
     public TextDocument Document
     {
       get { return _Document; }
-      set { this.Set(() => Document, ref _Document, value); }
+      private set { this.Set(() => Document, ref _Document, value); }
     }
+
+
+    
+    public bool IsContentFromFile
+    {
+      get { return _IsContentFromFile; }
+      private set { this.Set(() => this.IsContentFromFile, ref _IsContentFromFile, value); }
+    }
+
+
+    
+    public string FilePath
+    {
+      get { return _FilePath; }
+      private set { this.Set(() => this.FilePath, ref _FilePath, value); }
+    }
+
+
+
+    public string FileName
+    {
+      get { return _FileName; }
+      private set { this.Set(() => this.FileName, ref _FileName, value); }
+    }
+
+
 
     public Settings Settings { get; private set; }
     public ICommand CopyCommand { get; private set; }
@@ -39,6 +71,7 @@ namespace eXeMeL.ViewModel
     public ICommand DelveIntoDecodedXmlFromCursorPositionCommand { get; private set; }
     public ICommand CreateSnapshotCommand { get; private set; }
     public ICommand ChangeToSnapshotCommand { get; private set; }
+    public ICommand SaveCommand { get; private set; }
     public EditorFindViewModel FindViewModel { get; private set; }
     public event EventHandler RefreshComplete;
     public TextViewPosition CaretPosition { get; set; }
@@ -52,6 +85,7 @@ namespace eXeMeL.ViewModel
       this.DelveIntoDecodedXmlFromCursorPositionCommand = new RelayCommand(DelveIntoDecodedXmlFromCursorPositionCommand_Execute);
       this.CreateSnapshotCommand = new RelayCommand(CreateSnapshotCommand_Execute);
       this.ChangeToSnapshotCommand = new RelayCommand<DocumentSnapshot>(ChangeToSnapshotCommand_Execute);
+      this.SaveCommand = new RelayCommand(SaveCommand_Execute);
       this.Snapshots = new ObservableCollection<DocumentSnapshot>();
       this.Cleaners = new List<XmlCleanerBase>()
         {
@@ -156,6 +190,10 @@ namespace eXeMeL.ViewModel
     {
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
+      this.IsContentFromFile = false;
+      this.FilePath = null;
+      this.FileName = "From Clipboard";
+
       ReplaceOldDocumentWithNewDocument(text);
 
       var handler = RefreshComplete;
@@ -258,6 +296,11 @@ namespace eXeMeL.ViewModel
           return;
 
         var fileContents = await LoadFileContentsAsync(filePath);
+        
+        this.IsContentFromFile = true;
+        this.FilePath = filePath;
+        this.FileName = Path.GetFileName(filePath);
+
         ReplaceOldDocumentWithNewDocument(fileContents);
 
         RaiseRefreshComplete();
@@ -297,6 +340,44 @@ namespace eXeMeL.ViewModel
     private void ChangeToSnapshotCommand_Execute(DocumentSnapshot snapshot)
     {
       ChangeToSnapshot(snapshot);
+    }
+
+
+
+    async private void SaveCommand_Execute()
+    {
+      if (this.IsContentFromFile)
+      {
+        using (var file = new StreamWriter(this.FilePath))
+        {
+          await file.WriteAsync(this.Document.Text);
+        }
+      }
+      else
+      {
+        var saveDialog = new SaveFileDialog();
+        //dlg.FileName = "Document"; // Default file name
+        saveDialog.DefaultExt = ".xml"; // Default file extension
+        saveDialog.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
+
+        // Show save file dialog box
+        Nullable<bool> result = saveDialog.ShowDialog();
+
+        // Process save file dialog box results
+        if (result == true)
+        {
+          // Save document
+          this.FilePath = saveDialog.FileName;
+          this.FileName = Path.GetFileName(this.FilePath);
+          this.IsContentFromFile = true;
+
+          using (var file = new StreamWriter(this.FilePath))
+          {
+            await file.WriteAsync(this.Document.Text);
+          }
+        }
+
+      }
     }
 
 

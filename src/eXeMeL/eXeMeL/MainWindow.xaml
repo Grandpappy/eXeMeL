@@ -37,7 +37,6 @@
         <Setter Property="FontFamily" Value="Segoe UI"/>
       </Style>
 
-      
     </ResourceDictionary>
   </MahApps:MetroWindow.Resources>
 
@@ -62,6 +61,7 @@
         </StackPanel>
       </Button>
 
+      
       <Button 
         Command="{Binding Editor.CopyCommand}" 
         ToolTip="Copy all text to the clipboard" 
@@ -69,6 +69,17 @@
         <StackPanel Orientation="Horizontal" Background="Transparent">
           <Rectangle Width="20" Height="20" Fill="{DynamicResource CopyIconBrush}"/>
           <TextBlock Text="copy all" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
+        </StackPanel>
+      </Button>
+
+
+      <Button 
+        Command="{Binding Editor.SaveCommand}" 
+        ToolTip="Save the contents of the editor (Ctrl+S)"
+        >
+        <StackPanel Orientation="Horizontal" Background="Transparent">
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource SaveIconBrush}"/>
+          <TextBlock Text="save" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
         </StackPanel>
       </Button>
 
@@ -109,6 +120,7 @@
     <KeyBinding Key="F5" Command="{Binding Editor.RefreshCommand}"/>
     <KeyBinding Modifiers="Control" Key="F" Command="{Binding FocusOnFindControlCommand, ElementName=ControlRoot}"/>
     <KeyBinding Key="Escape" Command="{Binding ResetFocusCommand, ElementName=ControlRoot}"/>
+    <KeyBinding Modifiers="Control" Key="S" Command="{Binding Editor.SaveCommand}"/>
   </MahApps:MetroWindow.InputBindings>
 
 
@@ -183,6 +195,7 @@
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
               </Grid.ColumnDefinitions>
@@ -193,17 +206,56 @@
                 </Rectangle.OpacityMask>
               </Rectangle>
 
-              <TextBlock Grid.Column="1" Text="Editor" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Style="{DynamicResource SectionHeaderStyle}"/>
-              
+              <TextBlock Grid.Column="1" Text="Editor" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,1,0,0" Style="{DynamicResource SectionHeaderStyle}"/>
+
+              <Rectangle Grid.Column="2" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,10,5,5" Fill="{DynamicResource AccentColorBrush}">
+                <Rectangle.ToolTip>
+                  <TextBlock Text="{Binding FilePath}"/>
+                </Rectangle.ToolTip>
+                <Rectangle.OpacityMask>
+                  <VisualBrush Visual="{StaticResource XMLDocumentIcon}" Stretch="Fill" />
+                </Rectangle.OpacityMask>
+                <Rectangle.Style>
+                  <Style TargetType="Rectangle">
+                    <Setter Property="Visibility" Value="Visible"/>
+
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsContentFromFile}" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Rectangle.Style>
+              </Rectangle>
+              <Rectangle Grid.Column="2" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,10,5,5" Fill="{DynamicResource AccentColorBrush}">
+                <Rectangle.ToolTip>
+                  <TextBlock Text="This is a temporary file.  Save the file to persist it."/>
+                </Rectangle.ToolTip>
+                <Rectangle.OpacityMask>
+                  <VisualBrush Visual="{StaticResource XMLIcon}" Stretch="Fill" />
+                </Rectangle.OpacityMask>
+                <Rectangle.Style>
+                  <Style TargetType="Rectangle">
+                    <Setter Property="Visibility" Value="Visible"/>
+
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsContentFromFile}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Rectangle.Style>
+              </Rectangle>
+
               <views:EditorSnapshotView 
                 x:Name="EditorSnapshotControl" 
-                Grid.Column="2" 
+                Grid.Column="3" 
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Center"
                 />
               <views:EditorFindView 
                 x:Name="EditorFindControl" 
-                Grid.Column="3" 
+                Grid.Column="4" 
                 Margin="20,0,0,0"
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Center"

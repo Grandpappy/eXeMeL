@@ -76,5 +76,20 @@ Special Thanks
   </Canvas>
   <VisualBrush x:Key="AddSnapshotBrush" Stretch="Uniform" Visual="{StaticResource AddSnapshotIcon}" />
 
+  <Canvas x:Key="SaveIcon" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+    <Path Width="34.8333" Height="34.8333" Canvas.Left="20.5833" Canvas.Top="20.5833" Stretch="Fill" Fill="#FF000000" Data="F1 M 20.5833,20.5833L 55.4167,20.5833L 55.4167,55.4167L 45.9167,55.4167L 45.9167,44.3333L 30.0833,44.3333L 30.0833,55.4167L 20.5833,55.4167L 20.5833,20.5833 Z M 33.25,55.4167L 33.25,50.6667L 39.5833,50.6667L 39.5833,55.4167L 33.25,55.4167 Z M 26.9167,23.75L 26.9167,33.25L 49.0833,33.25L 49.0833,23.75L 26.9167,23.75 Z "/>
+  </Canvas>
+  <VisualBrush x:Key="SaveIconBrush" Stretch="Uniform" Visual="{StaticResource SaveIcon}" />
+
+  <Canvas x:Key="XMLDocumentIcon" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+    <Path Width="43.5" Height="44.25" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="#FF000000" Data="F1 M 48,61.25L 36.5,50.5L 48,39.75L 48,45.25L 41.75,50.5L 48,55.75L 48,61.25 Z M 52,61.25L 52,55.75L 58.25,50.5L 52,45.25L 52,39.75L 63.5,50.5L 52,61.25 Z M 20,17L 42.25,17L 55,29.75L 55,41.5L 52,38.5L 52,34L 38,34L 38,21L 24,21L 24,55L 39.5,55L 43.75,59L 20,59L 20,17 Z M 42,22.25L 42,30L 49.75,30L 42,22.25 Z "/>
+  </Canvas>
+  <VisualBrush x:Key="XMLDocumentIconBrush" Stretch="Uniform" Visual="{StaticResource XMLDocumentIcon}" />
+
+  <Canvas x:Key="XMLIcon" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+    <Path Width="38" Height="33.9999" Canvas.Left="19" Canvas.Top="21.0001" Stretch="Fill" Fill="#FF000000" Data="F1 M 30,51L 19,40L 19,37L 30,26L 30,31L 23,38L 30,45L 30,51 Z M 42.9999,21.0001L 37,55L 33,55L 39,21.0001L 42.9999,21.0001 Z M 46,51L 46,45L 53,38L 46,31L 46,26L 57,37L 57,40L 46,51 Z "/>
+  </Canvas>
+  <VisualBrush x:Key="XMLIconBrush" Stretch="Uniform" Visual="{StaticResource XMLIcon}" />
+
 
 </ResourceDictionary>

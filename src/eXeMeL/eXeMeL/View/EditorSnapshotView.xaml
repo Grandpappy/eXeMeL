@@ -23,8 +23,9 @@
           >
           <Button.ToolTip>
             <StackPanel Orientation="Vertical">
-              <TextBlock Text="Go to this snapshot" FontWeight="Bold"/>
-              <TextBlock Text="{Binding Document.Text}" Margin="10,10,5,0" MaxWidth="400" MaxHeight="200" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"/>
+              <TextBlock Text="Go to this snapshot"/>
+              <!--FontWeight="Bold"-->
+              <!--<TextBlock Text="{Binding Document.Text}" Margin="10,10,5,0" MaxWidth="400" MaxHeight="200" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"/>-->
             </StackPanel>
           </Button.ToolTip>
         </Button>
@@ -70,6 +71,7 @@
       VerticalAlignment="Center" 
       ToolTip="Add a new snapshot from this version of the document.  The document's contents and the undo stack will be included in the new snapshot."
       Command="{Binding CreateSnapshotCommand}" 
+      Focusable="False"
       >
     </Button>
   </Grid>
