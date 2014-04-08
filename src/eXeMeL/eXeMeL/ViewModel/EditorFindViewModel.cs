@@ -20,7 +20,7 @@ namespace eXeMeL.ViewModel
     #region Properties
 
 
-    private TextDocument Document { get; set; }
+    public TextDocument Document { get; set; }
 
     private string _currentFindValue;
     private int _matchCount;
@@ -146,10 +146,8 @@ namespace eXeMeL.ViewModel
     #region Construction
 
 
-    public EditorFindViewModel(TextDocument textDocument)
+    public EditorFindViewModel()
     {
-      this.Document = textDocument;
-
       this.FindNextCommand = new RelayCommand(FindNextCommand_Execute, FindNextCommand_CanExecute);
       this.FindPreviousCommand = new RelayCommand(FindPreviousCommand_Execute, FindPreviousCommand_CanExecute);
 

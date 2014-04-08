@@ -35,7 +35,11 @@ namespace eXeMeL.ViewModel
     public TextDocument Document
     {
       get { return _Document; }
-      private set { this.Set(() => Document, ref _Document, value); }
+      private set 
+      { 
+        this.Set(() => Document, ref _Document, value);
+        this.FindViewModel.Document = this.Document;
+      }
     }
 
 
@@ -87,6 +91,7 @@ namespace eXeMeL.ViewModel
       this.ChangeToSnapshotCommand = new RelayCommand<DocumentSnapshot>(ChangeToSnapshotCommand_Execute);
       this.SaveCommand = new RelayCommand(SaveCommand_Execute);
       this.Snapshots = new ObservableCollection<DocumentSnapshot>();
+      this.FindViewModel = new EditorFindViewModel();
       this.Cleaners = new List<XmlCleanerBase>()
         {
           new TrimCleaner(),
@@ -110,8 +115,6 @@ namespace eXeMeL.ViewModel
       {
         this.Document = new TextDocument();
       }
-
-      this.FindViewModel = new EditorFindViewModel(this.Document);   
     }
 
 
