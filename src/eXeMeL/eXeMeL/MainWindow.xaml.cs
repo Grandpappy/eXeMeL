@@ -112,6 +112,7 @@ namespace eXeMeL
     private void TextArea_DocumentChanged(object sender, EventArgs e)
     {
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
+      UpdateDocumentFoldings();
     }
 
     
@@ -155,8 +156,15 @@ namespace eXeMeL
 
     private void HandleChangedDocumentText(TextDocument document)
     {
+      UpdateDocumentFoldings();
+    }
+
+
+
+    private void UpdateDocumentFoldings()
+    {
       if (this.FoldingManager != null && this.FoldingStrategy != null)
-      { 
+      {
         this.FoldingStrategy.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
       }
     }
