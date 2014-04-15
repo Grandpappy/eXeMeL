@@ -41,5 +41,18 @@ namespace eXeMeL
       //  StartupOptions.InitialFilePath = e.Args[0];
       //}
     }
+
+    private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+      var error = string.Empty;
+      var currentException = e.Exception;
+      while (currentException != null)
+      {
+        error += currentException.Message + Environment.NewLine + Environment.NewLine;
+        currentException = currentException.InnerException;
+      }
+
+      MessageBox.Show(error);
+    }
   }
 }

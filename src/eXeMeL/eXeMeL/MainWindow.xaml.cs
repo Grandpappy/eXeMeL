@@ -27,6 +27,8 @@ using System.IO;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using eXeMeL.View.ChangeLog;
+using eXeMeL.Model;
+using System.Reflection;
 
 namespace eXeMeL
 {
@@ -187,6 +189,62 @@ namespace eXeMeL
       {
         this.ViewModel.Editor.OpenFileAsync(StartupOptions.InitialFilePath);
       }
+
+
+      if (!ChangeLogHasBeenShownThisVersion())
+      {
+        ShowChangeLog();
+        WriteCurrentVersionToRegistry();
+      }
+    }
+
+
+
+    private bool ChangeLogHasBeenShownThisVersion()
+    {
+      using (var registryKey = RegistryAccess.OpenRegistryKey())
+      {
+        var value = registryKey.GetValue("LastLaunchedVersion", "1.0.0.0") as string;
+        var publishedVersion = GetPublishedVersion().ToString();
+
+        if (value == publishedVersion)
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+    }
+
+
+
+    private void WriteCurrentVersionToRegistry()
+    {
+      using (var registryKey = RegistryAccess.OpenRegistryKey())
+      {
+        var publishedVersion = GetPublishedVersion().ToString();
+        registryKey.SetValue("LastLaunchedVersion", publishedVersion);
+      }
+
+    }
+
+
+
+    private static Version GetPublishedVersion()
+    {
+      XmlDocument xmlDoc = new XmlDocument();
+      Assembly asmCurrent = Assembly.GetExecutingAssembly();
+      string executePath = new Uri(asmCurrent.GetName().CodeBase).LocalPath;
+
+      xmlDoc.Load(executePath + ".manifest");
+      string retval = string.Empty;
+      if (xmlDoc.HasChildNodes)
+      {
+        retval = xmlDoc.ChildNodes[1].ChildNodes[0].Attributes.GetNamedItem("version").Value.ToString();
+      }
+      return new Version(retval);
     }
 
 
@@ -272,11 +330,19 @@ namespace eXeMeL
       }
     }
 
+    
+    
     private void ChangeLogButton_Click(object sender, RoutedEventArgs e)
     {
-      var changeLogWindow = new ChangeLogWindow() { Owner = this };
-      changeLogWindow.ShowDialog();
+      ShowChangeLog();
     }
 
+
+
+    private void ShowChangeLog()
+    {
+      var changeLogWindow = new ChangeLogWindow() { Owner = this };
+      changeLogWindow.Show();
+    }
   }
 }

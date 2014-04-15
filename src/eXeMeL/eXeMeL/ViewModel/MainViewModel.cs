@@ -28,7 +28,7 @@ namespace eXeMeL.ViewModel
 
     public MainViewModel()
     {
-      this.Settings = SettingsIO.ReadSettingsFile<Settings>();
+      this.Settings = SettingsIO.LoadSettings<Settings>();
       this.Editor = new EditorViewModel(this.Settings);
       this.MessengerInstance.Register<ApplicationClosingMessage>(this, HandleApplicationClosingMessage);
       this.MessengerInstance.Register<DisplayApplicationStatusMessage>(this, HandleDisplayApplicationStatusMessage);
@@ -38,7 +38,7 @@ namespace eXeMeL.ViewModel
 
     private void HandleApplicationClosingMessage(ApplicationClosingMessage message)
     {
-      SettingsIO.WriteSettingsFile(this.Settings);
+      SettingsIO.SaveSettings(this.Settings);
     }
 
 

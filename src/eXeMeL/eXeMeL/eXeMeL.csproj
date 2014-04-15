@@ -8,18 +8,18 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>eXeMeL</RootNamespace>
-    <AssemblyName>eXeMeL</AssemblyName>
+    <AssemblyName>eXeMeL-Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ExpressionBlendVersion>5.0.40218.0</ExpressionBlendVersion>
-    <PublishUrl>\\tsgprime\public\eXeMeL\</PublishUrl>
+    <PublishUrl>\\tsgprime\public\eXeMeL-Test\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Background</UpdateMode>
+    <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
@@ -28,7 +28,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>33</ApplicationRevision>
+    <ApplicationRevision>46</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -127,6 +127,7 @@
     <Compile Include="Messages\SelectTextInEditorMessage.cs" />
     <Compile Include="Messages\SetSearchTextMessage.cs" />
     <Compile Include="Messages\UnselectTextInEditorMessage.cs" />
+    <Compile Include="Model\RegistryAccess.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Utilities\EncodedXmlExtractor.cs" />
     <Compile Include="Utilities\Extensions.cs" />

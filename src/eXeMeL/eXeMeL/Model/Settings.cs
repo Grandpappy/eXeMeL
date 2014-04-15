@@ -5,38 +5,46 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace eXeMeL.Model
 {
   internal static class SettingsIO
   {
-    public static void WriteSettingsFile(SettingsBase settings)
+    public static void SaveSettings(SettingsBase settings)
     {
-      using (FileStream fs = new FileStream("Settings.json", FileMode.Create))
+      using (var s = new MemoryStream())
       {
-        DataContractJsonSerializer serializer = new DataContractJsonSerializer(settings.GetType());
-        serializer.WriteObject(fs, settings);
+        using (var registryKey = RegistryAccess.OpenRegistryKey())
+        {
+          var serializer = new DataContractJsonSerializer(settings.GetType());
+          serializer.WriteObject(s, settings);
+
+          var value = Encoding.UTF8.GetString(s.ToArray());
+
+          registryKey.SetValue("Settings", value);
+        }
       }
     }
 
 
 
-    public static T ReadSettingsFile<T>()
+    public static T LoadSettings<T>()
       where T : SettingsBase, new()
     {
-      if (!File.Exists("Settings.json"))
-      {
-        return new T();
-      }
-
       try
       {
-        using (FileStream fs = new FileStream("Settings.json", FileMode.Open))
+        using (var registryKey = RegistryAccess.OpenRegistryKey())
         {
-          DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
-          return serializer.ReadObject(fs) as T;
+          var value = registryKey.GetValue("Settings") as string;
+          using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(value)))
+          {
+            var serializer = new DataContractJsonSerializer(typeof(T));
+            return serializer.ReadObject(memoryStream) as T;
+          }
         }
       }
       catch
