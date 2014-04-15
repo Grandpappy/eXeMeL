@@ -1,0 +1,78 @@
+﻿<MahApps:MetroWindow
+  xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+  x:Class="eXeMeL.View.ChangeLog.ChangeLogWindow"
+  xmlns:local="clr-namespace:eXeMeL.View.ChangeLog"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  Name="ControlRoot"
+  ResizeMode="CanResize"
+  SaveWindowPosition="True"
+  ShowTitleBar="True"
+  GlowBrush="#FFD4AA00"
+  ShowCloseButton="True"
+  ShowMinButton="False"
+  ShowMaxRestoreButton="False"
+  ShowInTaskbar="False"
+  Title="Change Log" 
+  Height="500" 
+  Width="500"
+  >
+  
+  <MahApps:MetroWindow.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+        <ResourceDictionary Source="../../Resources/ThemeColors.xaml"/>
+        <ResourceDictionary Source="../../Resources/CommonStyles.xaml"/>
+        <ResourceDictionary Source="../../Resources/Icons.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+
+      <Style x:Key="SectionHeaderStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{DynamicResource LabelTextBrush}"/>
+        <Setter Property="FontSize" Value="26.667"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+      </Style>
+
+      
+      <DataTemplate DataType="{x:Type local:ChangeLogHeader}">
+        <TextBlock Text="{Binding Text, Mode=OneWay}" Style="{DynamicResource SectionHeaderStyle}" Margin="0,20,0,10"/>
+      </DataTemplate>
+      
+      
+      <DataTemplate DataType="{x:Type local:ChangeLogContent}">
+        <TextBox 
+          Text="{Binding Text, Mode=OneWay}" 
+          Margin="20,5,10,0" 
+          HorizontalAlignment="Stretch" 
+          TextWrapping="Wrap" 
+          IsReadOnly="True"
+          BorderThickness="0"
+          FontSize="14"
+          />
+      </DataTemplate>
+      
+      
+    </ResourceDictionary>
+  </MahApps:MetroWindow.Resources>
+  
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    
+    <ScrollViewer
+      Grid.Row="0"
+      >
+      <ItemsControl
+        ItemsSource="{Binding Entries, ElementName=ControlRoot}"
+        Margin="10,0,0,0"
+        />
+    </ScrollViewer>
+    
+    
+    <Button x:Name="CloseButton" Grid.Row="1" Content="Close" HorizontalAlignment="Center" Width="100" Margin="5" Click="CloseButton_Click"/>
+  </Grid>
+</MahApps:MetroWindow>

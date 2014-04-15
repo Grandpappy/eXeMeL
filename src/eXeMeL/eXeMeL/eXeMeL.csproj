@@ -142,6 +142,9 @@
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
+    <Compile Include="View\ChangeLogWindow\ChangeLogWindow.xaml.cs">
+      <DependentUpon>ChangeLogWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\EditorFindView.xaml.cs">
       <DependentUpon>EditorFindView.xaml</DependentUpon>
     </Compile>
@@ -180,6 +183,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\ChangeLogWindow\ChangeLogWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\EditorFindView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -211,6 +218,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\XmlSyntaxHighlighting.xshd" />
     <None Include="eXeMeL_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
@@ -255,6 +263,7 @@
     </FileAssociation>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\ChangeLog.txt" />
     <Content Include="Assets\FileIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

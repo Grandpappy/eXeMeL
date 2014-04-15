@@ -22,6 +22,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Xml;
+using System.IO;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using eXeMeL.View.ChangeLog;
 
 namespace eXeMeL
 {
@@ -57,6 +62,7 @@ namespace eXeMeL
       this.AvalonEditor.TextArea.DocumentChanged += TextArea_DocumentChanged;
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
+      this.AvalonEditor.SyntaxHighlighting = GetSyntaxHighlighting();
       
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
@@ -64,7 +70,7 @@ namespace eXeMeL
       this.IgnoreNextTextChange = false;
     }
 
-
+    
 
     private void AvalonEditor_TextChanged(object sender, EventArgs e)
     {
@@ -252,5 +258,25 @@ namespace eXeMeL
     {
       this.AvalonEditor.Focus();
     }
+
+
+
+    private IHighlightingDefinition GetSyntaxHighlighting()
+    {
+      using (Stream stream = this.GetType().Assembly.GetManifestResourceStream("eXeMeL.Assets.XmlSyntaxHighlighting.xshd"))
+      {
+        using (XmlTextReader reader = new XmlTextReader(stream))
+        {
+          return HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        }
+      }
+    }
+
+    private void ChangeLogButton_Click(object sender, RoutedEventArgs e)
+    {
+      var changeLogWindow = new ChangeLogWindow() { Owner = this };
+      changeLogWindow.ShowDialog();
+    }
+
   }
 }

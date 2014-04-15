@@ -1,0 +1,23 @@
+﻿*4/14/2014
+
+Added this Change Log window
+
+*4/9/2014
+
+Bug fixes that were caused during the release of the Delve feature
+
+* 4/6/2014 - Saving
+
+Added Save feature.  If a file is opened with eXeMeL then the contents of the window will be saved to the same document.  If the content of the eXeMeL editor did not come from a file, a save dialog is displayed.
+
+Note that the save feature will save the currently active snapshot for the document you have open.
+
+Icon added next to the Editor title that displays if the editor's document was loaded from a file or not.
+
+*4/5/2014 - Delve Feature
+
+Added new Snapshot feature.  This will take a snapshot-in-time of the current document and the undo stack, and push a new version of the document, with the same text, onto the Snapshot stack.  Initially added to support the Delve feature.
+
+Added new Delve feature.  Right click on a block of encoded XML and choose the Delve option.  A new snapshot will be created with the decoded version of the XML that was clicked on.
+
+Added a button next to the Find controls to manually create a snapshot

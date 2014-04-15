@@ -106,7 +106,10 @@
             IsOpen="False"
             Background="{DynamicResource SettingsBackgroundBrush}"
             >
-          <views:SettingsView DataContext="{Binding Settings}"/>
+          <StackPanel Orientation="Vertical">
+            <views:SettingsView DataContext="{Binding Settings}"/>
+            <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left"/>
+          </StackPanel>
         </MahApps:Flyout>
       </MahApps:FlyoutsControl.Items>
     </MahApps:FlyoutsControl>
@@ -382,7 +385,7 @@
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="5" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
       </Grid>
     </Border>
     <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">
