@@ -1,10 +1,12 @@
-﻿*4/15/2014
+﻿*4/15/2014 - Syntax Highlighting
+
+New syntax highlighting scheme and the ability to change the scheme the application uses.  Currently there are two options, the default "Earthy" option and the original "Bright" option.
 
 Automatically display the Change Log window when launching the application after an update
 
 Settings are now saved in the registry, under HK_CURRENT_USER/Software/eXeMeL to prevent them from being overwritten when updated.
 
-*4/14/2014
+*4/14/2014 - Change Log
 
 Added this Change Log window
 

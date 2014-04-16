@@ -28,7 +28,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>46</ApplicationRevision>
+    <ApplicationRevision>50</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -129,6 +129,8 @@
     <Compile Include="Messages\UnselectTextInEditorMessage.cs" />
     <Compile Include="Model\RegistryAccess.cs" />
     <Compile Include="Model\Settings.cs" />
+    <Compile Include="Model\ApplicationVersionControl.cs" />
+    <Compile Include="Model\SettingsIO.cs" />
     <Compile Include="Utilities\EncodedXmlExtractor.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\XmlParser.cs" />
@@ -219,7 +221,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\XmlSyntaxHighlighting.xshd" />
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd" />
     <None Include="eXeMeL_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
@@ -264,9 +266,11 @@
     </FileAssociation>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Bright.xshd" />
     <EmbeddedResource Include="Assets\ChangeLog.txt" />
     <Content Include="Assets\FileIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

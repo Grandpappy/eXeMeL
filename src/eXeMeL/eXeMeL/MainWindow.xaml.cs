@@ -41,6 +41,7 @@ namespace eXeMeL
     private XmlFoldingStrategy FoldingStrategy { get; set; }
     private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
+    private PropertyObserver<Settings> SettingsObserver { get; set; }
     private PropertyObserver<EditorViewModel> EditorObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
 
@@ -104,6 +105,10 @@ namespace eXeMeL
       this.TextDocumentObserver = 
         new PropertyObserver<TextDocument>(this.ViewModel.Editor.Document)
           .RegisterHandler(x => x.Text, HandleChangedDocumentText);
+
+      this.SettingsObserver =
+        new PropertyObserver<Settings>(this.ViewModel.Settings)
+        .RegisterHandler(x => x.SyntaxHighlightingStyle, HandleSyntaxHighlightingChange);
 
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SelectTextInEditorMessage>(this, HandleSelectTextInEditorMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<UnselectTextInEditorMessage>(this, HandleUnselectTextInEditorMessage);
@@ -191,60 +196,11 @@ namespace eXeMeL
       }
 
 
-      if (!ChangeLogHasBeenShownThisVersion())
+      if (!ApplicationVersionControl.CurrentVersionIsDifferentFromLastRunVersion())
       {
         ShowChangeLog();
-        WriteCurrentVersionToRegistry();
+        ApplicationVersionControl.WriteCurrentVersionToRegistry();
       }
-    }
-
-
-
-    private bool ChangeLogHasBeenShownThisVersion()
-    {
-      using (var registryKey = RegistryAccess.OpenRegistryKey())
-      {
-        var value = registryKey.GetValue("LastLaunchedVersion", "1.0.0.0") as string;
-        var publishedVersion = GetPublishedVersion().ToString();
-
-        if (value == publishedVersion)
-        {
-          return true;
-        }
-        else
-        {
-          return false;
-        }
-      }
-    }
-
-
-
-    private void WriteCurrentVersionToRegistry()
-    {
-      using (var registryKey = RegistryAccess.OpenRegistryKey())
-      {
-        var publishedVersion = GetPublishedVersion().ToString();
-        registryKey.SetValue("LastLaunchedVersion", publishedVersion);
-      }
-
-    }
-
-
-
-    private static Version GetPublishedVersion()
-    {
-      XmlDocument xmlDoc = new XmlDocument();
-      Assembly asmCurrent = Assembly.GetExecutingAssembly();
-      string executePath = new Uri(asmCurrent.GetName().CodeBase).LocalPath;
-
-      xmlDoc.Load(executePath + ".manifest");
-      string retval = string.Empty;
-      if (xmlDoc.HasChildNodes)
-      {
-        retval = xmlDoc.ChildNodes[1].ChildNodes[0].Attributes.GetNamedItem("version").Value.ToString();
-      }
-      return new Version(retval);
     }
 
 
@@ -319,9 +275,18 @@ namespace eXeMeL
 
 
 
+    private void HandleSyntaxHighlightingChange(Settings obj)
+    {
+      this.AvalonEditor.SyntaxHighlighting = GetSyntaxHighlighting();
+    }
+
+
+
     private IHighlightingDefinition GetSyntaxHighlighting()
     {
-      using (Stream stream = this.GetType().Assembly.GetManifestResourceStream("eXeMeL.Assets.XmlSyntaxHighlighting.xshd"))
+      var resourceName = GetSyntaxHighlightingResource();
+
+      using (Stream stream = this.GetType().Assembly.GetManifestResourceStream(resourceName))
       {
         using (XmlTextReader reader = new XmlTextReader(stream))
         {
@@ -330,8 +295,25 @@ namespace eXeMeL
       }
     }
 
-    
-    
+
+
+    private string GetSyntaxHighlightingResource()
+    {
+      switch (this.ViewModel.Settings.SyntaxHighlightingStyle)
+      {
+        case SyntaxHighlightingStyle.Earthy:
+          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd";
+
+        case SyntaxHighlightingStyle.Bright:
+          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Bright.xshd";
+
+        default:
+          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd";
+      }
+    }
+
+
+
     private void ChangeLogButton_Click(object sender, RoutedEventArgs e)
     {
       ShowChangeLog();
