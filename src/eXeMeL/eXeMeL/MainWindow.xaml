@@ -22,19 +22,11 @@
 
   <MahApps:MetroWindow.Resources>
     <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-        <ResourceDictionary Source="Resources/ThemeColors.xaml"/>
-        <ResourceDictionary Source="Resources/CommonStyles.xaml"/>
-        <ResourceDictionary Source="Resources/Icons.xaml"/>
-      </ResourceDictionary.MergedDictionaries>
-    
       <Style x:Key="SectionHeaderStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{DynamicResource LabelTextBrush}"/>
         <Setter Property="FontSize" Value="26.667"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="Opacity" Value="0.8"/>
       </Style>
 
     </ResourceDictionary>
@@ -56,7 +48,7 @@
         ToolTip="Replace all text with what's in the clipboard (F5)"
         >
         <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource RefreshIconBrush}"/>
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource RefreshIconBrush}"/>
           <TextBlock Text="refresh" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
         </StackPanel>
       </Button>
@@ -67,7 +59,7 @@
         ToolTip="Copy all text to the clipboard" 
         >
         <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource CopyIconBrush}"/>
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource CopyIconBrush}"/>
           <TextBlock Text="copy all" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
         </StackPanel>
       </Button>
@@ -78,18 +70,14 @@
         ToolTip="Save the contents of the editor (Ctrl+S)"
         >
         <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource SaveIconBrush}"/>
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource SaveIconBrush}"/>
           <TextBlock Text="save" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
         </StackPanel>
       </Button>
 
 
       <Button Click="OpenSettingsButton_Click" ToolTip="Edit settings">
-        <Rectangle Width="20" Height="20">
-          <Rectangle.Fill>
-            <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_settings}" />
-          </Rectangle.Fill>
-        </Rectangle>
+        <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource SettingsIconbrush}"/>
       </Button>
 
     </MahApps:WindowCommands>
@@ -104,7 +92,8 @@
             x:Name="SettingsFlyout"
             Header="Settings"
             IsOpen="False"
-            Background="{DynamicResource SettingsBackgroundBrush}"
+            Background="{DynamicResource FlyoutBackgroundBrush}"
+            Foreground="{DynamicResource FlyoutForegroundBrush}"
             >
           <StackPanel Orientation="Vertical">
             <views:SettingsView DataContext="{Binding Settings}"/>
@@ -279,6 +268,7 @@
               ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
               WordWrap="{Binding Settings.WrapEditorText}"
               Background="{x:Null}"
+              Foreground="{DynamicResource EditorTextBrush}"
               MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
               >
               <avalonEdit:TextEditor.ContextMenu>

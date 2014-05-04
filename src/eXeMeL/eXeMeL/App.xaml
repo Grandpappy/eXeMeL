@@ -13,15 +13,16 @@
   <Application.Resources>
     <ResourceDictionary>
       <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
-      
+
       <ResourceDictionary.MergedDictionaries>
-        <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-        <ResourceDictionary Source="Resources/ThemeColors.xaml"/>
+        <!--<ResourceDictionary Source="Resources/ThemeColors.xaml"/>-->
         <ResourceDictionary Source="Resources/CommonStyles.xaml"/>
-        <ResourceDictionary Source="Resources/Icons.xaml"/>-->
+        <ResourceDictionary Source="Resources/Icons.xaml"/>
       </ResourceDictionary.MergedDictionaries>
+
     </ResourceDictionary>
   </Application.Resources>
 </Application>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using eXeMeL.Model;
 using ICSharpCode.AvalonEdit.Utils;
 using MahApps.Metro.Controls;
 
@@ -26,8 +28,7 @@ namespace eXeMeL.View.ChangeLog
     public ObservableCollection<ChangeLogEntry> Entries { get; private set; }
 
 
-
-    public ChangeLogWindow()
+    public ChangeLogWindow(ApplicationTheme theme)
     {
       this.Entries = new ObservableCollection<ChangeLogEntry>();
 
@@ -40,9 +41,10 @@ namespace eXeMeL.View.ChangeLog
         this.Entries.Add(new ChangeLogContent("The second line of the first entry is longer.  This should hopefully show what the line looks like when it has to wrap due to a lot of text."));
       }
 
-
       this.Loaded += ChangeLogWindow_Loaded;
       InitializeComponent();
+
+      SetApplicationThemeBasedOnSettings(theme);
     }
 
 
@@ -87,6 +89,45 @@ namespace eXeMeL.View.ChangeLog
     {
       Close();
     }
+
+
+    #region Theme Control
+
+    // TODO: This should be extracted out so it can be shared by this window and the main application
+
+    private void SetApplicationThemeBasedOnSettings(ApplicationTheme theme)
+    {
+      Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
+
+      if (this.Resources.MergedDictionaries.Count == 6)
+      {
+        this.Resources.MergedDictionaries.RemoveAt(5);
+      }
+
+      var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(theme), UriKind.RelativeOrAbsolute) };
+      this.Resources.MergedDictionaries.Add(dict);
+
+      this.GlowBrush.Color = (Color)this.FindResource("WindowGlowColor");
+    }
+
+
+
+    private string GetApplicationThemeResource(ApplicationTheme theme)
+    {
+      switch (theme)
+      {
+        case ApplicationTheme.Light:
+          return @"pack://application:,,,/Resources/ThemeColors.xaml";
+
+        case ApplicationTheme.Dark:
+          return @"pack://application:,,,/Resources/DarkThemeColors.xaml";
+
+        default:
+          return @"pack://application:,,,/Resources/ThemeColors.xaml";
+      }
+    }
+
+    #endregion
   }
 
 

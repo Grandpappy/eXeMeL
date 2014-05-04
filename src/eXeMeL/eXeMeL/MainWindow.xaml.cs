@@ -29,6 +29,7 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace eXeMeL
 {
@@ -42,7 +43,6 @@ namespace eXeMeL
     private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private PropertyObserver<Settings> SettingsObserver { get; set; }
-    private PropertyObserver<EditorViewModel> EditorObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
 
     public ICommand FocusOnFindControlCommand { get; private set; }
@@ -66,6 +66,7 @@ namespace eXeMeL
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
       this.AvalonEditor.SyntaxHighlighting = GetSyntaxHighlighting();
+      SetApplicationThemeBasedOnSettings();
       
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
@@ -108,7 +109,8 @@ namespace eXeMeL
 
       this.SettingsObserver =
         new PropertyObserver<Settings>(this.ViewModel.Settings)
-        .RegisterHandler(x => x.SyntaxHighlightingStyle, HandleSyntaxHighlightingChange);
+        .RegisterHandler(x => x.SyntaxHighlightingStyle, HandleSyntaxHighlightingChange)
+        .RegisterHandler(x => x.ApplicationTheme, HandleApplicationThemeChange);
 
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SelectTextInEditorMessage>(this, HandleSelectTextInEditorMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<UnselectTextInEditorMessage>(this, HandleUnselectTextInEditorMessage);
@@ -301,14 +303,58 @@ namespace eXeMeL
     {
       switch (this.ViewModel.Settings.SyntaxHighlightingStyle)
       {
-        case SyntaxHighlightingStyle.Earthy:
+        case SyntaxHighlightingStyle.Light_Earthy:
           return "eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd";
 
-        case SyntaxHighlightingStyle.Bright:
+        case SyntaxHighlightingStyle.Light_Bright:
           return "eXeMeL.Assets.SyntaxHighlightingSchemes.Bright.xshd";
+
+        case SyntaxHighlightingStyle.Dark_Ethereal:
+          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Dark.xshd";
 
         default:
           return "eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd";
+      }
+    }
+
+
+
+    private void HandleApplicationThemeChange(Settings obj)
+    {
+      SetApplicationThemeBasedOnSettings();
+    }
+
+
+
+    private void SetApplicationThemeBasedOnSettings()
+    {
+      Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
+
+      if (Application.Current.Resources.MergedDictionaries.Count == 6)
+      {
+        Application.Current.Resources.MergedDictionaries.RemoveAt(5);
+      }
+
+      var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(), UriKind.RelativeOrAbsolute) };
+      Application.Current.Resources.MergedDictionaries.Add(dict);
+
+      this.GlowBrush.Color = (Color)this.FindResource("WindowGlowColor");
+    }
+
+
+
+    private string GetApplicationThemeResource()
+    {
+      switch (this.ViewModel.Settings.ApplicationTheme)
+      {
+        case ApplicationTheme.Light:
+          return @"pack://application:,,,/Resources/ThemeColors.xaml";
+
+        case ApplicationTheme.Dark:
+          return @"pack://application:,,,/Resources/DarkThemeColors.xaml";
+
+        default:
+          return @"pack://application:,,,/Resources/ThemeColors.xaml";
       }
     }
 
@@ -323,7 +369,7 @@ namespace eXeMeL
 
     private void ShowChangeLog()
     {
-      var changeLogWindow = new ChangeLogWindow() { Owner = this };
+      var changeLogWindow = new ChangeLogWindow(this.ViewModel.Settings.ApplicationTheme) { Owner = this };
       changeLogWindow.Show();
     }
   }

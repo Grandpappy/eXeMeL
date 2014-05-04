@@ -14,11 +14,24 @@ namespace eXeMeL.Model
 {
   public enum SyntaxHighlightingStyle 
   {
-    [Description("Bright")]
-    Bright,
+    [Description("Bright (Light Theme)")]
+    Light_Bright,
 
-    [Description("Earthy")]
-    Earthy 
+    [Description("Earthy (Light Theme)")]
+    Light_Earthy,
+
+    [Description("Ethereal (Dark Theme)")]
+    Dark_Ethereal 
+  }
+
+
+  public enum ApplicationTheme
+  {
+    [Description("Light")]
+    Light,
+
+    [Description("Dark")]
+    Dark
   }
 
 
@@ -44,6 +57,7 @@ namespace eXeMeL.Model
   public class Settings : SettingsBase
   {
     private SyntaxHighlightingStyle _SyntaxHighlightingStyle;
+    private ApplicationTheme _ApplicationTheme;
     public const double DEFAULT_EDITOR_FONT_SIZE = 16;
 
 
@@ -79,11 +93,21 @@ namespace eXeMeL.Model
     }
 
 
+
     [DataMember]
     public SyntaxHighlightingStyle SyntaxHighlightingStyle
     {
       get { return _SyntaxHighlightingStyle; }
       set { _SyntaxHighlightingStyle = value; NotifyPropertyChanged("SyntaxHighlightingStyle"); }
+    }
+
+
+
+    [DataMember]
+    public ApplicationTheme ApplicationTheme
+    {
+      get { return _ApplicationTheme; }
+      set { _ApplicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); }
     }
 
 
@@ -94,7 +118,8 @@ namespace eXeMeL.Model
       this.ShowEditorLineNumbers = true;
       this.WrapEditorText = true;
       this.EditorFontSize = DEFAULT_EDITOR_FONT_SIZE;
-      this.SyntaxHighlightingStyle = Model.SyntaxHighlightingStyle.Earthy;
+      this.SyntaxHighlightingStyle = Model.SyntaxHighlightingStyle.Light_Earthy;
+      this.ApplicationTheme = Model.ApplicationTheme.Light;
     }
   }
 }

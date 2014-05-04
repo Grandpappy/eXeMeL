@@ -182,10 +182,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\ThemeColors.xaml">
+    <Resource Include="Resources\DarkThemeColors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Resource>
+    <Resource Include="Resources\ThemeColors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </Resource>
     <Page Include="View\ChangeLogWindow\ChangeLogWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -222,6 +226,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd" />
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Dark.xshd" />
     <None Include="eXeMeL_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
