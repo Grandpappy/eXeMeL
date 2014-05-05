@@ -12,49 +12,8 @@ using Microsoft.Win32;
 
 namespace eXeMeL.Model
 {
-  public enum SyntaxHighlightingStyle 
-  {
-    [Description("Bright (Light Theme)")]
-    Light_Bright,
-
-    [Description("Earthy (Light Theme)")]
-    Light_Earthy,
-
-    [Description("Ethereal (Dark Theme)")]
-    Dark_Ethereal 
-  }
-
-
-  public enum ApplicationTheme
-  {
-    [Description("Light")]
-    Light,
-
-    [Description("Dark")]
-    Dark
-  }
-
-
   [DataContract]
-  public abstract class SettingsBase : INotifyPropertyChanged
-  {
-    protected void NotifyPropertyChanged(string propertyName)
-    {
-      var handler = this.PropertyChanged;
-      if (handler != null)
-      {
-        handler(this, new PropertyChangedEventArgs(propertyName));
-      }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-  }
-
-
-
-
-  [DataContract]
-  public class Settings : SettingsBase
+  public class Settings : INotifyPropertyChanged
   {
     private SyntaxHighlightingStyle _SyntaxHighlightingStyle;
     private ApplicationTheme _ApplicationTheme;
@@ -121,5 +80,19 @@ namespace eXeMeL.Model
       this.SyntaxHighlightingStyle = Model.SyntaxHighlightingStyle.Light_Earthy;
       this.ApplicationTheme = Model.ApplicationTheme.Light;
     }
+
+
+
+    protected void NotifyPropertyChanged(string propertyName)
+    {
+      var handler = this.PropertyChanged;
+      if (handler != null)
+      {
+        handler(this, new PropertyChangedEventArgs(propertyName));
+      }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
   }
+
 }

@@ -122,15 +122,19 @@
     </ApplicationDefinition>
     <Compile Include="Messages\ActivateSnapshotMessage.cs" />
     <Compile Include="Messages\ApplicationClosingMessage.cs" />
+    <Compile Include="Messages\ApplicationThemeUpdatedMessage.cs" />
     <Compile Include="Messages\DisplayApplicationStatusMessage.cs" />
     <Compile Include="Messages\GoToTopOfDocumentMessage.cs" />
     <Compile Include="Messages\SelectTextInEditorMessage.cs" />
     <Compile Include="Messages\SetSearchTextMessage.cs" />
     <Compile Include="Messages\UnselectTextInEditorMessage.cs" />
+    <Compile Include="Model\ApplicationThemeEnum.cs" />
+    <Compile Include="Model\Attributes.cs" />
     <Compile Include="Model\RegistryAccess.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Model\ApplicationVersionControl.cs" />
     <Compile Include="Model\SettingsIO.cs" />
+    <Compile Include="Model\SyntaxHighlightingStyleEnum.cs" />
     <Compile Include="Utilities\EncodedXmlExtractor.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\XmlParser.cs" />
@@ -138,6 +142,7 @@
     <Compile Include="ViewModel\DocumentSnapshot.cs" />
     <Compile Include="ViewModel\EditorViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\SyntaxHighlightManager.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\XmlCleaners\FormatCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\NewLineCleaner.cs" />

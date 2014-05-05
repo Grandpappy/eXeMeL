@@ -14,7 +14,7 @@ namespace eXeMeL.Model
 {
   internal static class SettingsIO
   {
-    public static void SaveSettings(SettingsBase settings)
+    public static void SaveSettings(Settings settings)
     {
       using (var s = new MemoryStream())
       {
@@ -33,7 +33,7 @@ namespace eXeMeL.Model
 
 
     public static T LoadSettings<T>()
-      where T : SettingsBase, new()
+      where T : Settings, new()
     {
       try
       {

@@ -42,7 +42,6 @@ namespace eXeMeL
     private XmlFoldingStrategy FoldingStrategy { get; set; }
     private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
-    private PropertyObserver<Settings> SettingsObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
 
     public ICommand FocusOnFindControlCommand { get; private set; }
@@ -65,8 +64,6 @@ namespace eXeMeL
       this.AvalonEditor.TextArea.DocumentChanged += TextArea_DocumentChanged;
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
-      this.AvalonEditor.SyntaxHighlighting = GetSyntaxHighlighting();
-      SetApplicationThemeBasedOnSettings();
       
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
@@ -107,14 +104,10 @@ namespace eXeMeL
         new PropertyObserver<TextDocument>(this.ViewModel.Editor.Document)
           .RegisterHandler(x => x.Text, HandleChangedDocumentText);
 
-      this.SettingsObserver =
-        new PropertyObserver<Settings>(this.ViewModel.Settings)
-        .RegisterHandler(x => x.SyntaxHighlightingStyle, HandleSyntaxHighlightingChange)
-        .RegisterHandler(x => x.ApplicationTheme, HandleApplicationThemeChange);
-
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SelectTextInEditorMessage>(this, HandleSelectTextInEditorMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<UnselectTextInEditorMessage>(this, HandleUnselectTextInEditorMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<DocumentTextReplacedMessage>(this, HandleDocumentTextReplacedMessage);
+      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<ApplicationThemeUpdatedMessage>(this, HandleApplicationThemeUpdatedMessage);
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
@@ -277,85 +270,9 @@ namespace eXeMeL
 
 
 
-    private void HandleSyntaxHighlightingChange(Settings obj)
+    private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
-      this.AvalonEditor.SyntaxHighlighting = GetSyntaxHighlighting();
-    }
-
-
-
-    private IHighlightingDefinition GetSyntaxHighlighting()
-    {
-      var resourceName = GetSyntaxHighlightingResource();
-
-      using (Stream stream = this.GetType().Assembly.GetManifestResourceStream(resourceName))
-      {
-        using (XmlTextReader reader = new XmlTextReader(stream))
-        {
-          return HighlightingLoader.Load(reader, HighlightingManager.Instance);
-        }
-      }
-    }
-
-
-
-    private string GetSyntaxHighlightingResource()
-    {
-      switch (this.ViewModel.Settings.SyntaxHighlightingStyle)
-      {
-        case SyntaxHighlightingStyle.Light_Earthy:
-          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd";
-
-        case SyntaxHighlightingStyle.Light_Bright:
-          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Bright.xshd";
-
-        case SyntaxHighlightingStyle.Dark_Ethereal:
-          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Dark.xshd";
-
-        default:
-          return "eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd";
-      }
-    }
-
-
-
-    private void HandleApplicationThemeChange(Settings obj)
-    {
-      SetApplicationThemeBasedOnSettings();
-    }
-
-
-
-    private void SetApplicationThemeBasedOnSettings()
-    {
-      Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
-
-      if (Application.Current.Resources.MergedDictionaries.Count == 6)
-      {
-        Application.Current.Resources.MergedDictionaries.RemoveAt(5);
-      }
-
-      var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(), UriKind.RelativeOrAbsolute) };
-      Application.Current.Resources.MergedDictionaries.Add(dict);
-
       this.GlowBrush.Color = (Color)this.FindResource("WindowGlowColor");
-    }
-
-
-
-    private string GetApplicationThemeResource()
-    {
-      switch (this.ViewModel.Settings.ApplicationTheme)
-      {
-        case ApplicationTheme.Light:
-          return @"pack://application:,,,/Resources/ThemeColors.xaml";
-
-        case ApplicationTheme.Dark:
-          return @"pack://application:,,,/Resources/DarkThemeColors.xaml";
-
-        default:
-          return @"pack://application:,,,/Resources/ThemeColors.xaml";
-      }
     }
 
 

@@ -260,7 +260,7 @@
               Margin="0,15,0,0"
               FontFamily="Consolas" 
               FontSize="{Binding Settings.EditorFontSize}" 
-              SyntaxHighlighting="XML" 
+              SyntaxHighlighting="{Binding DataContext.HighlightingManager.HighlightingDefinition, Mode=OneWay, ElementName=ControlRoot}"
               BorderThickness="1" 
               Document="{Binding Document}"
               VerticalScrollBarVisibility="Auto" 
@@ -271,6 +271,7 @@
               Foreground="{DynamicResource EditorTextBrush}"
               MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
               >
+              <!--SyntaxHighlighting="XML"-->
               <avalonEdit:TextEditor.ContextMenu>
                 <ContextMenu>
                   <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
