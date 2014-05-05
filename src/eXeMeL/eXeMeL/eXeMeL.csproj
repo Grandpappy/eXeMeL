@@ -28,7 +28,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>52</ApplicationRevision>
+    <ApplicationRevision>53</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -57,7 +57,7 @@
     <ApplicationIcon>Assets\eXeMeL Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>788784B0AD8FC78DF5435D14D7626BAE2DFA161D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>6F250294C5E7FF65BFC50196E306191B1BF6A420</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>eXeMeL_TemporaryKey.pfx</ManifestKeyFile>
@@ -232,6 +232,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd" />
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Dark.xshd" />
+    <None Include="eXeMeL_1_TemporaryKey.pfx" />
     <None Include="eXeMeL_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />

@@ -1,7 +1,5 @@
 ﻿using eXeMeL.Messages;
-using eXeMeL.View;
 using eXeMeL.ViewModel;
-using GalaSoft.MvvmLight.Messaging;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using MahApps.Metro.Controls;
@@ -9,27 +7,12 @@ using MvvmFoundation.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.ComponentModel;
-using System.Xml;
-using System.IO;
-using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
-using System.Reflection;
-using System.Diagnostics;
 
 namespace eXeMeL
 {
@@ -69,6 +52,7 @@ namespace eXeMeL
       this.FoldingStrategy = new XmlFoldingStrategy();
 
       this.IgnoreNextTextChange = false;
+      SetWindowGlow();
     }
 
     
@@ -271,6 +255,13 @@ namespace eXeMeL
 
 
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
+    {
+      SetWindowGlow();
+    }
+
+
+
+    private void SetWindowGlow()
     {
       this.GlowBrush.Color = (Color)this.FindResource("WindowGlowColor");
     }
