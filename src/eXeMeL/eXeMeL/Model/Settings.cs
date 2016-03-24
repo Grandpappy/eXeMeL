@@ -8,6 +8,7 @@ using System.Runtime.Serialization.Json;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using Microsoft.Win32;
 
 namespace eXeMeL.Model
@@ -23,6 +24,7 @@ namespace eXeMeL.Model
     private bool _WrapEditorText;
     private bool _ShowEditorLineNumbers;
     private double _EditorFontSize;
+    private string _FontFamily;
 
 
 
@@ -71,6 +73,15 @@ namespace eXeMeL.Model
 
 
 
+    [DataMember]
+    public string FontFamily
+    {
+      get { return this._FontFamily; }
+      set { _FontFamily = value; NotifyPropertyChanged("FontFamily"); }
+    }
+
+
+
     public Settings()
       : base()
     {
@@ -79,6 +90,7 @@ namespace eXeMeL.Model
       this.EditorFontSize = DEFAULT_EDITOR_FONT_SIZE;
       this.SyntaxHighlightingStyle = Model.SyntaxHighlightingStyle.Light_Earthy;
       this.ApplicationTheme = Model.ApplicationTheme.Light;
+      this.FontFamily = "Consolas";
     }
 
 

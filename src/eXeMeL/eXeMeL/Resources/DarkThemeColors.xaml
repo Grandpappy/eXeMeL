@@ -19,7 +19,9 @@
 
 
   <Color x:Key="BlackColor">#FFFFFFFF</Color>
-  <Color x:Key="WhiteColor">#272822</Color>
+  <!--<Color x:Key="WhiteColor">#272822</Color>-->
+  <Color x:Key="WhiteColor">#1E1E1E</Color>
+
 
   <Color x:Key="Gray1">#FFF9F9F9</Color>
   <Color x:Key="Gray2">#FF7F7F7F</Color>

@@ -21,7 +21,11 @@ namespace eXeMeL.Model
 
     [Description("Ethereal (Dark Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Dark.xshd")]
-    Dark_Ethereal
+    Dark_Ethereal,
+
+    [Description("Blue (Dark Theme)")]
+    [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.VSBlue.xshd")]
+    Dark_Blue
   }
 
 

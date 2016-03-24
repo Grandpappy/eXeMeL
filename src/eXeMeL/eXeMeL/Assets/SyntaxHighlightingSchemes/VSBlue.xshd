@@ -1,17 +1,18 @@
 ﻿<SyntaxDefinition name="XML" extensions=".xml;.xsl;.xslt;.xsd;.manifest;.config;.addin;.xshd;.wxs;.wxi;.wxl;.proj;.csproj;.vbproj;.ilproj;.booproj;.build;.xfrm;.targets;.xaml;.xpt;.xft;.map;.wsdl;.disco;.ps1xml;.nuspec" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-  <Color foreground="Green" name="Comment" exampleText="&lt;!-- comment --&gt;" />
-  <Color foreground="Teal" name="CData" exampleText="&lt;![CDATA[data]]&gt;" />
-  <Color foreground="Teal" name="DocType" exampleText="&lt;!DOCTYPE rootElement&gt;" />
-  <Color foreground="Teal" name="XmlDeclaration" exampleText='&lt;?xml version="1.0"?&gt;' />
+  <Color foreground="#56A439" name="Comment" exampleText="&lt;!-- comment --&gt;" />
+  <Color foreground="#569CD6" name="CData" exampleText="&lt;![CDATA[data]]&gt;" />
+  <Color foreground="#569CD6" name="DocType" exampleText="&lt;!DOCTYPE rootElement&gt;" />
+  <Color foreground="#569CD6" name="XmlDeclaration" exampleText='&lt;?xml version="1.0"?&gt;' />
   <!--<Color foreground="DarkMagenta" name="XmlTag" exampleText='&lt;tag attribute="value" /&gt;' />-->
-  <Color foreground="#BA2F2F" name="XmlTag" exampleText='&lt;tag attribute="value" /&gt;' />
+  <!--<Color foreground="#E6E6E6" name="XmlTag" exampleText='&lt;tag attribute="value" /&gt;' />-->
+  <Color foreground="#D6D6D6" name="XmlTag" exampleText='&lt;tag attribute="value" /&gt;' />
   <!--<Color foreground="Red" name="AttributeName" exampleText='&lt;tag attribute="value" /&gt;' />-->
-  <Color foreground="#DE7800" name="AttributeName" exampleText='&lt;tag attribute="value" /&gt;' />
+  <Color foreground="#92CAF4" name="AttributeName" exampleText='&lt;tag attribute="value" /&gt;' />
   <!--#D37200-->
   <!--<Color foreground="Blue" name="AttributeValue" exampleText='&lt;tag attribute="value" /&gt;' />-->
-  <Color foreground="Teal" name="AttributeValue" exampleText='&lt;tag attribute="value" /&gt;' />
-  <Color foreground="Teal" name="Entity" exampleText="index.aspx?a=1&amp;amp;b=2" />
-  <Color foreground="Olive" name="BrokenEntity" exampleText="index.aspx?a=1&amp;b=2" />
+  <Color foreground="#569CD6" name="AttributeValue" exampleText='&lt;tag attribute="value" /&gt;' />
+  <Color foreground="#569CD6" name="Entity" exampleText="index.aspx?a=1&amp;amp;b=2" />
+  <Color foreground="Red" name="BrokenEntity" exampleText="index.aspx?a=1&amp;b=2" />
 
   <RuleSet>
     <Span color="Comment" multiline="true">

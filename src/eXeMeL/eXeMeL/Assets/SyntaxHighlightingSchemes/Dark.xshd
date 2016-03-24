@@ -35,7 +35,7 @@
       <End>&gt;</End>
       <RuleSet>
         <!-- Treat the position before '<' as end, as that's not a valid character
-				     in attribute names and indicates the user forgot a closing quote. -->
+             in attribute names and indicates the user forgot a closing quote. -->
         <Span color="AttributeValue" multiline="true" ruleSet="EntitySet">
           <Begin>"</Begin>
           <End>"|(?=&lt;)</End>

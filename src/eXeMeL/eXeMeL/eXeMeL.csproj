@@ -15,7 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ExpressionBlendVersion>5.0.40218.0</ExpressionBlendVersion>
-    <PublishUrl>\\tsgprime\public\eXeMeL\</PublishUrl>
+    <PublishUrl>\\plapvsvprime\Public\eXeMeL\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -28,7 +28,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>53</ApplicationRevision>
+    <ApplicationRevision>56</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -57,10 +57,10 @@
     <ApplicationIcon>Assets\eXeMeL Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>6F250294C5E7FF65BFC50196E306191B1BF6A420</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>156CBF63CB21D032DAB84107F87AD6A0E70849AB</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>eXeMeL_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>eXeMeL_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -232,7 +232,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd" />
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Dark.xshd" />
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSBlue.xshd" />
     <None Include="eXeMeL_1_TemporaryKey.pfx" />
+    <None Include="eXeMeL_2_TemporaryKey.pfx" />
     <None Include="eXeMeL_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />

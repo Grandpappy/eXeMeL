@@ -1,4 +1,10 @@
-﻿*5/2/2014 - Dark Application Theme
+﻿*3/24/2016 - New Options
+
+New option to select the font that is used in the editor.
+
+New syntax highlighting scheme for the dark application theme.  This is largely based on Visual Studio's XAML scheme.
+
+*5/2/2014 - Dark Application Theme
 
 New application-wide dark theme.  Change to it in the settings.
 

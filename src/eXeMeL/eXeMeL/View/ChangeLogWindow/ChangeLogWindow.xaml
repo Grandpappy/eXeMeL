@@ -15,7 +15,7 @@
   ShowInTaskbar="False"
   Title="Change Log" 
   Height="500" 
-  Width="500"
+  Width="600"
   >
   
   <MahApps:MetroWindow.Resources>

@@ -258,7 +258,7 @@
               x:Name="AvalonEditor"
               Grid.Row="1"
               Margin="0,15,0,0"
-              FontFamily="Consolas" 
+              FontFamily="{Binding Settings.FontFamily}" 
               FontSize="{Binding Settings.EditorFontSize}" 
               SyntaxHighlighting="{Binding DataContext.HighlightingManager.HighlightingDefinition, Mode=OneWay, ElementName=ControlRoot}"
               BorderThickness="1" 
@@ -376,7 +376,7 @@
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Foreground="{DynamicResource WhiteBrush}"/>
       </Grid>
     </Border>
     <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">
