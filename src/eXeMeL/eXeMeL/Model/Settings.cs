@@ -9,6 +9,7 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using eXeMeL.Utilities;
 using Microsoft.Win32;
 
 namespace eXeMeL.Model
@@ -59,7 +60,7 @@ namespace eXeMeL.Model
     public SyntaxHighlightingStyle SyntaxHighlightingStyle
     {
       get { return _SyntaxHighlightingStyle; }
-      set { _SyntaxHighlightingStyle = value; NotifyPropertyChanged("SyntaxHighlightingStyle"); }
+      set { _SyntaxHighlightingStyle = value; NotifyPropertyChanged("SyntaxHighlightingStyle"); NotifyPropertyChanged("EditorBrush"); }
     }
 
 
@@ -68,7 +69,7 @@ namespace eXeMeL.Model
     public ApplicationTheme ApplicationTheme
     {
       get { return _ApplicationTheme; }
-      set { _ApplicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); }
+      set { _ApplicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); NotifyPropertyChanged("EditorBrush"); }
     }
 
 
@@ -78,6 +79,22 @@ namespace eXeMeL.Model
     {
       get { return this._FontFamily; }
       set { _FontFamily = value; NotifyPropertyChanged("FontFamily"); }
+    }
+
+
+
+    public Brush EditorBrush
+    {
+      get
+      {
+        var associatedBrush = this.SyntaxHighlightingStyle.GetAttributes<AssociatedThemeBrushAttribute>()
+          .FirstOrDefault(x => x.AssociatedTheme == this.ApplicationTheme);
+
+        if (associatedBrush == null)
+          return new SolidColorBrush(Colors.Black);
+
+        return associatedBrush.AssociatedBrush;
+      }
     }
 
 

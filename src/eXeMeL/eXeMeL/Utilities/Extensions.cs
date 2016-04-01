@@ -32,5 +32,13 @@ namespace eXeMeL.Utilities
 
       return expression(attribute);
     }
+
+
+
+    public static IEnumerable<T> GetAttributes<T>(this Enum enumeration)
+        where T : Attribute
+    {
+      return enumeration.GetType().GetMember(enumeration.ToString())[0].GetCustomAttributes(typeof(T), false).Cast<T>();
+    }
   }
 }

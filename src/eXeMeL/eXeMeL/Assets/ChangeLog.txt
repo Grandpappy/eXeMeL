@@ -1,4 +1,8 @@
-﻿*3/24/2016 - New Options
+﻿*4/1/2016 - Updated Syntax Highlighting
+
+Improved the contrast between elements and the element content for the new Blue theme.
+
+*3/24/2016 - New Options
 
 New option to select the font that is used in the editor.
 

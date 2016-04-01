@@ -13,18 +13,26 @@ namespace eXeMeL.Model
   {
     [Description("Bright (Light Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Bright.xshd")]
+    [AssociatedThemeBrush(ApplicationTheme.Light, "#FF333333")]
+    [AssociatedThemeBrush(ApplicationTheme.Dark, "#FFCCCCCC")]
     Light_Bright,
 
     [Description("Earthy (Light Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd")]
+    [AssociatedThemeBrush(ApplicationTheme.Light, "#FF333333")]
+    [AssociatedThemeBrush(ApplicationTheme.Dark, "#FFCCCCCC")]
     Light_Earthy,
 
     [Description("Ethereal (Dark Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Dark.xshd")]
+    [AssociatedThemeBrush(ApplicationTheme.Light, "#FF333333")]
+    [AssociatedThemeBrush(ApplicationTheme.Dark, "#FFCCCCCC")]
     Dark_Ethereal,
 
     [Description("Blue (Dark Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.VSBlue.xshd")]
+    [AssociatedThemeBrush(ApplicationTheme.Light, "#FF333333")]
+    [AssociatedThemeBrush(ApplicationTheme.Dark, "#FF939393")]
     Dark_Blue
   }
 

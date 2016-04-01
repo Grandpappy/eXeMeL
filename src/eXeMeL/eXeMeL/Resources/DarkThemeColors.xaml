@@ -4,7 +4,7 @@
   xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
   >
 
-  <SolidColorBrush x:Key="EditorTextBrush" Color="{DynamicResource Gray6}"/>
+  <SolidColorBrush x:Key="EditorTextBrush" Color="{DynamicResource Gray7}"/>
   <Color x:Key="WindowGlowColor">#99B99400</Color>
 
   <Color x:Key="AccentColor" >#CCB99400</Color>

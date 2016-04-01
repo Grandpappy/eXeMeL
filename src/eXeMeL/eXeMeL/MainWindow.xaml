@@ -268,7 +268,7 @@
               ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
               WordWrap="{Binding Settings.WrapEditorText}"
               Background="{x:Null}"
-              Foreground="{DynamicResource EditorTextBrush}"
+              Foreground="{Binding Settings.EditorBrush}"
               MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
               >
               <!--SyntaxHighlighting="XML"-->
