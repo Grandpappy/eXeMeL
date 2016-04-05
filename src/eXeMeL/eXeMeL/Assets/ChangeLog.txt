@@ -1,4 +1,10 @@
-﻿*4/1/2016 - Updated Syntax Highlighting
+﻿*4/5/2016 - Find and Editing Updates
+
+When searching for text, information will display in the lower right as to what match you're on, and how many were found.  Pressing Escape while in the Find box will now cancel your search.
+
+Added Copy, Cut, and Paste to the right-click context menu.
+
+*4/1/2016 - Updated Syntax Highlighting
 
 Improved the contrast between elements and the element content for the new Blue theme.
 

@@ -127,7 +127,7 @@ namespace eXeMeL.ViewModel
 
 
     
-    async public Task<string> CleanXmlIfPossibleAsync(string xml)
+    public async Task<string> CleanXmlIfPossibleAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
         return xml;
@@ -151,18 +151,18 @@ namespace eXeMeL.ViewModel
 
             if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
             {
-              this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage(context.ErrorMessage));
+              this.MessengerInstance.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
               return;
             }
           }
 
           if (context.ParsedXml != null)
           {
-            this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("XML parsed correctly"));
+            this.MessengerInstance.Send(new DisplayApplicationStatusMessage("XML parsed correctly"));
           }
           else
           {
-            this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
+            this.MessengerInstance.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
           }
         });
 
@@ -189,7 +189,7 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private Task SetDocumentTextFromClipboardAsync()
+    private async Task SetDocumentTextFromClipboardAsync()
     {
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
@@ -199,11 +199,10 @@ namespace eXeMeL.ViewModel
 
       ReplaceOldDocumentWithNewDocument(text);
 
-      var handler = RefreshComplete;
-      if (handler != null)
-      {
-        handler(this, EventArgs.Empty);
-      }
+      this.MessengerInstance.Send(new DisplayToolInformationMessage(string.Empty));
+
+      var handler = this.RefreshComplete;
+      handler?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -235,14 +234,14 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void RefreshCommand_Execute()
+    private async void RefreshCommand_Execute()
     {
       await SetDocumentTextFromClipboardAsync();
     }
 
 
 
-    async private void CopyDecodedXmlFromCursorPositionCommand_Execute()
+    private async void CopyDecodedXmlFromCursorPositionCommand_Execute()
     {
       var decodedText = await GetDecodedTextAtCaretPositionAsync();
       if (decodedText != null)
@@ -260,7 +259,7 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void DelveIntoDecodedXmlFromCursorPositionCommand_Execute()
+    private async void DelveIntoDecodedXmlFromCursorPositionCommand_Execute()
     {
       var decodedText = await GetDecodedTextAtCaretPositionAsync();
       if (decodedText != null)
@@ -308,11 +307,11 @@ namespace eXeMeL.ViewModel
 
         RaiseRefreshComplete();
 
-        this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
+        this.MessengerInstance.Send(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
       }
       catch (Exception ex)
       {
-        this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
+        this.MessengerInstance.Send(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
       }
     }
 
@@ -347,7 +346,7 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void SaveCommand_Execute()
+    private async void SaveCommand_Execute()
     {
       if (this.IsContentFromFile)
       {
@@ -387,7 +386,7 @@ namespace eXeMeL.ViewModel
 
     private async Task<string> LoadFileContentsAsync(string filePath)
     {
-      return await Task<string>.Run(() => { return File.ReadAllText(filePath); } );
+      return await Task.Run(() => File.ReadAllText(filePath));
     }
 
 

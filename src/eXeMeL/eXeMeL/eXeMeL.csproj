@@ -28,7 +28,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>58</ApplicationRevision>
+    <ApplicationRevision>59</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -124,6 +124,7 @@
     <Compile Include="Messages\ApplicationClosingMessage.cs" />
     <Compile Include="Messages\ApplicationThemeUpdatedMessage.cs" />
     <Compile Include="Messages\DisplayApplicationStatusMessage.cs" />
+    <Compile Include="Messages\DisplayToolInformationMessage.cs" />
     <Compile Include="Messages\GoToTopOfDocumentMessage.cs" />
     <Compile Include="Messages\SelectTextInEditorMessage.cs" />
     <Compile Include="Messages\SetSearchTextMessage.cs" />

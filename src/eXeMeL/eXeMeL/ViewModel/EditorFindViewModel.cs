@@ -42,7 +42,10 @@ namespace eXeMeL.ViewModel
         this.Set(() => SearchText, ref _currentFindValue, value);
         this.Matches = null;
 
-        PerformFindNextSearchAsync();
+        if (value != null && value.Length == 0)
+          CancelSearch();
+        else
+          PerformFindNextSearchAsync();
       }
     }
 
@@ -138,7 +141,7 @@ namespace eXeMeL.ViewModel
 
     public ICommand FindNextCommand { get; private set; }
     public ICommand FindPreviousCommand { get; private set; }
-
+    public ICommand CancelSearchCommand { get; private set; }
 
     #endregion
 
@@ -150,14 +153,13 @@ namespace eXeMeL.ViewModel
     {
       this.FindNextCommand = new RelayCommand(FindNextCommand_Execute, FindNextCommand_CanExecute);
       this.FindPreviousCommand = new RelayCommand(FindPreviousCommand_Execute, FindPreviousCommand_CanExecute);
+      this.CancelSearchCommand = new RelayCommand(CancelSearchCommand_Execute);
 
       this.MessengerInstance.Register<SetSearchTextMessage>(this, HandleSetFindTextMessage);
 
       this.SearchText = string.Empty;
     }
 
-
-       
     #endregion
 
 
@@ -183,14 +185,14 @@ namespace eXeMeL.ViewModel
 
     
 
-    async private void FindNextCommand_Execute()
+    private async void FindNextCommand_Execute()
     {
       await PerformFindNextSearchAsync();
     }
 
 
 
-    async private Task PerformFindNextSearchAsync()
+    private async Task PerformFindNextSearchAsync()
     {
       if (IsSearchNeeded())
       {
@@ -220,7 +222,7 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void FindPreviousCommand_Execute()
+    private async void FindPreviousCommand_Execute()
     {
       await PerformFindPreviousSearch();
     }
@@ -248,7 +250,7 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private void AutoFindTimer_Tick(object sender, EventArgs e)
+    private async void AutoFindTimer_Tick(object sender, EventArgs e)
     {
       if (IsSearchTextValidForAutomaticSearching())
         return;
@@ -273,8 +275,11 @@ namespace eXeMeL.ViewModel
 
 
 
-    async private Task PerformSearchAsync()
+    private async Task PerformSearchAsync()
     {
+      if (this.SearchText.Length == 0)
+        return;
+
       //this.AutoFindTimer.Stop();
 
       var text = this.Document.Text;
@@ -364,16 +369,32 @@ namespace eXeMeL.ViewModel
 
 
 
+    private void CancelSearchCommand_Execute()
+    {
+      this.SearchText = string.Empty;
+    }
+
+
+
     private void SendNavigationMessageForCurrentMatch()
     {
-      this.MessengerInstance.Send<SelectTextInEditorMessage>(new SelectTextInEditorMessage(this.CurrentMatch.Index, this.CurrentMatch.Length));
+      this.MessengerInstance.Send(new SelectTextInEditorMessage(this.CurrentMatch.Index, this.CurrentMatch.Length));
+      this.MessengerInstance.Send(new DisplayToolInformationMessage($"{this.CurrentMatchPosition} of {this.MatchCount} matches"));
     }
 
 
 
     private void SendNavigationMessageForNoMatch()
     {
-      this.MessengerInstance.Send<UnselectTextInEditorMessage>(new UnselectTextInEditorMessage());
+      this.MessengerInstance.Send(new UnselectTextInEditorMessage());
+      this.MessengerInstance.Send(new DisplayToolInformationMessage($"Unable to find \"{this.SearchText}\""));
+    }
+
+
+
+    private void CancelSearch()
+    {
+      this.MessengerInstance.Send(new DisplayToolInformationMessage(string.Empty));
     }
 
 

@@ -117,7 +117,7 @@
 
 
   <Grid Background="#00000000">
-    <i:Interaction.Triggers>
+    <!--<i:Interaction.Triggers>
       <i:EventTrigger EventName="DragLeave">
         <ei:GoToStateAction StateName="NoDragDrop"/>
       </i:EventTrigger>
@@ -127,9 +127,9 @@
       <i:EventTrigger EventName="Drop">
         <ei:GoToStateAction StateName="NoDragDrop"/>
       </i:EventTrigger>
-    </i:Interaction.Triggers>
+    </i:Interaction.Triggers>-->
     
-    <VisualStateManager.VisualStateGroups>
+    <!--<VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="DragDropStates">
         <VisualStateGroup.Transitions>
           <VisualTransition GeneratedDuration="0:0:0.2"/>
@@ -149,7 +149,7 @@
           </Storyboard>
         </VisualState>
       </VisualStateGroup>
-    </VisualStateManager.VisualStateGroups>
+    </VisualStateManager.VisualStateGroups>-->
     
     <Grid.RowDefinitions>
       <RowDefinition Height="40"/>
@@ -271,9 +271,12 @@
               Foreground="{Binding Settings.EditorBrush}"
               MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
               >
-              <!--SyntaxHighlighting="XML"-->
               <avalonEdit:TextEditor.ContextMenu>
                 <ContextMenu>
+                  <MenuItem Header="Copy" Command="Copy"/>
+                  <MenuItem Header="Cut" Command="Cut"/>
+                  <MenuItem Header="Paste" Command="Paste"/>
+                  <Separator Margin="3"/>
                   <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
                   <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
                 </ContextMenu>
@@ -370,19 +373,17 @@
 
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="4*"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Foreground="{DynamicResource WhiteBrush}"/>
+        <TextBlock Grid.Column="0" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Foreground="{DynamicResource WhiteBrush}"/>
+        <TextBlock Grid.Column="1" Text="{Binding ToolInformation}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Foreground="{DynamicResource WhiteBrush}" HorizontalAlignment="Right"/>
       </Grid>
     </Border>
-    <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">
+    <!--<Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">
       <Rectangle.Fill>
         <SolidColorBrush Color="{DynamicResource AccentColor3}"/>
       </Rectangle.Fill>
-    </Rectangle>
+    </Rectangle>-->
   </Grid>
 </MahApps:MetroWindow>
