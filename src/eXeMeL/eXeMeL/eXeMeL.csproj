@@ -151,6 +151,7 @@
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
+    <Compile Include="ViewModel\XmlUtilityViewModel.cs" />
     <Compile Include="View\ChangeLogWindow\ChangeLogWindow.xaml.cs">
       <DependentUpon>ChangeLogWindow.xaml</DependentUpon>
     </Compile>
@@ -162,6 +163,9 @@
     </Compile>
     <Compile Include="View\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\XmlUtilityView.xaml.cs">
+      <DependentUpon>XmlUtilityView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -185,6 +189,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Icons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\XmlUtilityView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

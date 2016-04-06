@@ -23,7 +23,7 @@ namespace eXeMeL
   {
     private FoldingManager FoldingManager { get; set; }
     private XmlFoldingStrategy FoldingStrategy { get; set; }
-    private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
+    public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
 

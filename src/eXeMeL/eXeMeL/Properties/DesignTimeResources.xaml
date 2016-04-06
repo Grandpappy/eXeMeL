@@ -5,6 +5,7 @@
 		<ResourceDictionary Source="/eXeMeL;component/Resources/ThemeColors.xaml"/>
 		<ResourceDictionary Source="/eXeMeL;component/Resources/Icons.xaml"/>
 		<ResourceDictionary Source="/eXeMeL;component/Resources/CommonStyles.xaml"/>
-	</ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/eXeMeL;component/Resources/DarkThemeColors.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
 	<!-- Resource dictionary entries should be defined here. -->
 </ResourceDictionary>

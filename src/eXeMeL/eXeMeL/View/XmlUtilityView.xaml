@@ -1,0 +1,54 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:eXeMeL.View"
+             xmlns:vm="clr-namespace:eXeMeL.ViewModel"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" x:Class="eXeMeL.View.XmlUtilityView"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance vm:XmlUtilityViewModel}"
+             >
+  <Grid>
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="ValidXmlGroup">
+        <VisualState x:Name="ValidXml">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlText">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+        <VisualState x:Name="InvalidXml">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlText">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+      </VisualStateGroup>
+    </VisualStateManager.VisualStateGroups>
+
+    <i:Interaction.Triggers>
+      <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="False">
+        <ei:GoToStateAction x:Name="GoToInvalidXmlVisualStateAction" StateName="InvalidXml"/>
+      </ei:DataTrigger>
+      <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="True">
+        <ei:GoToStateAction x:Name="GoToValidXmlVisualStateAction" StateName="ValidXml"/>
+      </ei:DataTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid x:Name="XmlUtilityContainer" Background="DarkGray">
+      
+    </Grid>
+
+    <TextBlock x:Name="InvalidXmlText" Text="Document is not valid Xml" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" Visibility="Collapsed" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
+  </Grid>
+</UserControl>

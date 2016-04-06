@@ -31,7 +31,7 @@ namespace eXeMeL.ViewModel
 
     public string SearchText
     {
-      get { return _currentFindValue; }
+      get { return this._currentFindValue; }
       set 
       {
         if (!string.IsNullOrEmpty(this.SearchText) && string.IsNullOrEmpty(value))
@@ -39,7 +39,7 @@ namespace eXeMeL.ViewModel
           NavigateToNoMatch();
         }
 
-        this.Set(() => SearchText, ref _currentFindValue, value);
+        Set(() => this.SearchText, ref this._currentFindValue, value);
         this.Matches = null;
 
         if (value != null && value.Length == 0)
@@ -53,18 +53,18 @@ namespace eXeMeL.ViewModel
 
     public int MatchCount
     {
-      get { return _matchCount; }
-      set { this.Set(() => MatchCount, ref _matchCount, value); }
+      get { return this._matchCount; }
+      set { Set(() => this.MatchCount, ref this._matchCount, value); }
     }
     
 
 
     private MatchCollection Matches
     {
-      get { return _matches; }
+      get { return this._matches; }
       set 
       { 
-        this.Set(() => Matches, ref _matches, value);
+        Set(() => this.Matches, ref this._matches, value);
 
         if (this.Matches == null || this.Matches.Count == 0)
         {
@@ -83,26 +83,26 @@ namespace eXeMeL.ViewModel
 
     public int? CurrentMatchIndex
     {
-      get { return _currentMatchIndex; }
+      get { return this._currentMatchIndex; }
       set 
       { 
         if (this.Matches == null || this.Matches.Count == 0)
         {
-          this.Set(() => CurrentMatchIndex, ref _currentMatchIndex, null);
+          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, null);
         }
         else
         if (value >= 0 && value < this.Matches.Count)
         {
-          this.Set(() => CurrentMatchIndex, ref _currentMatchIndex, value);
+          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, value);
         }
         else
         if (value < 0)
         {
-          this.Set(() => CurrentMatchIndex, ref _currentMatchIndex, 0);
+          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, 0);
         }
         else
         {
-          this.Set(() => CurrentMatchIndex, ref _currentMatchIndex, this.Matches.Count - 1);
+          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, this.Matches.Count - 1);
         }
       }
     }
