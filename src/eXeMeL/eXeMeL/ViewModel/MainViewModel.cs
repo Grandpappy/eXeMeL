@@ -41,6 +41,15 @@ namespace eXeMeL.ViewModel
       this.MessengerInstance.Register<ApplicationClosingMessage>(this, HandleApplicationClosingMessage);
       this.MessengerInstance.Register<DisplayApplicationStatusMessage>(this, HandleDisplayApplicationStatusMessage);
       this.MessengerInstance.Register<DisplayToolInformationMessage>(this, HandleDisplayToolInformationMessage);
+      this.MessengerInstance.Register<DocumentRefreshCompleted>(this, HandleDocumentRefreshCompletedMessage);
+    }
+
+
+
+    private void HandleDocumentRefreshCompletedMessage(DocumentRefreshCompleted message)
+    {
+      //this.EditorMode = EditorMode.Editor;
+      this.XmlUtility.DocumentText = message.NewDocumentText;
     }
 
 

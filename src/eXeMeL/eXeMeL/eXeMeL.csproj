@@ -125,6 +125,7 @@
     <Compile Include="Messages\ApplicationThemeUpdatedMessage.cs" />
     <Compile Include="Messages\DisplayApplicationStatusMessage.cs" />
     <Compile Include="Messages\DisplayToolInformationMessage.cs" />
+    <Compile Include="Messages\DocumentRefreshCompleted.cs" />
     <Compile Include="Messages\GoToTopOfDocumentMessage.cs" />
     <Compile Include="Messages\SelectTextInEditorMessage.cs" />
     <Compile Include="Messages\SetSearchTextMessage.cs" />

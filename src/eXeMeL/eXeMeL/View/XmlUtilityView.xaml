@@ -7,9 +7,86 @@
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" x:Class="eXeMeL.View.XmlUtilityView"
              mc:Ignorable="d" 
+             Name="ControlRoot"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance vm:XmlUtilityViewModel}"
              >
+  
+  <UserControl.Resources>
+    <Style x:Key="XmlText" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"/>
+      <Setter Property="FontFamily" Value="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
+    </Style>
+    
+    <Style x:Key="HorizontalItemsControl" TargetType="ItemsControl">
+      <Setter Property="ItemsPanel">
+        <Setter.Value>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"/>
+          </ItemsPanelTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+
+    <Style x:Key="VerticalItemsControl" TargetType="ItemsControl">
+      <Setter Property="ItemsPanel">
+        <Setter.Value>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"/>
+          </ItemsPanelTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+
+    <DataTemplate DataType="{x:Type vm:ElementViewModel}">
+      <DataTemplate.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource XmlText}"/>
+      </DataTemplate.Resources>
+      
+      <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&lt;"/>
+          <TextBlock Text="{Binding Name}"/>
+          <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
+          <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
+          <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <ItemsControl ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0"/>
+
+        <StackPanel Name="EndTag" Orientation="Horizontal">
+          <TextBlock Text="&lt;/"/>
+          <TextBlock Text="{Binding Name}"/>
+          <TextBlock Text="&gt;"/>
+        </StackPanel>
+      </StackPanel>
+      
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="EndTag" Property="Visibility" Value="Collapsed"/>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+    
+    
+    <DataTemplate DataType="{x:Type vm:AttributeViewModel}">
+      <DataTemplate.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource XmlText}"/>
+      </DataTemplate.Resources>
+      
+      <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+        <TextBlock Text="{Binding Name}"/>
+        <TextBlock Text="=&quot;"/>
+        <TextBlock Text="{Binding Value}"/>
+        <TextBlock Text="&quot;"/>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.Resources>
+  
   <Grid>
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="ValidXmlGroup">
@@ -45,10 +122,15 @@
       </ei:DataTrigger>
     </i:Interaction.Triggers>
 
-    <Grid x:Name="XmlUtilityContainer" Background="DarkGray">
-      
+    <Grid x:Name="XmlUtilityContainer">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ContentPresenter Content="{Binding Root}"/>
+      </ScrollViewer>
     </Grid>
 
     <TextBlock x:Name="InvalidXmlText" Text="Document is not valid Xml" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" Visibility="Collapsed" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
   </Grid>
 </UserControl>
+ 
+
+ 
