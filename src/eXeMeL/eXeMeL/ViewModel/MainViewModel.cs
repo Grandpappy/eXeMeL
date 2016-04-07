@@ -9,7 +9,6 @@ namespace eXeMeL.ViewModel
   public class MainViewModel : ViewModelBase
   {
     private string _Status;
-    private XElement _ParsedXml;
     private SyntaxHighlightingManager _HighlightingManager;
     private ApplicationThemeManager _ApplicationThemeManager;
 
@@ -20,14 +19,6 @@ namespace eXeMeL.ViewModel
     public string Status { get { return _Status; } private set { this.Set(() => Status, ref _Status, value); } }
     public SyntaxHighlightingManager HighlightingManager { get { return _HighlightingManager; } private set { Set(() => HighlightingManager, ref _HighlightingManager, value); } }
     public ApplicationThemeManager ApplicationThemeManager { get { return _ApplicationThemeManager; } private set { Set(() => ApplicationThemeManager, ref _ApplicationThemeManager, value); } }
-
-
-
-    public XElement ParsedXml
-    {
-      get { return _ParsedXml; }
-      set { _ParsedXml = value; }
-    }
 
 
 

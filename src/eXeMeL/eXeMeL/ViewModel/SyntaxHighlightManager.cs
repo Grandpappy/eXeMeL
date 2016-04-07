@@ -108,7 +108,7 @@ namespace eXeMeL.ViewModel
 
     private void SetApplicationThemeBasedOnSettings()
     {
-      Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
+      //Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
 
       if (Application.Current.Resources.MergedDictionaries.Count == 6)
       {

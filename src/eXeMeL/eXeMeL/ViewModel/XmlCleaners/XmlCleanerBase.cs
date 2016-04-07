@@ -12,6 +12,7 @@ namespace eXeMeL.ViewModel.XmlCleaners
     public string XmlToClean { get; set; }
     public XElement ParsedXml { get; set; }
     public string ErrorMessage { get; set; }
+    public string OriginalXml { get; set; }
   }
 
 

@@ -17,6 +17,7 @@
   d:DesignWidth="742" d:DesignHeight="577"
   x:Name="ControlRoot"
   GlowBrush="#FFD4AA00"
+  
   >
 
 
@@ -29,6 +30,7 @@
         <Setter Property="Opacity" Value="0.8"/>
       </Style>
 
+      <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </ResourceDictionary>
   </MahApps:MetroWindow.Resources>
 
@@ -99,6 +101,16 @@
             <views:SettingsView DataContext="{Binding Settings}"/>
             <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left"/>
           </StackPanel>
+        </MahApps:Flyout>
+        <MahApps:Flyout
+          x:Name="CleanersFlyout"
+          Header="Changes Made"
+          IsOpen="False"
+          Margin="0,80,0,28"
+          Position="Right"
+          Background="{DynamicResource FlyoutBackgroundBrush}"
+          Foreground="{DynamicResource FlyoutForegroundBrush}"
+          >
         </MahApps:Flyout>
       </MahApps:FlyoutsControl.Items>
     </MahApps:FlyoutsControl>
@@ -366,6 +378,12 @@
             <Setter Property="Foreground" Value="{DynamicResource BlackBrush}"/>
             <Setter Property="FontSize" Value="14"/>
           </Style>
+          <Style TargetType="{x:Type Button}">
+            <Setter Property="TextElement.FontFamily" Value="Segoe UI"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource BlackBrush}"/>
+            <Setter Property="TextElement.FontSize" Value="14"/>
+            <Setter Property="TextElement.FontWeight" Value="Bold"/>
+          </Style>
         </Grid.Resources>
 
         <Grid.ColumnDefinitions>
@@ -377,9 +395,18 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"/>
+        <Button Name="ViewChangesButton" Click="ViewChangesButton_OnClick" Grid.Column="4" Visibility="{Binding Editor.OriginalXmlWasChanged, Converter={StaticResource BooleanToVisibilityConverter}}">
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border Background="Transparent">
+                <TextBlock Text="MODIFIED" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+            </ControlTemplate>
+          </Button.Template>
+        </Button>
       </Grid>
     </Border>
-    <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0">
+    <Rectangle x:Name="FileDragDropIndicator" Grid.RowSpan="3" IsHitTestVisible="False" Opacity="0" Margin="0" d:IsHidden="True">
       <Rectangle.Fill>
         <SolidColorBrush Color="{DynamicResource AccentColor3}"/>
       </Rectangle.Fill>

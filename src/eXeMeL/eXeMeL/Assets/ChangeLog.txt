@@ -1,4 +1,8 @@
-﻿*5/2/2014 - Dark Application Theme
+﻿*8/19/2014
+
+Small change to remove actual "\r\n" in the text, that Visual Studio likes to add when using the watch window.
+
+*5/2/2014 - Dark Application Theme
 
 New application-wide dark theme.  Change to it in the settings.
 

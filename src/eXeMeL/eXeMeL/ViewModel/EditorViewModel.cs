@@ -29,15 +29,16 @@ namespace eXeMeL.ViewModel
     private string _FileName;
 
     private List<XmlCleanerBase> Cleaners;
+    private bool _originalXmlWasChanged;
     public ObservableCollection<DocumentSnapshot> Snapshots { get; set; }
 
 
     public TextDocument Document
     {
-      get { return _Document; }
+      get { return this._Document; }
       private set 
       { 
-        this.Set(() => Document, ref _Document, value);
+        Set(() => this.Document, ref this._Document, value);
         this.FindViewModel.Document = this.Document;
       }
     }
@@ -46,24 +47,32 @@ namespace eXeMeL.ViewModel
     
     public bool IsContentFromFile
     {
-      get { return _IsContentFromFile; }
-      private set { this.Set(() => this.IsContentFromFile, ref _IsContentFromFile, value); }
+      get { return this._IsContentFromFile; }
+      private set { Set(() => this.IsContentFromFile, ref this._IsContentFromFile, value); }
     }
 
 
-    
+
+    public bool OriginalXmlWasChanged
+    {
+      get { return this._originalXmlWasChanged; }
+      private set { Set(() => this.OriginalXmlWasChanged, ref this._originalXmlWasChanged, value); }
+    }
+
+
+
     public string FilePath
     {
-      get { return _FilePath; }
-      private set { this.Set(() => this.FilePath, ref _FilePath, value); }
+      get { return this._FilePath; }
+      private set { Set(() => this.FilePath, ref this._FilePath, value); }
     }
 
 
 
     public string FileName
     {
-      get { return _FileName; }
-      private set { this.Set(() => this.FileName, ref _FileName, value); }
+      get { return this._FileName; }
+      private set { Set(() => this.FileName, ref this._FileName, value); }
     }
 
 
@@ -100,16 +109,17 @@ namespace eXeMeL.ViewModel
           new VisualStudioCleaner(),
           new VisualStudioVBScriptCleaner(),
           new AddedRootCleaner(),
-          new FormatCleaner()
+          //new FormatCleaner()
         };
 
 
-      if (IsInDesignMode)
+      if (this.IsInDesignMode)
       {
         this.Document = new TextDocument() { Text = "<Root IsValue=\"true\"><FirstChild Name=\"Robby\" Address=\"1521 Greenway Dr\"><Toys>All of them</Toys></FirstChild></Root>" };
         this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "Original"));
         this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "1"));
         this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "Current"));
+        this.OriginalXmlWasChanged = true;
       }
       else
       {
@@ -126,17 +136,27 @@ namespace eXeMeL.ViewModel
     }
 
 
-    
-    async public Task<string> CleanXmlIfPossibleAsync(string xml)
+
+    private class CleanedXmlResult
+    {
+      public string CleanedXml { get; set; }
+      public string OriginalXml { get; set; }
+    }
+
+
+
+    private async Task<CleanedXmlResult> CleanXmlIfPossibleAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
-        return xml;
+        return new CleanedXmlResult(){ CleanedXml = xml, OriginalXml = xml };
 
-      var context = new XmlCleanerContext() { XmlToClean = xml };
+      var context = new XmlCleanerContext() { XmlToClean = xml, OriginalXml = xml};
 
       await CleanXml(context);
 
-      return context.XmlToClean;
+      this.OriginalXmlWasChanged = (context.XmlToClean != context.OriginalXml);
+      
+      return new CleanedXmlResult() { CleanedXml = context.XmlToClean, OriginalXml = context.OriginalXml };
     }
 
 
@@ -151,18 +171,18 @@ namespace eXeMeL.ViewModel
 
             if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
             {
-              this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage(context.ErrorMessage));
+              this.MessengerInstance.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
               return;
             }
           }
 
           if (context.ParsedXml != null)
           {
-            this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("XML parsed correctly"));
+            this.MessengerInstance.Send(new DisplayApplicationStatusMessage("XML parsed correctly"));
           }
           else
           {
-            this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
+            this.MessengerInstance.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
           }
         });
 
@@ -191,15 +211,15 @@ namespace eXeMeL.ViewModel
 
     async private Task SetDocumentTextFromClipboardAsync()
     {
-      var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
+      var cleanResult = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
       this.IsContentFromFile = false;
       this.FilePath = null;
       this.FileName = "From Clipboard";
 
-      ReplaceOldDocumentWithNewDocument(text);
+      ReplaceOldDocumentWithNewDocument(cleanResult.CleanedXml);
 
-      var handler = RefreshComplete;
+      var handler = this.RefreshComplete;
       if (handler != null)
       {
         handler(this, EventArgs.Empty);
@@ -265,9 +285,9 @@ namespace eXeMeL.ViewModel
       var decodedText = await GetDecodedTextAtCaretPositionAsync();
       if (decodedText != null)
       {
-        var cleanedText = await CleanXmlIfPossibleAsync(decodedText);
+        var cleanedResult = await CleanXmlIfPossibleAsync(decodedText);
         ClearSnapshotsAfterDocument(this.Document);
-        AddNewSnapshotWithNewText(cleanedText);
+        AddNewSnapshotWithNewText(cleanedResult.CleanedXml);
       }
     }
 
@@ -308,11 +328,11 @@ namespace eXeMeL.ViewModel
 
         RaiseRefreshComplete();
 
-        this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
+        this.MessengerInstance.Send(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
       }
       catch (Exception ex)
       {
-        this.MessengerInstance.Send<DisplayApplicationStatusMessage>(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
+        this.MessengerInstance.Send(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
       }
     }
 
@@ -320,7 +340,7 @@ namespace eXeMeL.ViewModel
 
     private void RaiseRefreshComplete()
     {
-      var handler = RefreshComplete;
+      var handler = this.RefreshComplete;
       if (handler != null)
       {
         handler(this, EventArgs.Empty);
@@ -387,7 +407,7 @@ namespace eXeMeL.ViewModel
 
     private async Task<string> LoadFileContentsAsync(string filePath)
     {
-      return await Task<string>.Run(() => { return File.ReadAllText(filePath); } );
+      return await Task.Run(() => { return File.ReadAllText(filePath); } );
     }
 
 

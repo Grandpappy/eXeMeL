@@ -230,6 +230,7 @@ namespace eXeMeL
 
     private void OpenSettingsButton_Click(object sender, RoutedEventArgs e)
     {
+      CloseAllFlyouts(exceptFlyout: this.SettingsFlyout);
       this.SettingsFlyout.IsOpen = !this.SettingsFlyout.IsOpen;
     }
 
@@ -279,6 +280,27 @@ namespace eXeMeL
     {
       var changeLogWindow = new ChangeLogWindow(this.ViewModel.Settings.ApplicationTheme) { Owner = this };
       changeLogWindow.Show();
+    }
+
+
+
+    private void ViewChangesButton_OnClick(object sender, RoutedEventArgs e)
+    {
+      CloseAllFlyouts(exceptFlyout: this.CleanersFlyout);
+      this.CleanersFlyout.IsOpen = !this.CleanersFlyout.IsOpen;
+    }
+
+
+
+    private void CloseAllFlyouts(Flyout exceptFlyout)
+    {
+      foreach (Flyout flyout in this.Flyouts.Items)
+      {
+        if (flyout == exceptFlyout)
+          continue;
+
+        flyout.IsOpen = false;
+      }
     }
   }
 }

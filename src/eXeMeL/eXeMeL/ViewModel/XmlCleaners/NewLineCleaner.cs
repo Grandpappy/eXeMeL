@@ -13,7 +13,7 @@ namespace eXeMeL.ViewModel.XmlCleaners
 
     public override void CleanXml(XmlCleanerContext context)
     {
-      context.XmlToClean = context.XmlToClean.Replace("\\\"", "\"");
+      context.XmlToClean = context.XmlToClean.Replace("\\\"", "\"").Replace("\\r\\n", string.Empty);
     }
   }
 

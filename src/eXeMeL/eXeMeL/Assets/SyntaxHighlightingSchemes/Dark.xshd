@@ -13,6 +13,9 @@
   <Color foreground="#9DCFA9" name="Entity" exampleText="index.aspx?a=1&amp;amp;b=2" />
   <Color foreground="Olive" name="BrokenEntity" exampleText="index.aspx?a=1&amp;b=2" />
 
+  <!--<Color foreground="White" name="Punctuation" exampleText='&lt;' />-->
+
+
   <RuleSet>
     <Span color="Comment" multiline="true">
       <Begin>&lt;!--</Begin>
@@ -34,6 +37,9 @@
       <Begin>&lt;</Begin>
       <End>&gt;</End>
       <RuleSet>
+        
+
+        
         <!-- Treat the position before '<' as end, as that's not a valid character
 				     in attribute names and indicates the user forgot a closing quote. -->
         <Span color="AttributeValue" multiline="true" ruleSet="EntitySet">
@@ -46,6 +52,20 @@
         </Span>
         <Rule color="AttributeName">[\d\w_\-\.]+(?=(\s*=))</Rule>
         <Rule color="AttributeValue">=</Rule>
+
+        <!--<Keywords color="Punctuation">
+          <Word>&lt;</Word>
+        </Keywords>-->
+
+        <!--<Rule color="Punctuation">=</Rule>
+        <Rule color="Punctuation">&lt;</Rule>
+        <Rule color="Punctuation">&gt;</Rule>
+        <Rule color="Punctuation">/</Rule>-->
+
+        <!--<Span color="Punctuation" multiline="false">
+          <Begin>&lt;</Begin>
+          <End>&lt;|</End>
+        </Span>-->
       </RuleSet>
     </Span>
     <Import ruleSet="EntitySet"/>
