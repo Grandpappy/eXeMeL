@@ -26,7 +26,10 @@ namespace eXeMeL.Model
     private bool _ShowEditorLineNumbers;
     private double _EditorFontSize;
     private string _FontFamily;
-
+    private Brush _editorBrush;
+    private Brush _elementBrush;
+    private Brush _attributeNameBrush;
+    private Brush _attributeValueBrush;
 
 
     [DataMember]
@@ -60,7 +63,12 @@ namespace eXeMeL.Model
     public SyntaxHighlightingStyle SyntaxHighlightingStyle
     {
       get { return _SyntaxHighlightingStyle; }
-      set { _SyntaxHighlightingStyle = value; NotifyPropertyChanged("SyntaxHighlightingStyle"); NotifyPropertyChanged("EditorBrush"); }
+      set
+      {
+        _SyntaxHighlightingStyle = value;
+        NotifyPropertyChanged("SyntaxHighlightingStyle");
+        UpdateBrushes();
+      }
     }
 
 
@@ -85,16 +93,32 @@ namespace eXeMeL.Model
 
     public Brush EditorBrush
     {
-      get
-      {
-        var associatedBrush = this.SyntaxHighlightingStyle.GetAttributes<AssociatedThemeBrushAttribute>()
-          .FirstOrDefault(x => x.AssociatedTheme == this.ApplicationTheme);
+      get { return this._editorBrush; }
+      set { _editorBrush = value; NotifyPropertyChanged("EditorBrush"); }
+    }
 
-        if (associatedBrush == null)
-          return new SolidColorBrush(Colors.Black);
 
-        return associatedBrush.AssociatedBrush;
-      }
+
+    public Brush ElementBrush
+    {
+      get { return this._elementBrush; }
+      set { _elementBrush = value; NotifyPropertyChanged("ElementBrush"); }
+    }
+
+
+
+    public Brush AttributeNameBrush
+    {
+      get { return this._attributeNameBrush; }
+      set { _attributeNameBrush = value; NotifyPropertyChanged("AttributeNameBrush"); }
+    }
+
+
+
+    public Brush AttributeValueBrush
+    {
+      get { return this._attributeValueBrush; }
+      set { _attributeValueBrush = value; NotifyPropertyChanged("AttributeValueBrush"); }
     }
 
 
@@ -108,6 +132,30 @@ namespace eXeMeL.Model
       this.SyntaxHighlightingStyle = Model.SyntaxHighlightingStyle.Light_Earthy;
       this.ApplicationTheme = Model.ApplicationTheme.Light;
       this.FontFamily = "Consolas";
+    }
+
+
+
+    private void UpdateBrushes()
+    {
+      this.EditorBrush = GetBrushForCurrentTheme(ThemeBrushTarget.EditorContent);
+      this.ElementBrush = GetBrushForCurrentTheme(ThemeBrushTarget.Element);
+      this.AttributeNameBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeName);
+      this.AttributeValueBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeValue);
+    }
+
+
+
+    private Brush GetBrushForCurrentTheme(ThemeBrushTarget target)
+    {
+      var attribute = this.SyntaxHighlightingStyle.GetAttributes<AssociatedThemeBrushAttribute>()
+         .FirstOrDefault(x => (x.AssociatedTheme == this.ApplicationTheme || x.AssociatedTheme == ApplicationTheme.Any)
+                              && x.Target == target);
+
+      if (attribute == null)
+        return new SolidColorBrush(Colors.Red);
+      else
+        return attribute.AssociatedBrush;
     }
 
 

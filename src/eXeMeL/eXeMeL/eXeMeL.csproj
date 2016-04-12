@@ -66,7 +66,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
@@ -152,7 +152,7 @@
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
-    <Compile Include="ViewModel\XmlUtilityViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\XmlUtilityViewModel.cs" />
     <Compile Include="View\ChangeLogWindow\ChangeLogWindow.xaml.cs">
       <DependentUpon>ChangeLogWindow.xaml</DependentUpon>
     </Compile>

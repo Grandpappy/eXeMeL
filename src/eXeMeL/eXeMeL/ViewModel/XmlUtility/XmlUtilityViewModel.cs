@@ -17,6 +17,7 @@ namespace eXeMeL.ViewModel
     private string _documentText;
     private bool _isXmlValid;
     private ElementViewModel _root;
+    private bool _isBusy;
 
 
 
@@ -32,6 +33,16 @@ namespace eXeMeL.ViewModel
       get { return this._documentText; }
       set
       {
+        //if (this.DocumentText == value)
+        //{
+        //  Task.Factory.StartNew(() =>
+        //  {
+        //    RaisePropertyChanged(() => this.IsBusy);
+        //  });
+
+        //  return;
+        //}
+
         Set(() => this.DocumentText, ref this._documentText, value);
         ParseDocumentText();
       }
@@ -50,6 +61,15 @@ namespace eXeMeL.ViewModel
     }
 
 
+    
+    public bool IsBusy
+    {
+      get { return this._isBusy; }
+      set { Set(() => this.IsBusy, ref this._isBusy, value); }
+    }
+
+
+
 
     public ElementViewModel Root
     {
@@ -63,11 +83,26 @@ namespace eXeMeL.ViewModel
     {
       try
       {
-        var root = XElement.Parse(this.DocumentText);
+        this.IsBusy = true;
 
-        ParseElement(root);
+        Task t = new Task(() =>
+        {
+          try
+          {
+            var root = XElement.Parse(this.DocumentText);
 
-        this.IsXmlValid = true;
+            ParseElement(root);
+
+            this.IsXmlValid = true;
+          }
+          finally
+          {
+            this.IsBusy = false;
+          }
+        });
+
+        t.Start();
+
       }
       catch (Exception)
       {
@@ -90,6 +125,12 @@ namespace eXeMeL.ViewModel
     public ObservableCollection<ElementViewModel> ChildElements { get; private set; }
     public ObservableCollection<AttributeViewModel> Attributes { get; private set; }
     private XElement InternalElement { get; set; }
+    private bool _IsExpanded;
+    public bool IsExpanded
+    {
+      get { return this._IsExpanded; }
+      set { Set(() => this.IsExpanded, ref this._IsExpanded, value); }
+    }
 
 
 
@@ -99,6 +140,7 @@ namespace eXeMeL.ViewModel
       this.InternalElement = element;
       this.ChildElements = new ObservableCollection<ElementViewModel>();
       this.Attributes = new ObservableCollection<AttributeViewModel>();
+      this.IsExpanded = true;
 
       Populate();
     }

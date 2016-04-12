@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:eXeMeL.View"
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" x:Class="eXeMeL.View.XmlUtilityView"
+             xmlns:mahapps="clr-namespace:MahApps.Metro;assembly=MahApps.Metro"
              mc:Ignorable="d" 
              Name="ControlRoot"
              d:DesignHeight="300" d:DesignWidth="300"
@@ -13,11 +14,26 @@
              >
   
   <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    
     <Style x:Key="XmlText" TargetType="TextBlock">
       <Setter Property="FontSize" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"/>
       <Setter Property="FontFamily" Value="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
     </Style>
-    
+
+    <Style x:Key="ElementXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.ElementBrush}"/>
+    </Style>
+
+    <Style x:Key="AttributeNameXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.AttributeNameBrush}"/>
+    </Style>
+
+    <Style x:Key="AttributeValueXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.AttributeValueBrush}"/>
+    </Style>
+
     <Style x:Key="HorizontalItemsControl" TargetType="ItemsControl">
       <Setter Property="ItemsPanel">
         <Setter.Value>
@@ -42,19 +58,38 @@
 
     <DataTemplate DataType="{x:Type vm:ElementViewModel}">
       <DataTemplate.Resources>
-        <Style TargetType="TextBlock" BasedOn="{StaticResource XmlText}"/>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
       </DataTemplate.Resources>
       
       <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&lt;"/>
-          <TextBlock Text="{Binding Name}"/>
+          <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand">
+            <ToggleButton.Template>
+              <ControlTemplate TargetType="ToggleButton">
+                <ControlTemplate.Resources>
+                  <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
+                </ControlTemplate.Resources>
+                
+                <StackPanel Name="Container" Orientation="Horizontal" Background="Transparent">
+                  <TextBlock Text="&lt;"/>
+                  <TextBlock Text="{Binding Name}"/>
+                </StackPanel>
+
+                <ControlTemplate.Triggers>
+                  <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Container" Property="Background" Value="#66666666"/>
+                  </Trigger>
+                </ControlTemplate.Triggers>
+              </ControlTemplate>
+            </ToggleButton.Template>
+          </ToggleButton>
+          
           <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
           <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
           <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
         </StackPanel>
 
-        <ItemsControl ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0"/>
+        <ItemsControl ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0" Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
         <StackPanel Name="EndTag" Orientation="Horizontal">
           <TextBlock Text="&lt;/"/>
@@ -79,10 +114,8 @@
       </DataTemplate.Resources>
       
       <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-        <TextBlock Text="{Binding Name}"/>
-        <TextBlock Text="=&quot;"/>
-        <TextBlock Text="{Binding Value}"/>
-        <TextBlock Text="&quot;"/>
+        <TextBlock Text="{Binding Name, StringFormat='{}{0}='}" Style="{StaticResource AttributeNameXmlText}"/>
+        <TextBlock Text="{Binding Value, StringFormat='{}&quot;{0}&quot;'}" Style="{StaticResource AttributeValueXmlText}"/>
       </StackPanel>
     </DataTemplate>
   </UserControl.Resources>
@@ -92,7 +125,7 @@
       <VisualStateGroup x:Name="ValidXmlGroup">
         <VisualState x:Name="ValidXml">
           <Storyboard>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlText">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlContainer">
               <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
             </ObjectAnimationUsingKeyFrames>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityContainer">
@@ -102,7 +135,7 @@
         </VisualState>
         <VisualState x:Name="InvalidXml">
           <Storyboard>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlText">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlContainer">
               <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
             </ObjectAnimationUsingKeyFrames>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityContainer">
@@ -111,6 +144,28 @@
           </Storyboard>
         </VisualState>
       </VisualStateGroup>
+      <!--<VisualStateGroup x:Name="LoadXmlStates" >
+        <VisualState x:Name="LoadingXml">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlContentContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="LoadingContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+        <VisualState x:Name="XmlLoaded">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlContentContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="LoadingContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+      </VisualStateGroup>-->
     </VisualStateManager.VisualStateGroups>
 
     <i:Interaction.Triggers>
@@ -120,15 +175,33 @@
       <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="True">
         <ei:GoToStateAction x:Name="GoToValidXmlVisualStateAction" StateName="ValidXml"/>
       </ei:DataTrigger>
+      <!--<ei:DataTrigger Binding="{Binding IsBusy}" Value="True">
+        <ei:GoToStateAction x:Name="GoToLoadingVisualStateAction" StateName="LoadingXml"/>
+      </ei:DataTrigger>
+      <ei:DataTrigger Binding="{Binding IsBusy}" Value="False">
+        <ei:GoToStateAction x:Name="GoToLoadedXmlVisualStateAction" StateName="XmlLoaded"/>
+      </ei:DataTrigger>-->
     </i:Interaction.Triggers>
 
-    <Grid x:Name="XmlUtilityContainer">
-      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-        <ContentPresenter Content="{Binding Root}"/>
-      </ScrollViewer>
-    </Grid>
+    <Grid x:Name="OuterContainer">
+      <!--<Grid x:Name="LoadingContainer" Visibility="Collapsed">
+        <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
+        <ProgressBar IsIndeterminate="True" Width="200" VerticalAlignment="Top" Margin="0,100,0,0"/>
+      </Grid>-->
 
-    <TextBlock x:Name="InvalidXmlText" Text="Document is not valid Xml" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" Visibility="Collapsed" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
+      <Grid x:Name="XmlContentContainer">
+        <Grid x:Name="XmlUtilityContainer">
+          <ScrollViewer HorizontalScrollBarVisibility="Auto">
+            <ContentPresenter Content="{Binding Root}"/>
+          </ScrollViewer>
+        </Grid>
+
+
+        <Grid x:Name="InvalidXmlContainer" Visibility="Collapsed">
+          <TextBlock Text="Document is not valid Xml" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
+        </Grid>
+      </Grid>
+    </Grid>
   </Grid>
 </UserControl>
  
