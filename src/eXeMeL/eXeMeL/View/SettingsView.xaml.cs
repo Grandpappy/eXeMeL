@@ -32,7 +32,7 @@ namespace eXeMeL.View
 
     private void ResetFontSizeButton_Click(object sender, RoutedEventArgs e)
     {
-      (this.DataContext as Settings).EditorFontSize = Settings.DEFAULT_EDITOR_FONT_SIZE;
+      (this.DataContext as Settings).EditorFontSize = Settings.DefaultEditorFontSize;
     }
 
 

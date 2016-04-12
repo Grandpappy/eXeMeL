@@ -14,7 +14,8 @@ namespace eXeMeL.Model
     EditorContent,
     Element,
     AttributeName,
-    AttributeValue
+    AttributeValue,
+    HoverBackground
   }
 
 
@@ -45,6 +46,7 @@ namespace eXeMeL.Model
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Element, "#FFD6D6D6")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.AttributeName, "#FF92CAF4")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.AttributeValue, "#FF569CD6")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.HoverBackground, "#66666666")]
     //[AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Content, "#FFD6D6D6")]
 
 

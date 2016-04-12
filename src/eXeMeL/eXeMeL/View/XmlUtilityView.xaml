@@ -49,11 +49,30 @@
       <Setter Property="ItemsPanel">
         <Setter.Value>
           <ItemsPanelTemplate>
-            <StackPanel Orientation="Vertical"/>
+            <VirtualizingStackPanel Orientation="Vertical" VirtualizationMode="Recycling"/>
           </ItemsPanelTemplate>
         </Setter.Value>
       </Setter>
     </Style>
+
+
+    <ControlTemplate x:Key="ElementTextToggleButton" TargetType="ToggleButton">
+      <ControlTemplate.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
+      </ControlTemplate.Resources>
+
+      <Border Name="Border">
+        <ContentPresenter Content="{TemplateBinding Content}"/>
+      </Border>
+
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter TargetName="Border" Property="Background" Value="{Binding ElementName=ControlRoot, Path=Settings.HoverBackgroundBrush}"/>
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+
 
 
     <DataTemplate DataType="{x:Type vm:ElementViewModel}">
@@ -61,27 +80,16 @@
         <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
       </DataTemplate.Resources>
       
-      <StackPanel Orientation="Vertical">
+      <StackPanel Name="OuterStackPanel" Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
-          <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand">
-            <ToggleButton.Template>
-              <ControlTemplate TargetType="ToggleButton">
-                <ControlTemplate.Resources>
-                  <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
-                </ControlTemplate.Resources>
-                
-                <StackPanel Name="Container" Orientation="Horizontal" Background="Transparent">
-                  <TextBlock Text="&lt;"/>
-                  <TextBlock Text="{Binding Name}"/>
-                </StackPanel>
-
-                <ControlTemplate.Triggers>
-                  <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="Container" Property="Background" Value="#66666666"/>
-                  </Trigger>
-                </ControlTemplate.Triggers>
-              </ControlTemplate>
-            </ToggleButton.Template>
+          <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}">
+            <TextBlock Text="{Binding Name, StringFormat='{}&lt;{0}'}">
+              <TextBlock.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
+                </ContextMenu>
+              </TextBlock.ContextMenu>
+            </TextBlock>
           </ToggleButton>
           
           <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
@@ -89,20 +97,27 @@
           <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
         </StackPanel>
 
-        <ItemsControl ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0" Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <ItemsControl Name="ChildElementsItemsControl" ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0"/>
+        <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"-->
+        <TextBlock Name="HiddenChildrenReplacementText"  Text="..." Visibility="Collapsed" />
 
-        <StackPanel Name="EndTag" Orientation="Horizontal">
-          <TextBlock Text="&lt;/"/>
-          <TextBlock Text="{Binding Name}"/>
-          <TextBlock Text="&gt;"/>
+        <StackPanel Orientation="Horizontal">
+          <ToggleButton Name="EndTag" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
+            <TextBlock Text="{Binding Name, StringFormat='{}&lt;/{0}&gt;'}"/>
+          </ToggleButton>
         </StackPanel>
       </StackPanel>
       
       <DataTemplate.Triggers>
         <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
           <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
-          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
           <Setter TargetName="EndTag" Property="Visibility" Value="Collapsed"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+          <Setter TargetName="OuterStackPanel" Property="Orientation" Value="Horizontal"/>
+          <Setter TargetName="ChildElementsItemsControl" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="HiddenChildrenReplacementText" Property="Visibility" Value="Visible"/>
         </DataTrigger>
       </DataTemplate.Triggers>
     </DataTemplate>

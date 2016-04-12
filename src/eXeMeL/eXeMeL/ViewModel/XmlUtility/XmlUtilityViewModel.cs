@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Xml.Linq;
 using eXeMeL.Model;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 
 namespace eXeMeL.ViewModel
@@ -116,16 +118,18 @@ namespace eXeMeL.ViewModel
     private void ParseElement(XElement root)
     {
       this.Root = new ElementViewModel(root, null);
+      //this.Root.Populate();
     }
   }
 
 
   public class ElementViewModel : XmlNodeViewModel
   {
-    public ObservableCollection<ElementViewModel> ChildElements { get; private set; }
-    public ObservableCollection<AttributeViewModel> Attributes { get; private set; }
+    public List<ElementViewModel> ChildElements { get; private set; }
+    public List<AttributeViewModel> Attributes { get; private set; }
     private XElement InternalElement { get; set; }
     private bool _IsExpanded;
+    public ICommand CollapseAllOtherElementsCommand { get; }
     public bool IsExpanded
     {
       get { return this._IsExpanded; }
@@ -138,25 +142,69 @@ namespace eXeMeL.ViewModel
       : base(parent, element.Name.LocalName, element.Value, element.Name.NamespaceName)
     {
       this.InternalElement = element;
-      this.ChildElements = new ObservableCollection<ElementViewModel>();
-      this.Attributes = new ObservableCollection<AttributeViewModel>();
+      this.ChildElements = new List<ElementViewModel>();
+      this.Attributes = new List<AttributeViewModel>();
       this.IsExpanded = true;
+      this.CollapseAllOtherElementsCommand = new RelayCommand<ElementViewModel>(CollapseAllOtherElementsCommand_Execute);
+
 
       Populate();
     }
 
 
 
-    private void Populate()
+    private void CollapseAllOtherElementsCommand_Execute(ElementViewModel element)
+    {
+      var rootElement = FindRoot(element);
+
+      rootElement.CollapseAllChildElements();
+
+      var currentElement = element;
+      while (currentElement.Parent != null)
+      {
+        currentElement.IsExpanded = true;
+        currentElement = currentElement.Parent;
+      }
+    }
+
+
+
+    private static ElementViewModel FindRoot(ElementViewModel element)
+    {
+      var currentElement = element;
+      while (currentElement.Parent != null)
+      {
+        currentElement = currentElement.Parent;
+      }
+      return currentElement;
+    }
+
+
+
+    public void Populate()
     {
       foreach (var xmlAttribute in this.InternalElement.Attributes())
       {
-        this.Attributes.Add(new AttributeViewModel(xmlAttribute, this));
+        var attribute = new AttributeViewModel(xmlAttribute, this);
+        this.Attributes.Add(attribute);
       }
 
       foreach (var xmlElement in this.InternalElement.Elements())
       {
-        this.ChildElements.Add(new ElementViewModel(xmlElement, this));
+        var element = new ElementViewModel(xmlElement, this);
+        this.ChildElements.Add(element);
+        //element.Populate();
+      }
+    }
+
+
+
+    public void CollapseAllChildElements()
+    {
+      foreach (var child in this.ChildElements)
+      {
+        child.IsExpanded = false;
+        child.CollapseAllChildElements();
       }
     }
   }
