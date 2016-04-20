@@ -152,6 +152,11 @@
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
+    <Compile Include="ViewModel\XmlUtility\AttributeViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\Messages\CollapseAllOtherElementsMessage.cs" />
+    <Compile Include="ViewModel\XmlUtility\ElementViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\XmlNodeViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\XmlUtilityOperations.cs" />
     <Compile Include="ViewModel\XmlUtility\XmlUtilityViewModel.cs" />
     <Compile Include="View\ChangeLogWindow\ChangeLogWindow.xaml.cs">
       <DependentUpon>ChangeLogWindow.xaml</DependentUpon>

@@ -22,6 +22,12 @@
       <Setter Property="FontWeight" Value="Normal"/>
     </Style>
 
+    <Style x:Key="XmlTextBox" TargetType="TextBox">
+      <Setter Property="FontSize" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"/>
+      <Setter Property="FontFamily" Value="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
     <Style x:Key="ElementXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
       <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.ElementBrush}"/>
     </Style>
@@ -87,6 +93,10 @@
               <TextBlock.ContextMenu>
                 <ContextMenu>
                   <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
+                  <Separator/>
+                  <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
+                  <Separator/>
+                  <MenuItem Header="Build XPath to this element, from root" Command="{Binding FindXPathFromRootCommand}" CommandParameter="{Binding}"/>
                 </ContextMenu>
               </TextBlock.ContextMenu>
             </TextBlock>
@@ -99,7 +109,9 @@
 
         <ItemsControl Name="ChildElementsItemsControl" ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0"/>
         <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"-->
-        <TextBlock Name="HiddenChildrenReplacementText"  Text="..." Visibility="Collapsed" />
+        <StackPanel Name="HiddenChildrenReplacementTextContainer">
+          <TextBlock Name="HiddenChildrenReplacementText"  Text="..." Visibility="Collapsed" />
+        </StackPanel>
 
         <StackPanel Orientation="Horizontal">
           <ToggleButton Name="EndTag" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
@@ -113,6 +125,7 @@
           <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
           <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
           <Setter TargetName="EndTag" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="HiddenChildrenReplacementTextContainer" Property="Visibility" Value="Collapsed"/>
         </DataTrigger>
         <DataTrigger Binding="{Binding IsExpanded}" Value="False">
           <Setter TargetName="OuterStackPanel" Property="Orientation" Value="Horizontal"/>
@@ -206,7 +219,18 @@
 
       <Grid x:Name="XmlContentContainer">
         <Grid x:Name="XmlUtilityContainer">
-          <ScrollViewer HorizontalScrollBarVisibility="Auto">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <DockPanel Grid.Row="0" Margin="10,10,30,20">
+            <TextBlock DockPanel.Dock="Left" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
+            <TextBox DockPanel.Dock="Right" Text="{Binding XPath}" Style="{StaticResource XmlTextBox}" Margin="20,0,0,0" Padding="10"/>
+          </DockPanel>
+          
+          
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
             <ContentPresenter Content="{Binding Root}"/>
           </ScrollViewer>
         </Grid>

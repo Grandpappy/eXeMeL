@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Xml.Linq;
 using eXeMeL.Model;
+using eXeMeL.ViewModel.UtilityOperationMessages;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 
 namespace eXeMeL.ViewModel
@@ -20,12 +18,27 @@ namespace eXeMeL.ViewModel
     private bool _isXmlValid;
     private ElementViewModel _root;
     private bool _isBusy;
+    private string _xPath;
 
 
 
     public XmlUtilityViewModel(Settings settings)
     {
       this.Settings = settings;
+      this.UtilityOperations = new XmlUtilityOperations(settings, () => this.Root);
+      this.MessengerInstance.Register< ReplaceXPathMessage>(this, HandleReplaceXPathMessage);
+    }
+
+
+
+    public XmlUtilityOperations UtilityOperations { get; set; }
+
+
+
+    public string XPath
+    {
+      get { return this._xPath; }
+      set { Set(() => this.XPath, ref this._xPath, value); }
     }
 
 
@@ -120,126 +133,12 @@ namespace eXeMeL.ViewModel
       this.Root = new ElementViewModel(root, null);
       //this.Root.Populate();
     }
-  }
 
 
-  public class ElementViewModel : XmlNodeViewModel
-  {
-    public List<ElementViewModel> ChildElements { get; private set; }
-    public List<AttributeViewModel> Attributes { get; private set; }
-    private XElement InternalElement { get; set; }
-    private bool _IsExpanded;
-    public ICommand CollapseAllOtherElementsCommand { get; }
-    public bool IsExpanded
+
+    private void HandleReplaceXPathMessage(ReplaceXPathMessage message)
     {
-      get { return this._IsExpanded; }
-      set { Set(() => this.IsExpanded, ref this._IsExpanded, value); }
-    }
-
-
-
-    public ElementViewModel(XElement element, ElementViewModel parent)
-      : base(parent, element.Name.LocalName, element.Value, element.Name.NamespaceName)
-    {
-      this.InternalElement = element;
-      this.ChildElements = new List<ElementViewModel>();
-      this.Attributes = new List<AttributeViewModel>();
-      this.IsExpanded = true;
-      this.CollapseAllOtherElementsCommand = new RelayCommand<ElementViewModel>(CollapseAllOtherElementsCommand_Execute);
-
-
-      Populate();
-    }
-
-
-
-    private void CollapseAllOtherElementsCommand_Execute(ElementViewModel element)
-    {
-      var rootElement = FindRoot(element);
-
-      rootElement.CollapseAllChildElements();
-
-      var currentElement = element;
-      while (currentElement.Parent != null)
-      {
-        currentElement.IsExpanded = true;
-        currentElement = currentElement.Parent;
-      }
-    }
-
-
-
-    private static ElementViewModel FindRoot(ElementViewModel element)
-    {
-      var currentElement = element;
-      while (currentElement.Parent != null)
-      {
-        currentElement = currentElement.Parent;
-      }
-      return currentElement;
-    }
-
-
-
-    public void Populate()
-    {
-      foreach (var xmlAttribute in this.InternalElement.Attributes())
-      {
-        var attribute = new AttributeViewModel(xmlAttribute, this);
-        this.Attributes.Add(attribute);
-      }
-
-      foreach (var xmlElement in this.InternalElement.Elements())
-      {
-        var element = new ElementViewModel(xmlElement, this);
-        this.ChildElements.Add(element);
-        //element.Populate();
-      }
-    }
-
-
-
-    public void CollapseAllChildElements()
-    {
-      foreach (var child in this.ChildElements)
-      {
-        child.IsExpanded = false;
-        child.CollapseAllChildElements();
-      }
-    }
-  }
-
-
-
-  public class AttributeViewModel : XmlNodeViewModel
-  {
-    public XAttribute InternalAttribute { get; }
-
-
-
-    public AttributeViewModel(XAttribute xmlAttribute, ElementViewModel parent)
-      : base(parent, xmlAttribute.Name.LocalName, xmlAttribute.Value, xmlAttribute.Name.NamespaceName)
-    {
-      this.InternalAttribute = xmlAttribute;
-    }
-  }
-
-
-  public abstract class XmlNodeViewModel : ViewModelBase
-  {
-    public ElementViewModel Parent { get; }
-    public string Name { get; }
-    public string Value { get; }
-    public string NamespaceName { get; }
-
-
-
-    protected XmlNodeViewModel(ElementViewModel parent, string name, string value, string namespaceName)
-    {
-      this.Parent = parent;
-      this.Name = name;
-      this.Value = value;
-      this.NamespaceName = namespaceName;
+      this.XPath = message.Value;
     }
   }
 }
