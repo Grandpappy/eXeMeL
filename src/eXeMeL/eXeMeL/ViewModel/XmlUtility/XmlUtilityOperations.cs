@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.UtilityOperationMessages;
 using GalaSoft.MvvmLight.Messaging;
@@ -11,6 +13,7 @@ namespace eXeMeL.ViewModel
   {
     public Settings Settings { get; set; }
     public Func<ElementViewModel> GetRoot { get; set; }
+    private ElementViewModel StartOfXPath { get; set; }
 
 
 
@@ -20,19 +23,86 @@ namespace eXeMeL.ViewModel
       this.GetRoot = getRoot;
       Messenger.Default.Register<CollapseAllOtherElementsMessage>(this, HandleCollapseAllOtherElementsMessage);
       Messenger.Default.Register<ExpandAllChildElementsMessage>(this, HandleExpandAllChildElementsMessage);
-      Messenger.Default.Register<FindXPathFromRootMessage>(this, HandleFindXPathFromRootMessage);
+      Messenger.Default.Register<BuildXPathFromRootMessage>(this, HandleBuildXPathFromRootMessage);
+      Messenger.Default.Register<SetStartElementForXPathMessage>(this, HandleSetStartElementForXPathMessage);
+      Messenger.Default.Register<DocumentRefreshCompleted>(this, HandleDocumentRefressMessage);
+      Messenger.Default.Register<BuildXPathFromStartMessage>(this, HandleBuildXpathFromStartMessage);
     }
 
 
 
-    private void HandleFindXPathFromRootMessage(FindXPathFromRootMessage message)
+    private void HandleBuildXpathFromStartMessage(BuildXPathFromStartMessage message)
     {
-      var ancestors = GetOrderedAncestorsFromElementToRoot(message.Element);
-      ancestors.Reverse();
+      if (this.StartOfXPath == null)
+        return;
+
+      var startElementAncestors = GetOrderedAncestorsFromElementToRoot(this.StartOfXPath);
+      var currentElementAncestors = GetOrderedAncestorsFromElementToRoot(message.Element);
+
+      ElementViewModel commonAncestor = null;
+      foreach (var startElementAncestor in startElementAncestors)
+      {
+        foreach (var currentElementAncestor in currentElementAncestors)
+        {
+          if (currentElementAncestor != startElementAncestor)
+            continue;
+
+          commonAncestor = startElementAncestor;
+          break;
+        }
+
+        if (commonAncestor != null)
+          break;
+      }
+
+      var numberOfElementsUpTheAncestorChainFromStart = startElementAncestors.IndexOf(commonAncestor);
+      var numberOfElementsUpTheAncestorChainFromCurrent = currentElementAncestors.IndexOf(commonAncestor);
+
+
+      var prefix = string.Concat(Enumerable.Repeat(@"../", numberOfElementsUpTheAncestorChainFromStart));
+      var postfix = string.Join(@"/",
+        currentElementAncestors.Take(numberOfElementsUpTheAncestorChainFromCurrent).Select(x => x.Name).Reverse().ToArray());
+
+      var fullXpath = prefix + postfix;
+
+      SendOutputBasedOnTarget(fullXpath, OutputTarget.XPathEditor);
+    }
+
+
+
+    private void HandleDocumentRefressMessage(DocumentRefreshCompleted message)
+    {
+      this.StartOfXPath = null;
+    }
+
+
+
+    private void HandleSetStartElementForXPathMessage(SetStartElementForXPathMessage message)
+    {
+      this.StartOfXPath = message.Element;
+    }
+
+
+
+    private void HandleBuildXPathFromRootMessage(BuildXPathFromRootMessage message)
+    {
+      var ancestors = GetOrderedAncestorsFromRootToElement(message.Element);
       var ancestorNames = ancestors.Select(x => x.Name);
 
       var xPath = string.Join("/", ancestorNames.ToArray());
-      Messenger.Default.Send(new ReplaceXPathMessage(xPath));
+
+      var outputTarget = message.OutputTarget;
+      SendOutputBasedOnTarget(xPath, outputTarget);
+    }
+
+
+
+    private static void SendOutputBasedOnTarget(string xPath, OutputTarget outputTarget)
+    {
+      if (outputTarget == OutputTarget.XPathEditor)
+        Messenger.Default.Send(new ReplaceXPathMessage(xPath));
+      else
+        Clipboard.SetText(xPath);
     }
 
 
@@ -59,6 +129,15 @@ namespace eXeMeL.ViewModel
       //  currentElement.IsExpanded = true;
       //  currentElement = currentElement.Parent;
       //}
+    }
+
+
+
+    private List<ElementViewModel> GetOrderedAncestorsFromRootToElement(ElementViewModel element)
+    {
+      var list = GetOrderedAncestorsFromElementToRoot(element);
+      list.Reverse();
+      return list;
     }
 
 

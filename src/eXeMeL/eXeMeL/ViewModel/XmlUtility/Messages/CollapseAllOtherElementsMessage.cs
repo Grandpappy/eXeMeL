@@ -14,10 +14,36 @@ namespace eXeMeL.ViewModel.UtilityOperationMessages
 
 
 
-  internal class FindXPathFromRootMessage : BaseUtilityElementMessage
+  internal class BuildXPathFromRootMessage : BaseUtilityElementMessage
   {
-    public FindXPathFromRootMessage(ElementViewModel element) : base(element) { }
+    public OutputTarget OutputTarget { get; set; }
+    public BuildXPathFromRootMessage(ElementViewModel element, OutputTarget outputTarget) : base(element)
+    {
+      this.OutputTarget = outputTarget;
+    }
   }
+
+
+
+  internal class BuildXPathFromStartMessage : BaseUtilityElementMessage
+  {
+    public OutputTarget OutputTarget { get; set; }
+    public BuildXPathFromStartMessage(ElementViewModel element, OutputTarget outputTarget) : base(element)
+    {
+      this.OutputTarget = outputTarget;
+    }
+  }
+
+
+
+  internal class SetStartElementForXPathMessage : BaseUtilityElementMessage
+  {
+    public SetStartElementForXPathMessage(ElementViewModel element) : base(element) {}
+  }
+
+
+
+  internal enum OutputTarget { XPathEditor, Clipboard }
 
 
   internal class ReplaceXPathMessage : BaseUtilityXPathMessage

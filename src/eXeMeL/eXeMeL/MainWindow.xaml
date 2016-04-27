@@ -110,6 +110,7 @@
 
   <MahApps:MetroWindow.InputBindings>
     <KeyBinding Key="F5" Command="{Binding Editor.RefreshCommand}"/>
+    <KeyBinding Key="F2" Command="{Binding ToggleEditorModeCommand}"/>
     <KeyBinding Modifiers="Control" Key="F" Command="{Binding FocusOnFindControlCommand, ElementName=ControlRoot}"/>
     <KeyBinding Key="Escape" Command="{Binding ResetFocusCommand, ElementName=ControlRoot}"/>
     <KeyBinding Modifiers="Control" Key="S" Command="{Binding Editor.SaveCommand}"/>
@@ -198,7 +199,7 @@
                 </Rectangle.OpacityMask>
               </Rectangle>
 
-              <Button x:Name="button" Grid.Column="1" Margin="5,1,0,0" Command="{Binding ViewModel.ToggleEditorModeCommand, ElementName=ControlRoot}" Content="Editor" ToolTip="Click to change the view">
+              <Button x:Name="button" Grid.Column="1" Margin="5,1,0,0" Command="{Binding ViewModel.ToggleEditorModeCommand, ElementName=ControlRoot}" Content="Editor" ToolTip="Click to change the view (F2)">
                 <Button.Template>
                   <ControlTemplate TargetType="Button">
                     <Border Background="Transparent" BorderThickness="0">

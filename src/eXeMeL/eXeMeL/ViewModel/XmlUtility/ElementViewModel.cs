@@ -12,9 +12,17 @@ namespace eXeMeL.ViewModel
     public List<AttributeViewModel> Attributes { get; private set; }
     private XElement InternalElement { get; set; }
     private bool _IsExpanded;
+    public string InnerText { get; set; }
+    public bool HasInnerText => !string.IsNullOrWhiteSpace(this.InnerText);
     public ICommand CollapseAllOtherElementsCommand { get; }
     public ICommand ExpandAllChildElementsCommand { get; }
-    public ICommand FindXPathFromRootCommand { get; }
+    public ICommand BuildXPathFromRootCommand { get; }
+    public ICommand CopyXPathFromRootCommand { get; }
+    public ICommand SetStartXPathCommand { get; set; }
+    public ICommand BuildXPathFromStartCommand { get; set; }
+    public ICommand CopyXPathFromStartCommand { get; set; }
+
+
 
     public bool IsExpanded
     {
@@ -30,22 +38,56 @@ namespace eXeMeL.ViewModel
     public ElementViewModel(XElement element, ElementViewModel parent)
       : base(parent, element.Name.LocalName, element.Value, element.Name.NamespaceName)
     {
+      this.InnerText = (element.FirstNode as XText)?.Value;
       this.InternalElement = element;
       this.ChildElements = new List<ElementViewModel>();
       this.Attributes = new List<AttributeViewModel>();
       this.IsExpanded = true;
       this.CollapseAllOtherElementsCommand = new RelayCommand<ElementViewModel>(CollapseAllOtherElementsCommand_Execute);
       this.ExpandAllChildElementsCommand = new RelayCommand<ElementViewModel>(ExpandAllChildElementsCommand_Execute);
-      this.FindXPathFromRootCommand = new RelayCommand<ElementViewModel>(FindXPathFromRootCommand_Execute);
+      this.BuildXPathFromRootCommand = new RelayCommand<ElementViewModel>(BuildXPathFromRootCommand_Execute);
+      this.CopyXPathFromRootCommand = new RelayCommand<ElementViewModel>(CopyXPathFromRootCommand_Execute);
+      this.SetStartXPathCommand = new RelayCommand<ElementViewModel>(SetStartXPathCommand_Execute);
+      this.BuildXPathFromStartCommand = new RelayCommand<ElementViewModel>(BuildXPathFromStartCommand_Execute);
+      this.CopyXPathFromStartCommand = new RelayCommand<ElementViewModel>(CopyXPathFromStartCommand_Execute);
+
 
       Populate();
     }
 
 
 
-    private void FindXPathFromRootCommand_Execute(ElementViewModel element)
+    private void CopyXPathFromStartCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new FindXPathFromRootMessage(element));
+      this.MessengerInstance.Send(new BuildXPathFromStartMessage(element, OutputTarget.Clipboard));
+    }
+
+
+
+    private void BuildXPathFromStartCommand_Execute(ElementViewModel element)
+    {
+      this.MessengerInstance.Send(new BuildXPathFromStartMessage(element, OutputTarget.XPathEditor));
+    }
+
+
+
+    private void SetStartXPathCommand_Execute(ElementViewModel element)
+    {
+      this.MessengerInstance.Send(new SetStartElementForXPathMessage(element));
+    }
+
+
+
+    private void BuildXPathFromRootCommand_Execute(ElementViewModel element)
+    {
+      this.MessengerInstance.Send(new BuildXPathFromRootMessage(element, OutputTarget.XPathEditor));
+    }
+
+
+
+    private void CopyXPathFromRootCommand_Execute(ElementViewModel element)
+    {
+      this.MessengerInstance.Send(new BuildXPathFromRootMessage(element, OutputTarget.Clipboard));
     }
 
 

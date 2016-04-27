@@ -32,6 +32,10 @@
       <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.ElementBrush}"/>
     </Style>
 
+    <Style x:Key="ElementInnerText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorBrush}"/>
+    </Style>
+
     <Style x:Key="AttributeNameXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
       <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.AttributeNameBrush}"/>
     </Style>
@@ -93,10 +97,15 @@
               <TextBlock.ContextMenu>
                 <ContextMenu>
                   <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
-                  <Separator/>
                   <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
                   <Separator/>
-                  <MenuItem Header="Build XPath to this element, from root" Command="{Binding FindXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                  <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
+                  <Separator/>
+                  <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                  <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>
+                  <Separator/>
+                  <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                  <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
                 </ContextMenu>
               </TextBlock.ContextMenu>
             </TextBlock>
@@ -105,8 +114,13 @@
           <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
           <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
           <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
+          <TextBlock Name="InnerText" Text="{Binding InnerText}" Visibility="Collapsed" Style="{StaticResource ElementInnerText}"/>
+          <ToggleButton Name="EndTagAfterInnerText" Visibility="Collapsed" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
+            <TextBlock Text="{Binding Name, StringFormat='{}&lt;/{0}&gt;'}"/>
+          </ToggleButton>
         </StackPanel>
 
+        
         <ItemsControl Name="ChildElementsItemsControl" ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0"/>
         <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"-->
         <StackPanel Name="HiddenChildrenReplacementTextContainer">
@@ -114,7 +128,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-          <ToggleButton Name="EndTag" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
+          <ToggleButton Name="EndTagAfterChildElements" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
             <TextBlock Text="{Binding Name, StringFormat='{}&lt;/{0}&gt;'}"/>
           </ToggleButton>
         </StackPanel>
@@ -124,12 +138,22 @@
         <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
           <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
           <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
-          <Setter TargetName="EndTag" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="EndTagAfterChildElements" Property="Visibility" Value="Collapsed"/>
           <Setter TargetName="HiddenChildrenReplacementTextContainer" Property="Visibility" Value="Collapsed"/>
         </DataTrigger>
+        <DataTrigger Binding="{Binding HasInnerText}" Value="True">
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="InnerText" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="EndTagAfterInnerText" Property="Visibility" Value="Visible"/>
+        </DataTrigger>
         <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
           <Setter TargetName="OuterStackPanel" Property="Orientation" Value="Horizontal"/>
           <Setter TargetName="ChildElementsItemsControl" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="InnerText" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="EndTagAfterInnerText" Property="Visibility" Value="Collapsed"/>
           <Setter TargetName="HiddenChildrenReplacementText" Property="Visibility" Value="Visible"/>
         </DataTrigger>
       </DataTemplate.Triggers>
@@ -142,8 +166,8 @@
       </DataTemplate.Resources>
       
       <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-        <TextBlock Text="{Binding Name, StringFormat='{}{0}='}" Style="{StaticResource AttributeNameXmlText}"/>
-        <TextBlock Text="{Binding Value, StringFormat='{}&quot;{0}&quot;'}" Style="{StaticResource AttributeValueXmlText}"/>
+        <TextBlock Text="{Binding Name, StringFormat='{}{0}'}" Style="{StaticResource AttributeNameXmlText}"/>
+        <TextBlock Text="{Binding Value, StringFormat='{}=&quot;{0}&quot;'}" Style="{StaticResource AttributeValueXmlText}"/>
       </StackPanel>
     </DataTemplate>
   </UserControl.Resources>
@@ -226,7 +250,7 @@
 
           <DockPanel Grid.Row="0" Margin="10,10,30,20">
             <TextBlock DockPanel.Dock="Left" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
-            <TextBox DockPanel.Dock="Right" Text="{Binding XPath}" Style="{StaticResource XmlTextBox}" Margin="20,0,0,0" Padding="10"/>
+            <TextBox DockPanel.Dock="Right" Text="{Binding XPath, Mode=TwoWay}" Style="{StaticResource XmlTextBox}" Margin="20,0,0,0" Padding="10"/>
           </DockPanel>
           
           
