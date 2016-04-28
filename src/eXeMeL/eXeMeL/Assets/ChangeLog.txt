@@ -1,6 +1,6 @@
 ﻿*4/28/2016 - New Editor Features
 
-New option to highlight all intances of the currently selected text in the editor.
+New option to highlight all instances of the currently selected text in the editor.
 
 New hotkeys to fold/unfold specific levels of the XML.  Pressing ALT+1 now folds the first level of XML elements.  SHIFT+ALT+1 will unfold that same level.  ALT+2 folds the second level, and so on.
 
