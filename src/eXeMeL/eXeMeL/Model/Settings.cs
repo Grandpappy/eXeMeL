@@ -26,6 +26,7 @@ namespace eXeMeL.Model
     private bool _ShowEditorLineNumbers;
     private double _EditorFontSize;
     private string _FontFamily;
+    private bool _highlightOtherInstancesOfSelection;
 
 
 
@@ -79,6 +80,15 @@ namespace eXeMeL.Model
     {
       get { return this._FontFamily; }
       set { _FontFamily = value; NotifyPropertyChanged("FontFamily"); }
+    }
+
+
+
+    [DataMember]
+    public bool HighlightOtherInstancesOfSelection
+    {
+      get { return this._highlightOtherInstancesOfSelection; }
+      set { this._highlightOtherInstancesOfSelection = value; NotifyPropertyChanged("HighlightOtherInstancesOfSelection"); }
     }
 
 

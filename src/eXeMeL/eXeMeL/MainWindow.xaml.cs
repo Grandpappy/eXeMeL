@@ -30,6 +30,9 @@ namespace eXeMeL
     public ICommand FocusOnFindControlCommand { get; private set; }
     public ICommand ResetFocusCommand { get; private set; }
 
+    public ICommand FoldLevelCommand { get; private set; }
+    public ICommand UnFoldLevelCommand { get; private set; }
+
 
     public MainWindow()
     {
@@ -40,11 +43,15 @@ namespace eXeMeL
       this.Drop += MainWindow_Drop;
       this.FocusOnFindControlCommand = new RelayCommand(FocusOnFindControlCommand_Executed);
       this.ResetFocusCommand = new RelayCommand(ResetFocusCommand_Executed);
+      this.FoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, true));
+      this.UnFoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, false));
 
       InitializeComponent();
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
       this.AvalonEditor.TextArea.DocumentChanged += TextArea_DocumentChanged;
+      this.AvalonEditor.TextArea.TextView.LineTransformers.Add(new AllSelectionColorizer(this.AvalonEditor, this.ViewModel.Settings));
+      this.AvalonEditor.TextArea.SelectionChanged += (sender, args) => this.AvalonEditor.TextArea.TextView.Redraw();
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
       
@@ -54,8 +61,6 @@ namespace eXeMeL
       this.IgnoreNextTextChange = false;
       SetWindowGlow();
     }
-
-    
 
     private void AvalonEditor_TextChanged(object sender, EventArgs e)
     {
@@ -95,6 +100,8 @@ namespace eXeMeL
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
+
+      //this.SelectionColorizer.Settings = this.ViewModel.Settings;
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
     }
@@ -221,7 +228,7 @@ namespace eXeMeL
 
 
 
-    private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void MainWindow_Closing(object sender, CancelEventArgs e)
     {
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
     }
@@ -254,6 +261,41 @@ namespace eXeMeL
 
 
 
+    private FoldingSection[] FoldSectionCache { get; set; }
+    private List<FoldingSection>[] FoldingLevels { get; set; }
+
+
+
+    private void FoldSections(string level, bool fold)
+    {
+      if (string.IsNullOrEmpty(level) || level.Length > 1 || "1234567890-".IndexOf(level) < 0) return;
+
+      if (this.FoldSectionCache == null || this.FoldSectionCache.Any(f => !this.FoldingManager.AllFoldings.Contains(f)))
+      {
+        this.FoldSectionCache = this.FoldingManager.AllFoldings.ToArray();
+        this.FoldingLevels = new List<FoldingSection>[10];
+
+        for (var i = 0; i < 10; i++)
+          this.FoldingLevels[i] = new List<FoldingSection>();
+
+        // rebuild
+        var stack = new Stack<FoldingSection>();
+        foreach (var foldSection in this.FoldingManager.AllFoldings)
+        {
+          if (stack.Any())
+            while (foldSection.StartOffset > stack.Peek().EndOffset) stack.Pop();
+          if (stack.Count < 10)
+            this.FoldingLevels[stack.Count].Add(foldSection);
+          stack.Push(foldSection);
+        }
+      }
+
+      var itemsToFold = level != "-" ? this.FoldingLevels[level[0] - '0'] : this.FoldingManager.AllFoldings.ToList();
+      itemsToFold.ForEach(f => f.IsFolded = fold);
+    }
+
+
+
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
       SetWindowGlow();
@@ -263,7 +305,7 @@ namespace eXeMeL
 
     private void SetWindowGlow()
     {
-      this.GlowBrush.Color = (Color)this.FindResource("WindowGlowColor");
+      this.GlowBrush.Color = (Color)FindResource("WindowGlowColor");
     }
 
 

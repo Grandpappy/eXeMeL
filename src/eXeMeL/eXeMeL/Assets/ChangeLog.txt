@@ -1,4 +1,12 @@
-﻿*4/5/2016 - Find and Editing Updates
+﻿*4/28/2016 - New Editor Features
+
+New option to highlight all intances of the currently selected text in the editor.
+
+New hotkeys to fold/unfold specific levels of the XML.  Pressing ALT+1 now folds the first level of XML elements.  SHIFT+ALT+1 will unfold that same level.  ALT+2 folds the second level, and so on.
+
+Thanks to Wei Yang for adding these features.
+
+*4/5/2016 - Find and Editing Updates
 
 When searching for text, information will display in the lower right as to what match you're on, and how many were found.  Pressing Escape while in the Find box will now cancel your search.
 
