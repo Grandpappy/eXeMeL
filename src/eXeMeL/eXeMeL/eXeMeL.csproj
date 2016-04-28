@@ -139,6 +139,7 @@
     <Compile Include="Utilities\EncodedXmlExtractor.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\XmlParser.cs" />
+    <Compile Include="ViewModel\AllSelectionColorizer.cs" />
     <Compile Include="ViewModel\EditorFindViewModel.cs" />
     <Compile Include="ViewModel\DocumentSnapshot.cs" />
     <Compile Include="ViewModel\EditorViewModel.cs" />

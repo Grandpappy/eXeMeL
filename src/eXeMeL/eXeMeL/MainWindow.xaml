@@ -113,6 +113,29 @@
     <KeyBinding Modifiers="Control" Key="F" Command="{Binding FocusOnFindControlCommand, ElementName=ControlRoot}"/>
     <KeyBinding Key="Escape" Command="{Binding ResetFocusCommand, ElementName=ControlRoot}"/>
     <KeyBinding Modifiers="Control" Key="S" Command="{Binding Editor.SaveCommand}"/>
+
+    <KeyBinding Modifiers="Alt" Key="D0" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="0" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D0" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="0" />
+    <KeyBinding Modifiers="Alt" Key="D1" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="1" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D1" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="1" />
+    <KeyBinding Modifiers="Alt" Key="D2" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="2" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D2" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="2" />
+    <KeyBinding Modifiers="Alt" Key="D3" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="3" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D3" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="3" />
+    <KeyBinding Modifiers="Alt" Key="D4" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="4" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D4" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="4" />
+    <KeyBinding Modifiers="Alt" Key="D5" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="5" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D5" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="5" />
+    <KeyBinding Modifiers="Alt" Key="D6" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="6" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D6" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="6" />
+    <KeyBinding Modifiers="Alt" Key="D7" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="7" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D7" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="7" />
+    <KeyBinding Modifiers="Alt" Key="D8" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="8" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D8" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="8" />
+    <KeyBinding Modifiers="Alt" Key="D9" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="9" />
+    <KeyBinding Modifiers="Alt+Shift" Key="D9" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="9" />
+    <KeyBinding Modifiers="Alt" Key="OemMinus" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
+    <KeyBinding Modifiers="Alt+Shift" Key="OemMinus" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
   </MahApps:MetroWindow.InputBindings>
 
 
