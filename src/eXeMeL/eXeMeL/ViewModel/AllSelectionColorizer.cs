@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using eXeMeL.Model;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
@@ -15,30 +16,51 @@ namespace eXeMeL.ViewModel
   public class AllSelectionColorizer : DocumentColorizingTransformer
   {
     private TextEditor Editor { get; set; }
+    public Settings Settings { get; set; }
 
-    public AllSelectionColorizer(TextEditor editor)
+
+
+    public AllSelectionColorizer(TextEditor editor, Settings settings)
     {
-      Editor = editor;
+      this.Editor = editor;
+      this.Settings = settings;
     }
+
+
+
     protected override void ColorizeLine(DocumentLine line)
     {
-      if (string.IsNullOrEmpty(Editor.SelectedText)) return;
+      if (!this.Settings.HighlightOtherInstancesOfSelection)
+        return;
 
-      int lineStartOffset = line.Offset;
-      string text = CurrentContext.Document.GetText(line);
-      int start = 0;
+      if (string.IsNullOrEmpty(this.Editor.SelectedText)) return;
+
+      var lineStartOffset = line.Offset;
+      var text = this.CurrentContext.Document.GetText(line);
+      var start = 0;
       int index;
 
-      while ((index = text.IndexOf(Editor.SelectedText, start)) >= 0)
+      var caretOffset = this.Editor.CaretOffset;
+
+      while ((index = text.IndexOf(this.Editor.SelectedText, start)) >= 0)
       {
-        base.ChangeLinePart(
-            lineStartOffset + index, // startOffset
-            lineStartOffset + index + Editor.SelectionLength, // endOffset
-            (VisualLineElement element) => {
+        var startOffset = lineStartOffset + index;
+        var endOffset = startOffset + this.Editor.SelectionLength;
+        var isCaretInSelection = (caretOffset >= startOffset) && (caretOffset <= endOffset);
+
+        if (!isCaretInSelection)
+        {
+          base.ChangeLinePart(
+            startOffset,
+            endOffset,
+            (VisualLineElement element) =>
+            {
               // maybe change color according to theme later
               element.TextRunProperties.SetForegroundBrush(Brushes.White);
               element.TextRunProperties.SetBackgroundBrush(Brushes.DodgerBlue);
             });
+        }
+
         start = index + 1; // search for next occurrence
       }
     }
