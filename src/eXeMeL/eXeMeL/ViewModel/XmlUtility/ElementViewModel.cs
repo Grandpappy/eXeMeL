@@ -10,7 +10,7 @@ namespace eXeMeL.ViewModel
   {
     public List<ElementViewModel> ChildElements { get; private set; }
     public List<AttributeViewModel> Attributes { get; private set; }
-    private XElement InternalElement { get; set; }
+    public XElement InternalElement { get; private set; }
     private bool _IsExpanded;
     public string InnerText { get; set; }
     public bool HasInnerText => !string.IsNullOrWhiteSpace(this.InnerText);
@@ -168,6 +168,20 @@ namespace eXeMeL.ViewModel
         child.IsExpanded = true;
         child.ExpandAllChildren();
       }
+    }
+
+
+
+    public List<ElementViewModel> GetElementAndAllDescendents()
+    {
+      var l = new List<ElementViewModel> {this};
+
+      foreach (var child in this.ChildElements)
+      {
+        l.AddRange(child.GetElementAndAllDescendents());
+      }
+
+      return l;
     }
   }
 }

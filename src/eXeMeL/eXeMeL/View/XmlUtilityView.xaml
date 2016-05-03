@@ -92,25 +92,29 @@
       
       <StackPanel Name="OuterStackPanel" Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
-          <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}">
-            <TextBlock Text="{Binding Name, StringFormat='{}&lt;{0}'}">
-              <TextBlock.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
-                  <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
-                  <Separator/>
-                  <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
-                  <Separator/>
-                  <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
-                  <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>
-                  <Separator/>
-                  <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
-                  <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
-                </ContextMenu>
-              </TextBlock.ContextMenu>
-            </TextBlock>
-          </ToggleButton>
-          
+          <Grid>
+            <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="Red"/>
+            
+            <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}">
+              <TextBlock Text="{Binding Name, StringFormat='{}&lt;{0}'}">
+                <TextBlock.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
+                    <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
+                    <Separator/>
+                    <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
+                    <Separator/>
+                    <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                    <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>
+                    <Separator/>
+                    <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                    <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
+                  </ContextMenu>
+                </TextBlock.ContextMenu>
+              </TextBlock>
+            </ToggleButton>
+          </Grid>
+
           <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
           <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
           <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
@@ -135,6 +139,9 @@
       </StackPanel>
       
       <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding IsXPathTarget}" Value="True">
+          <Setter TargetName="XPathTargetHighlight" Property="Visibility" Value="Visible"></Setter>
+        </DataTrigger>
         <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
           <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
           <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
@@ -250,7 +257,7 @@
 
           <DockPanel Grid.Row="0" Margin="10,10,30,20">
             <TextBlock DockPanel.Dock="Left" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
-            <TextBox DockPanel.Dock="Right" Text="{Binding XPath, Mode=TwoWay}" Style="{StaticResource XmlTextBox}" Margin="20,0,0,0" Padding="10"/>
+            <TextBox DockPanel.Dock="Right" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource XmlTextBox}" Margin="20,0,0,0" Padding="10"/>
           </DockPanel>
           
           

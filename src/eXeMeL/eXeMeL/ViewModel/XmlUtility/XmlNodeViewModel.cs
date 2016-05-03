@@ -4,10 +4,28 @@ namespace eXeMeL.ViewModel
 {
   public abstract class XmlNodeViewModel : ViewModelBase
   {
+    private bool _isAlongXPath;
+    private bool _isXPathTarget;
     public ElementViewModel Parent { get; }
     public string Name { get; }
     public string Value { get; }
     public string NamespaceName { get; }
+
+
+
+    public bool IsAlongXPath
+    {
+      get { return this._isAlongXPath; }
+      set { Set(() => this.IsAlongXPath, ref this._isAlongXPath, value); }
+    }
+
+
+
+    public bool IsXPathTarget
+    {
+      get { return this._isXPathTarget; }
+      set { Set(() => this.IsXPathTarget, ref this._isXPathTarget, value); }
+    }
 
 
 
