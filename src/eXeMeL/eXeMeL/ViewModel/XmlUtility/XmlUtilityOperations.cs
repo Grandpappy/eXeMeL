@@ -87,9 +87,10 @@ namespace eXeMeL.ViewModel
     private void HandleBuildXPathFromRootMessage(BuildXPathFromRootMessage message)
     {
       var ancestors = GetOrderedAncestorsFromRootToElement(message.Element);
-      var ancestorNames = ancestors.Select(x => x.Name);
+      var ancestorNames = ancestors.Select(x => x.Name).ToList();
 
-      var xPath = string.Join("/", ancestorNames.ToArray());
+      // Ignore the root element in the xpath, since that's where we're starting from
+      var xPath = string.Join("/", ancestorNames.Skip(1).ToArray());
 
       var outputTarget = message.OutputTarget;
       SendOutputBasedOnTarget(xPath, outputTarget);

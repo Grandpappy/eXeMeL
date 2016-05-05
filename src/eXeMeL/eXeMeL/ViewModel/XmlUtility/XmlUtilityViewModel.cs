@@ -159,6 +159,9 @@ namespace eXeMeL.ViewModel
       {
         try
         {
+          var allElements = this.Root.GetElementAndAllDescendents();
+          allElements.ForEach(x => x.IsXPathTarget = false);
+
           var result = (IEnumerable)this.Root.InternalElement.XPathEvaluate(this.XPath);
           if (this.ElementUpdateCancellation.IsCancellationRequested)
           {
@@ -171,37 +174,44 @@ namespace eXeMeL.ViewModel
 
           this.MessengerInstance.Send(new DisplayApplicationStatusMessage(foundXElements.Count + " element found.  " + attributes.Count + " attributes found"));
 
-          if (foundXElements.Count > 0)
+          
+          if (this.ElementUpdateCancellation.IsCancellationRequested)
           {
-            var allElements = this.Root.GetElementAndAllDescendents();
+            CompleteCurrentElementUpdateAction();
+            return;
+          }
 
-            if (this.ElementUpdateCancellation.IsCancellationRequested)
+          var bringNextIntoView = true;
+
+          foreach (var foundXElement in foundXElements)
+          {
+            foreach (var currentElement in allElements)
             {
-              CompleteCurrentElementUpdateAction();
-              return;
-            }
-
-            allElements.ForEach(x => x.IsXPathTarget = false);
-
-            foreach (var foundXElement in foundXElements)
-            {
-              foreach (var currentElement in allElements)
+              if (this.ElementUpdateCancellation.IsCancellationRequested)
               {
-                if (this.ElementUpdateCancellation.IsCancellationRequested)
-                {
-                  CompleteCurrentElementUpdateAction();
-                  return;
-                }
+                CompleteCurrentElementUpdateAction();
+                return;
+              }
 
-                if (currentElement.InternalElement == foundXElement)
-                  currentElement.IsXPathTarget = true;
+              if (currentElement.InternalElement == foundXElement)
+              {
+                currentElement.IsXPathTarget = true;
+                if (bringNextIntoView)
+                {
+                  currentElement.RaiseBringIntoView();
+                  bringNextIntoView = false;
+                }
               }
             }
           }
-          else
+
+          if (this.ElementUpdateCancellation.IsCancellationRequested)
           {
-            // TODO Handle attributes 
+            CompleteCurrentElementUpdateAction();
+            return;
           }
+
+          // TODO Handle attributes 
         }
         finally
         {

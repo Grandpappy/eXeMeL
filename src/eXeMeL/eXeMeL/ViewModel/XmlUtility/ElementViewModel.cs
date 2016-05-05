@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using System.Xml.Linq;
@@ -183,5 +184,19 @@ namespace eXeMeL.ViewModel
 
       return l;
     }
+
+
+
+    public void RaiseBringIntoView()
+    {
+      var handler = this.BringIntoView;
+      handler?.Invoke(this, new EventArgs());
+    }
+
+
+
+    public event BringIntoViewEventHandler BringIntoView;
+    public delegate void BringIntoViewEventHandler(object sender, EventArgs e);
+
   }
 }

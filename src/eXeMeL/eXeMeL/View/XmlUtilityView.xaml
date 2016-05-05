@@ -93,9 +93,9 @@
       <StackPanel Name="OuterStackPanel" Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
           <Grid>
-            <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="Red"/>
+            <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathTargetBrush}"/>
             
-            <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}">
+            <ToggleButton Name="ElementStartToggleButton" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Loaded="ElementStartToggleButton_OnLoaded">
               <TextBlock Text="{Binding Name, StringFormat='{}&lt;{0}'}">
                 <TextBlock.ContextMenu>
                   <ContextMenu>
@@ -103,9 +103,9 @@
                     <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
                     <Separator/>
                     <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
-                    <Separator/>
+                    <!--<Separator/>
                     <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
-                    <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>
+                    <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>-->
                     <Separator/>
                     <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
                     <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
@@ -139,6 +139,7 @@
       </StackPanel>
       
       <DataTemplate.Triggers>
+        
         <DataTrigger Binding="{Binding IsXPathTarget}" Value="True">
           <Setter TargetName="XPathTargetHighlight" Property="Visibility" Value="Visible"></Setter>
         </DataTrigger>

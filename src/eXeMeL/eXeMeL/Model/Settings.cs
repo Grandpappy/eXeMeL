@@ -31,6 +31,7 @@ namespace eXeMeL.Model
     private Brush _attributeNameBrush;
     private Brush _attributeValueBrush;
     private Brush _hoverBackgroundBrush;
+    private Brush _currentXPathTargetBrush;
 
 
 
@@ -38,8 +39,7 @@ namespace eXeMeL.Model
     public bool ShowEditorLineNumbers
     {
       get { return this._showEditorLineNumbers; }
-      set {
-        this._showEditorLineNumbers = value; NotifyPropertyChanged("ShowEditorLineNumbers"); }
+      set { this._showEditorLineNumbers = value; NotifyPropertyChanged("ShowEditorLineNumbers"); }
     }
 
 
@@ -48,8 +48,7 @@ namespace eXeMeL.Model
     public bool WrapEditorText
     {
       get { return this._wrapEditorText; }
-      set {
-        this._wrapEditorText = value; NotifyPropertyChanged("WrapEditorText"); }
+      set { this._wrapEditorText = value; NotifyPropertyChanged("WrapEditorText"); }
     }
 
 
@@ -58,8 +57,7 @@ namespace eXeMeL.Model
     public double EditorFontSize
     {
       get { return this._editorFontSize; }
-      set {
-        this._editorFontSize = value; NotifyPropertyChanged("EditorFontSize"); }
+      set { this._editorFontSize = value; NotifyPropertyChanged("EditorFontSize"); }
     }
 
 
@@ -82,8 +80,7 @@ namespace eXeMeL.Model
     public ApplicationTheme ApplicationTheme
     {
       get { return this._applicationTheme; }
-      set {
-        this._applicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); NotifyPropertyChanged("EditorBrush"); }
+      set { this._applicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); NotifyPropertyChanged("EditorBrush"); }
     }
 
 
@@ -92,8 +89,7 @@ namespace eXeMeL.Model
     public string FontFamily
     {
       get { return this._fontFamily; }
-      set {
-        this._fontFamily = value; NotifyPropertyChanged("FontFamily"); }
+      set { this._fontFamily = value; NotifyPropertyChanged("FontFamily"); }
     }
 
 
@@ -101,8 +97,7 @@ namespace eXeMeL.Model
     public Brush EditorBrush
     {
       get { return this._editorBrush; }
-      set {
-        this._editorBrush = value; NotifyPropertyChanged("EditorBrush"); }
+      set { this._editorBrush = value; NotifyPropertyChanged("EditorBrush"); }
     }
 
 
@@ -110,8 +105,7 @@ namespace eXeMeL.Model
     public Brush ElementBrush
     {
       get { return this._elementBrush; }
-      set {
-        this._elementBrush = value; NotifyPropertyChanged("ElementBrush"); }
+      set { this._elementBrush = value; NotifyPropertyChanged("ElementBrush"); }
     }
 
 
@@ -119,8 +113,7 @@ namespace eXeMeL.Model
     public Brush AttributeNameBrush
     {
       get { return this._attributeNameBrush; }
-      set {
-        this._attributeNameBrush = value; NotifyPropertyChanged("AttributeNameBrush"); }
+      set { this._attributeNameBrush = value; NotifyPropertyChanged("AttributeNameBrush"); }
     }
 
 
@@ -128,8 +121,7 @@ namespace eXeMeL.Model
     public Brush AttributeValueBrush
     {
       get { return this._attributeValueBrush; }
-      set {
-        this._attributeValueBrush = value; NotifyPropertyChanged("AttributeValueBrush"); }
+      set {this._attributeValueBrush = value; NotifyPropertyChanged("AttributeValueBrush"); }
     }
 
 
@@ -140,6 +132,14 @@ namespace eXeMeL.Model
       set { this._hoverBackgroundBrush = value; NotifyPropertyChanged("HoverBackgroundBrush"); }
     }
 
+
+
+    public Brush CurrentXPathTargetBrush
+    {
+      get { return this._currentXPathTargetBrush; }
+      set { this._currentXPathTargetBrush = value; NotifyPropertyChanged("CurrentXPathTargetBrush"); }
+    }
+    
 
 
     public Settings()
@@ -161,6 +161,7 @@ namespace eXeMeL.Model
       this.AttributeNameBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeName);
       this.AttributeValueBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeValue);
       this.HoverBackgroundBrush = GetBrushForCurrentTheme(ThemeBrushTarget.HoverBackground);
+      this.CurrentXPathTargetBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathTarget);
     }
 
 

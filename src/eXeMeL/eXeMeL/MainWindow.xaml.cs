@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
+using eXeMeL.Utilities;
 
 namespace eXeMeL
 {
@@ -33,6 +34,8 @@ namespace eXeMeL
 
     public MainWindow()
     {
+      UIThread.Initialize(this.Dispatcher, false);
+
       this.Closing += MainWindow_Closing;
       this.Loaded += MainWindow_Loaded;
       this.DataContextChanged += MainWindow_DataContextChanged;
