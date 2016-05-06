@@ -45,7 +45,7 @@
 
       <Button 
         Command="{Binding Editor.RefreshCommand}" 
-        ToolTip="Replace all text with what's in the clipboard (F5)"
+        ToolTip="Replace all text with what's in the clipboard (F5)" Focusable="False"
         >
         <StackPanel Orientation="Horizontal" Background="Transparent">
           <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource RefreshIconBrush}"/>
@@ -56,7 +56,7 @@
 
       <Button 
         Command="{Binding Editor.CopyCommand}" 
-        ToolTip="Copy all text to the clipboard" 
+        ToolTip="Copy all text to the clipboard"  Focusable="False"
         >
         <StackPanel Orientation="Horizontal" Background="Transparent">
           <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource CopyIconBrush}"/>
@@ -67,7 +67,7 @@
 
       <Button 
         Command="{Binding Editor.SaveCommand}" 
-        ToolTip="Save the contents of the editor (Ctrl+S)"
+        ToolTip="Save the contents of the editor (Ctrl+S)" Focusable="False"
         >
         <StackPanel Orientation="Horizontal" Background="Transparent">
           <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource SaveIconBrush}"/>
@@ -76,7 +76,7 @@
       </Button>
 
 
-      <Button Click="OpenSettingsButton_Click" ToolTip="Edit settings">
+      <Button Click="OpenSettingsButton_Click" ToolTip="Edit settings" Focusable="False">
         <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource SettingsIconbrush}"/>
       </Button>
 
@@ -97,7 +97,7 @@
             >
           <StackPanel Orientation="Vertical">
             <views:SettingsView DataContext="{Binding Settings}"/>
-            <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left"/>
+            <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left" Focusable="False"/>
           </StackPanel>
         </MahApps:Flyout>
       </MahApps:FlyoutsControl.Items>
@@ -150,7 +150,7 @@
               <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
             </ObjectAnimationUsingKeyFrames>
             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentControl.Content)" Storyboard.TargetName="button">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="Xml Utility"/>
+              <DiscreteObjectKeyFrame KeyTime="0" Value="XPath Utility"/>
             </ObjectAnimationUsingKeyFrames>
           </Storyboard>
         </VisualState>
@@ -199,7 +199,7 @@
                 </Rectangle.OpacityMask>
               </Rectangle>
 
-              <Button x:Name="button" Grid.Column="1" Margin="5,1,0,0" Command="{Binding ViewModel.ToggleEditorModeCommand, ElementName=ControlRoot}" Content="Editor" ToolTip="Click to change the view (F2)">
+              <Button x:Name="button" Grid.Column="1" Margin="5,1,0,0" Command="{Binding ViewModel.ToggleEditorModeCommand, ElementName=ControlRoot}" Content="Editor" ToolTip="Click to change the view (F2)" Focusable="False">
                 <Button.Template>
                   <ControlTemplate TargetType="Button">
                     <Border Background="Transparent" BorderThickness="0">
@@ -317,7 +317,7 @@
 
         <Border Grid.Column="2" Margin="0" Padding="5,0,5,5" Cursor="Hand" Visibility="Collapsed">
           <Grid>
-            <Button HorizontalAlignment="Stretch" Margin="-5,0,-5,-5">
+            <Button HorizontalAlignment="Stretch" Margin="-5,0,-5,-5" Focusable="False">
               <Button.Template>
                 <ControlTemplate TargetType="{x:Type Button}">
                   <Border Background="{DynamicResource Gray4Brush}" Padding="5,0,5,5">

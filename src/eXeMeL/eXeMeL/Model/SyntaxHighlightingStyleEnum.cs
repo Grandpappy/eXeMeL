@@ -16,7 +16,8 @@ namespace eXeMeL.Model
     AttributeName,
     AttributeValue,
     HoverBackground,
-    CurrentXPathTarget
+    CurrentXPathTarget,
+    CurrentXPathStart
   }
 
 
@@ -49,9 +50,7 @@ namespace eXeMeL.Model
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.AttributeValue, "#FF569CD6")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.HoverBackground, "#66666666")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.CurrentXPathTarget, "#66999999")]
-    //[AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Content, "#FFD6D6D6")]
-
-
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.CurrentXPathStart, "#66B99400")]
     Dark_Blue
   }
 

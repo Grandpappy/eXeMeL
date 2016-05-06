@@ -13,19 +13,18 @@ namespace eXeMeL.ViewModel
   {
     public Settings Settings { get; set; }
     public Func<ElementViewModel> GetRoot { get; set; }
-    private ElementViewModel StartOfXPath { get; set; }
+    public Func<ElementViewModel> GetStartOfXPath { get; set; }
 
 
 
-    public XmlUtilityOperations(Settings settings, Func<ElementViewModel> getRoot)
+    public XmlUtilityOperations(Settings settings, Func<ElementViewModel> getRoot, Func<ElementViewModel> getStartOfXPath )
     {
       this.Settings = settings;
       this.GetRoot = getRoot;
+      this.GetStartOfXPath = getStartOfXPath;
       Messenger.Default.Register<CollapseAllOtherElementsMessage>(this, HandleCollapseAllOtherElementsMessage);
       Messenger.Default.Register<ExpandAllChildElementsMessage>(this, HandleExpandAllChildElementsMessage);
       Messenger.Default.Register<BuildXPathFromRootMessage>(this, HandleBuildXPathFromRootMessage);
-      Messenger.Default.Register<SetStartElementForXPathMessage>(this, HandleSetStartElementForXPathMessage);
-      Messenger.Default.Register<DocumentRefreshCompleted>(this, HandleDocumentRefressMessage);
       Messenger.Default.Register<BuildXPathFromStartMessage>(this, HandleBuildXpathFromStartMessage);
     }
 
@@ -33,10 +32,11 @@ namespace eXeMeL.ViewModel
 
     private void HandleBuildXpathFromStartMessage(BuildXPathFromStartMessage message)
     {
-      if (this.StartOfXPath == null)
+      var startOfXPath = this.GetStartOfXPath();
+      if (startOfXPath == null)
         return;
 
-      var startElementAncestors = GetOrderedAncestorsFromElementToRoot(this.StartOfXPath);
+      var startElementAncestors = GetOrderedAncestorsFromElementToRoot(startOfXPath);
       var currentElementAncestors = GetOrderedAncestorsFromElementToRoot(message.Element);
 
       ElementViewModel commonAncestor = null;
@@ -65,21 +65,7 @@ namespace eXeMeL.ViewModel
 
       var fullXpath = prefix + postfix;
 
-      SendOutputBasedOnTarget(fullXpath, OutputTarget.XPathEditor);
-    }
-
-
-
-    private void HandleDocumentRefressMessage(DocumentRefreshCompleted message)
-    {
-      this.StartOfXPath = null;
-    }
-
-
-
-    private void HandleSetStartElementForXPathMessage(SetStartElementForXPathMessage message)
-    {
-      this.StartOfXPath = message.Element;
+      SendOutputBasedOnTarget(fullXpath, message.OutputTarget);
     }
 
 
@@ -90,7 +76,7 @@ namespace eXeMeL.ViewModel
       var ancestorNames = ancestors.Select(x => x.Name).ToList();
 
       // Ignore the root element in the xpath, since that's where we're starting from
-      var xPath = string.Join("/", ancestorNames.Skip(1).ToArray());
+      var xPath = "/" + string.Join("/", ancestorNames.Skip(1).ToArray());
 
       var outputTarget = message.OutputTarget;
       SendOutputBasedOnTarget(xPath, outputTarget);

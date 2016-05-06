@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using eXeMeL.Messages;
 using eXeMeL.Model;
+using eXeMeL.Utilities;
 using eXeMeL.ViewModel.UtilityOperationMessages;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
@@ -30,8 +31,23 @@ namespace eXeMeL.ViewModel
     public XmlUtilityViewModel(Settings settings)
     {
       this.Settings = settings;
-      this.UtilityOperations = new XmlUtilityOperations(settings, () => this.Root);
+      this.UtilityOperations = new XmlUtilityOperations(settings, () => this.Root, () => this.StartOfXPath);
       this.MessengerInstance.Register< ReplaceXPathMessage>(this, HandleReplaceXPathMessage);
+      Messenger.Default.Register<DocumentRefreshCompleted>(this, HandleDocumentRefressMessage);
+      Messenger.Default.Register<SetStartElementForXPathMessage>(this, HandleSetStartElementForXPathMessage);
+    }
+
+
+    private void HandleDocumentRefressMessage(DocumentRefreshCompleted message)
+    {
+      this.StartOfXPath = null;
+    }
+
+
+
+    private void HandleSetStartElementForXPathMessage(SetStartElementForXPathMessage message)
+    {
+      this.StartOfXPath = message.Element;
     }
 
 
@@ -48,6 +64,47 @@ namespace eXeMeL.ViewModel
         Set(() => this.XPath, ref this._xPath, value);
         UpdateElementsInXPath();
       }
+    }
+
+
+
+    private ElementViewModel StartOfXPath
+    {
+      get { return this._startOfXPath; }
+      set
+      {
+        Set(() => this.StartOfXPath, ref this._startOfXPath, value);
+        UpdateStartOfXPathText();
+
+        if (this.Root != null)
+        {
+          foreach (var x in this.Root.GetElementAndAllDescendents())
+          {
+            x.IsXPathTarget = false;
+            x.IsXPathStart = false;
+          }
+
+          if (this.StartOfXPath != null)
+          {
+            this.StartOfXPath.IsXPathStart = true;
+          }
+        }
+      }
+    }
+
+
+
+    private void UpdateStartOfXPathText()
+    {
+      this.StartOfXPathText = this.StartOfXPath?.Name ?? "Root";
+    }
+
+
+
+    public string StartOfXPathText
+    {
+      get { return this._startOfXPathText; }
+      set { Set(() => this.StartOfXPathText, ref this._startOfXPathText, value); }
     }
 
 
@@ -98,7 +155,11 @@ namespace eXeMeL.ViewModel
     public ElementViewModel Root
     {
       get { return this._root; }
-      set { Set(() => this.Root, ref this._root, value); }
+      set
+      {
+        Set(() => this.Root, ref this._root, value);
+        this.StartOfXPath = this.Root;
+      }
     }
 
 
@@ -155,6 +216,8 @@ namespace eXeMeL.ViewModel
     private void UpdateElementsInXPath()
     {
       var xPathToUse = this.XPath;
+      var xPathRoot = this.StartOfXPath;
+
       AddNewElementUpdateAction(() =>
       {
         try
@@ -162,7 +225,7 @@ namespace eXeMeL.ViewModel
           var allElements = this.Root.GetElementAndAllDescendents();
           allElements.ForEach(x => x.IsXPathTarget = false);
 
-          var result = (IEnumerable)this.Root.InternalElement.XPathEvaluate(this.XPath);
+          var result = (IEnumerable)xPathRoot.InternalElement.XPathEvaluate(xPathToUse);
           if (this.ElementUpdateCancellation.IsCancellationRequested)
           {
             CompleteCurrentElementUpdateAction();
@@ -279,6 +342,8 @@ namespace eXeMeL.ViewModel
 
     private CancellationTokenSource ElementUpdateCancellation { get; set; }
     private object _elementUpdateLock = new object();
+    private ElementViewModel _startOfXPath;
+    private string _startOfXPathText;
     private Action CurrentElementAction { get; set; }
     private Action NextElementAction { get; set; }
   }

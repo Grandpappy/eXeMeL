@@ -32,6 +32,7 @@ namespace eXeMeL.Model
     private Brush _attributeValueBrush;
     private Brush _hoverBackgroundBrush;
     private Brush _currentXPathTargetBrush;
+    private Brush _currentXPathStartBrush;
 
 
 
@@ -139,7 +140,15 @@ namespace eXeMeL.Model
       get { return this._currentXPathTargetBrush; }
       set { this._currentXPathTargetBrush = value; NotifyPropertyChanged("CurrentXPathTargetBrush"); }
     }
-    
+
+
+
+    public Brush CurrentXPathStartBrush
+    {
+      get { return this._currentXPathStartBrush; }
+      set { this._currentXPathStartBrush = value; NotifyPropertyChanged("CurrentXPathStartBrush"); }
+    }
+
 
 
     public Settings()
@@ -162,6 +171,7 @@ namespace eXeMeL.Model
       this.AttributeValueBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeValue);
       this.HoverBackgroundBrush = GetBrushForCurrentTheme(ThemeBrushTarget.HoverBackground);
       this.CurrentXPathTargetBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathTarget);
+      this.CurrentXPathStartBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathStart);
     }
 
 

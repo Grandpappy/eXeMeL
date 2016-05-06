@@ -6,6 +6,7 @@ namespace eXeMeL.ViewModel
   {
     private bool _isAlongXPath;
     private bool _isXPathTarget;
+    private bool _isXPathStart;
     public ElementViewModel Parent { get; }
     public string Name { get; }
     public string Value { get; }
@@ -17,6 +18,14 @@ namespace eXeMeL.ViewModel
     {
       get { return this._isAlongXPath; }
       set { Set(() => this.IsAlongXPath, ref this._isAlongXPath, value); }
+    }
+
+
+
+    public bool IsXPathStart
+    {
+      get { return this._isXPathStart; }
+      set { Set(() => this.IsXPathStart, ref this._isXPathStart, value); }
     }
 
 

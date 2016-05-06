@@ -92,34 +92,42 @@
       
       <StackPanel Name="OuterStackPanel" Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
-          <Grid>
-            <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathTargetBrush}"/>
             
-            <ToggleButton Name="ElementStartToggleButton" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Loaded="ElementStartToggleButton_OnLoaded">
-              <TextBlock Text="{Binding Name, StringFormat='{}&lt;{0}'}">
-                <TextBlock.ContextMenu>
-                  <ContextMenu>
-                    <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
-                    <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
-                    <Separator/>
-                    <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
-                    <!--<Separator/>
-                    <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
-                    <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>-->
-                    <Separator/>
-                    <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
-                    <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
-                  </ContextMenu>
-                </TextBlock.ContextMenu>
-              </TextBlock>
-            </ToggleButton>
-          </Grid>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="&lt;"></TextBlock>
+
+            <Grid>
+              <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathTargetBrush}" SnapsToDevicePixels="True"/>
+              <Rectangle Name="XPathStartHighlight" Visibility="Collapsed" RadiusX="3" RadiusY="3" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathStartBrush}" SnapsToDevicePixels="True" Margin="-2,-2,-2,0"/>
+
+              <ToggleButton Name="ElementStartToggleButton" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Loaded="ElementStartToggleButton_OnLoaded" Focusable="False">
+                <TextBlock Text="{Binding Name}">
+                  <TextBlock.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
+                      <Separator/>
+                      <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
+                      <!--<Separator/>
+                      <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>-->
+                      <Separator/>
+                      <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
+                    </ContextMenu>
+                  </TextBlock.ContextMenu>
+                </TextBlock>
+              </ToggleButton>
+            </Grid>
+          </StackPanel>
+
+            
 
           <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
           <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
           <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
           <TextBlock Name="InnerText" Text="{Binding InnerText}" Visibility="Collapsed" Style="{StaticResource ElementInnerText}"/>
-          <ToggleButton Name="EndTagAfterInnerText" Visibility="Collapsed" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
+          <ToggleButton Name="EndTagAfterInnerText" Visibility="Collapsed" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto" Focusable="False">
             <TextBlock Text="{Binding Name, StringFormat='{}&lt;/{0}&gt;'}"/>
           </ToggleButton>
         </StackPanel>
@@ -131,10 +139,12 @@
           <TextBlock Name="HiddenChildrenReplacementText"  Text="..." Visibility="Collapsed" />
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
-          <ToggleButton Name="EndTagAfterChildElements" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto">
-            <TextBlock Text="{Binding Name, StringFormat='{}&lt;/{0}&gt;'}"/>
+        <StackPanel Orientation="Horizontal" Name="EndTagAfterChildElements">
+          <TextBlock Text="&lt;/"/>
+          <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto" Focusable="False">
+            <TextBlock Text="{Binding Name}"/>
           </ToggleButton>
+          <TextBlock Text="&gt;"/>
         </StackPanel>
       </StackPanel>
       
@@ -142,6 +152,9 @@
         
         <DataTrigger Binding="{Binding IsXPathTarget}" Value="True">
           <Setter TargetName="XPathTargetHighlight" Property="Visibility" Value="Visible"></Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsXPathStart}" Value="True">
+          <Setter TargetName="XPathStartHighlight" Property="Visibility" Value="Visible"></Setter>
         </DataTrigger>
         <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
           <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
@@ -256,14 +269,23 @@
             <RowDefinition Height="*"/>
           </Grid.RowDefinitions>
 
-          <DockPanel Grid.Row="0" Margin="10,10,30,20">
-            <TextBlock DockPanel.Dock="Left" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
-            <TextBox DockPanel.Dock="Right" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource XmlTextBox}" Margin="20,0,0,0" Padding="10"/>
-          </DockPanel>
+          <Grid Grid.Row="0" Margin="10,10,30,20">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
+            <TextBox Grid.Column="1" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="0" Style="{StaticResource XmlTextBox}" Margin="20,0,20,0" Padding="10"/>
+            <StackPanel Grid.Column="2" Orientation="Vertical">
+              <TextBlock Text="{Binding StartOfXPathText, StringFormat='{}Start: {0}'}" Style="{StaticResource XmlText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding StartOfXPathText}"/>
+            </StackPanel>
+          </Grid>
           
           
-          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
-            <ContentPresenter Content="{Binding Root}"/>
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" Focusable="False">
+            <ContentPresenter Content="{Binding Root}" Margin="4,4,0,4"/>
           </ScrollViewer>
         </Grid>
 
