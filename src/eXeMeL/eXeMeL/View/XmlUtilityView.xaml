@@ -48,7 +48,7 @@
       <Setter Property="ItemsPanel">
         <Setter.Value>
           <ItemsPanelTemplate>
-            <StackPanel Orientation="Horizontal"/>
+            <WrapPanel Orientation="Horizontal"/>
           </ItemsPanelTemplate>
         </Setter.Value>
       </Setter>
@@ -97,8 +97,8 @@
             <TextBlock Text="&lt;"></TextBlock>
 
             <Grid>
-              <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathTargetBrush}" SnapsToDevicePixels="True"/>
-              <Rectangle Name="XPathStartHighlight" Visibility="Collapsed" RadiusX="3" RadiusY="3" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathStartBrush}" SnapsToDevicePixels="True" Margin="-2,-2,-2,0"/>
+              <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathTargetBrush}" SnapsToDevicePixels="True" RadiusX="3" RadiusY="3" />
+              <Rectangle Name="XPathStartHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathStartBrush}" SnapsToDevicePixels="True" Margin="-2,-2,-2,0" RadiusX="3" RadiusY="3" />
 
               <ToggleButton Name="ElementStartToggleButton" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Loaded="ElementStartToggleButton_OnLoaded" Focusable="False">
                 <TextBlock Text="{Binding Name}">
@@ -123,7 +123,7 @@
 
             
 
-          <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}"/>
+          <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}" Focusable="False"/>
           <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
           <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
           <TextBlock Name="InnerText" Text="{Binding InnerText}" Visibility="Collapsed" Style="{StaticResource ElementInnerText}"/>
@@ -132,8 +132,8 @@
           </ToggleButton>
         </StackPanel>
 
-        
-        <ItemsControl Name="ChildElementsItemsControl" ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0"/>
+
+        <ItemsControl Name="ChildElementsItemsControl" ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0" Focusable="False"/>
         <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"-->
         <StackPanel Name="HiddenChildrenReplacementTextContainer">
           <TextBlock Name="HiddenChildrenReplacementText"  Text="..." Visibility="Collapsed" />
@@ -277,9 +277,9 @@
             </Grid.ColumnDefinitions>
             
             <TextBlock Grid.Column="0" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
-            <TextBox Grid.Column="1" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="0" Style="{StaticResource XmlTextBox}" Margin="20,0,20,0" Padding="10"/>
+            <TextBox Name="XPathTextBox" Grid.Column="1" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="0" Style="{StaticResource XmlTextBox}" Margin="20,0,20,0" Padding="10"/>
             <StackPanel Grid.Column="2" Orientation="Vertical">
-              <TextBlock Text="{Binding StartOfXPathText, StringFormat='{}Start: {0}'}" Style="{StaticResource XmlText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding StartOfXPathText}"/>
+              <TextBlock Text="{Binding StartOfXPathText, StringFormat='{}Start: {0}'}" Style="{StaticResource XmlText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding StartOfXPathText}" Foreground="#8F8F8F"/>
             </StackPanel>
           </Grid>
           

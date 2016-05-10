@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,9 +16,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.Utilities;
 using eXeMeL.ViewModel;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace eXeMeL.View
 {
@@ -28,8 +31,23 @@ namespace eXeMeL.View
   {
     public XmlUtilityView()
     {
+      Messenger.Default.Register<EditorModeChangedMessage>(this, HandleEditorModeChangedMessage);
+
       this.DataContextChanged += XmlUtilityView_DataContextChanged;
       InitializeComponent();
+    }
+
+
+
+    private void HandleEditorModeChangedMessage(EditorModeChangedMessage message)
+    {
+      if (message.EditorMode == EditorMode.XmlUtility)
+      {
+        // Since we don't know when this is called when compaired to a visual state change, queue up the work
+        // on the UI thread after whatever's running
+
+        UIThread.Queue(() => this.XPathTextBox.Focus());
+      }
     }
 
 
@@ -38,6 +56,7 @@ namespace eXeMeL.View
     {
       OnPropertyChanged("ViewModel");
       OnPropertyChanged("Settings");
+
     }
 
 

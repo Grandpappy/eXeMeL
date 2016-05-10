@@ -65,5 +65,12 @@ namespace eXeMeL.Utilities
         _dispatcher.Invoke(action, null);
       }
     }
+
+
+    // Queue up an action to run once all current items on the UI thread is complete
+    public static void Queue(Action action)
+    {
+      Task.Factory.StartNew(() => Run(action));
+    }
   }
 }

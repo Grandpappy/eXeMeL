@@ -65,6 +65,8 @@ namespace eXeMeL.ViewModel
       {
         this.EditorMode = EditorMode.Editor;
       }
+
+      this.MessengerInstance.Send(new EditorModeChangedMessage(this.EditorMode));
     }
 
 
