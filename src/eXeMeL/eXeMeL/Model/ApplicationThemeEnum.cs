@@ -17,7 +17,10 @@ namespace eXeMeL.Model
 
     [Description("Dark")]
     [AssociatedResourceDictionary(@"pack://application:,,,/Resources/DarkThemeColors.xaml")]
-    Dark
+    Dark,
+
+    [DoNotDisplayInSettings]
+    Any
   }
 
 

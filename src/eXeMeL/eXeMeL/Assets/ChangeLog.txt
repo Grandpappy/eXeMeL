@@ -1,4 +1,18 @@
-﻿*4/28/2016 - New Editor Features
+﻿*5/10/2016 - New XPath Utility
+
+New XPath Utility mode has been added.  Get to it by pressing the "Editor" button in the upper left, or press F2.
+
+Search for elements using the XPath textbox at the top.  All elements that match the xpath will be highlighted as you type.
+
+The xpath's starting element is highlighted, and the name is displayed to the right of the XPath textbox.
+
+Right click an element for additional options:
+
+- Select it as the new starting element for xpaths
+- Expand / Collapse elements across the entire document
+- Copy to the clipboard an xpath that starts at the root, or the starting element, to the current element
+
+*4/28/2016 - New Editor Features
 
 New option to highlight all instances of the currently selected text in the editor.
 

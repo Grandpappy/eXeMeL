@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
+using eXeMeL.Utilities;
 
 namespace eXeMeL
 {
@@ -23,7 +24,7 @@ namespace eXeMeL
   {
     private FoldingManager FoldingManager { get; set; }
     private XmlFoldingStrategy FoldingStrategy { get; set; }
-    private MainViewModel ViewModel { get { return this.DataContext as MainViewModel; } }
+    public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
 
@@ -36,6 +37,8 @@ namespace eXeMeL
 
     public MainWindow()
     {
+      UIThread.Initialize(this.Dispatcher, false);
+
       this.Closing += MainWindow_Closing;
       this.Loaded += MainWindow_Loaded;
       this.DataContextChanged += MainWindow_DataContextChanged;

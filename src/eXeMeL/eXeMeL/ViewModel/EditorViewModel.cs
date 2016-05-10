@@ -200,7 +200,8 @@ namespace eXeMeL.ViewModel
       ReplaceOldDocumentWithNewDocument(text);
 
       this.MessengerInstance.Send(new DisplayToolInformationMessage(string.Empty));
-
+      this.MessengerInstance.Send(new DocumentRefreshCompleted(text));
+      
       var handler = this.RefreshComplete;
       handler?.Invoke(this, EventArgs.Empty);
     }

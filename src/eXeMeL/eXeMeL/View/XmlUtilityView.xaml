@@ -1,0 +1,302 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:eXeMeL.View"
+             xmlns:vm="clr-namespace:eXeMeL.ViewModel"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" x:Class="eXeMeL.View.XmlUtilityView"
+             xmlns:mahapps="clr-namespace:MahApps.Metro;assembly=MahApps.Metro"
+             mc:Ignorable="d" 
+             Name="ControlRoot"
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance vm:XmlUtilityViewModel}"
+             >
+  
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    
+    <Style x:Key="XmlText" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"/>
+      <Setter Property="FontFamily" Value="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <Style x:Key="XmlTextBox" TargetType="TextBox">
+      <Setter Property="FontSize" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"/>
+      <Setter Property="FontFamily" Value="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <Style x:Key="ElementXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.ElementBrush}"/>
+    </Style>
+
+    <Style x:Key="ElementInnerText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorBrush}"/>
+    </Style>
+
+    <Style x:Key="AttributeNameXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.AttributeNameBrush}"/>
+    </Style>
+
+    <Style x:Key="AttributeValueXmlText" TargetType="TextBlock" BasedOn="{StaticResource XmlText}">
+      <Setter Property="Foreground" Value="{Binding ElementName=ControlRoot, Path=Settings.AttributeValueBrush}"/>
+    </Style>
+
+    <Style x:Key="HorizontalItemsControl" TargetType="ItemsControl">
+      <Setter Property="ItemsPanel">
+        <Setter.Value>
+          <ItemsPanelTemplate>
+            <WrapPanel Orientation="Horizontal"/>
+          </ItemsPanelTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+
+    <Style x:Key="VerticalItemsControl" TargetType="ItemsControl">
+      <Setter Property="ItemsPanel">
+        <Setter.Value>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel Orientation="Vertical" VirtualizationMode="Recycling"/>
+          </ItemsPanelTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+
+    <ControlTemplate x:Key="ElementTextToggleButton" TargetType="ToggleButton">
+      <ControlTemplate.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
+      </ControlTemplate.Resources>
+
+      <Border Name="Border">
+        <ContentPresenter Content="{TemplateBinding Content}"/>
+      </Border>
+
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter TargetName="Border" Property="Background" Value="{Binding ElementName=ControlRoot, Path=Settings.HoverBackgroundBrush}"/>
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+
+
+
+    <DataTemplate DataType="{x:Type vm:ElementViewModel}">
+      <DataTemplate.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
+      </DataTemplate.Resources>
+      
+      <StackPanel Name="OuterStackPanel" Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="&lt;"></TextBlock>
+
+            <Grid>
+              <Rectangle Name="XPathTargetHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathTargetBrush}" SnapsToDevicePixels="True" RadiusX="3" RadiusY="3" />
+              <Rectangle Name="XPathStartHighlight" Visibility="Collapsed" Fill="{Binding ElementName=ControlRoot, Path=Settings.CurrentXPathStartBrush}" SnapsToDevicePixels="True" Margin="-2,-2,-2,0" RadiusX="3" RadiusY="3" />
+
+              <ToggleButton Name="ElementStartToggleButton" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Loaded="ElementStartToggleButton_OnLoaded" Focusable="False">
+                <TextBlock Text="{Binding Name}">
+                  <TextBlock.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="Collapse all other elements" Command="{Binding CollapseAllOtherElementsCommand}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="Expand all child elements" Command="{Binding ExpandAllChildElementsCommand}" CommandParameter="{Binding}"/>
+                      <Separator/>
+                      <MenuItem Header="Select start element for XPath" Command="{Binding SetStartXPathCommand}" CommandParameter="{Binding}"/>
+                      <!--<Separator/>
+                      <MenuItem Header="Build XPath to this element from root" Command="{Binding BuildXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="Build XPath to this element from start" Command="{Binding BuildXPathFromStartCommand}" CommandParameter="{Binding}"/>-->
+                      <Separator/>
+                      <MenuItem Header="Copy XPath to this element from root" Command="{Binding CopyXPathFromRootCommand}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="Copy XPath to this element from start" Command="{Binding CopyXPathFromStartCommand}" CommandParameter="{Binding}"/>
+                    </ContextMenu>
+                  </TextBlock.ContextMenu>
+                </TextBlock>
+              </ToggleButton>
+            </Grid>
+          </StackPanel>
+
+            
+
+          <ItemsControl ItemsSource="{Binding Attributes}" Style="{StaticResource HorizontalItemsControl}" Focusable="False"/>
+          <TextBlock Name="StartTagWithChildTerminator" Text="&gt;"/>
+          <TextBlock Name="StartTagWithoutChildTerminator" Text="/&gt;" Visibility="Collapsed"/>
+          <TextBlock Name="InnerText" Text="{Binding InnerText}" Visibility="Collapsed" Style="{StaticResource ElementInnerText}"/>
+          <ToggleButton Name="EndTagAfterInnerText" Visibility="Collapsed" IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto" Focusable="False">
+            <TextBlock Text="{Binding Name, StringFormat='{}&lt;/{0}&gt;'}"/>
+          </ToggleButton>
+        </StackPanel>
+
+
+        <ItemsControl Name="ChildElementsItemsControl" ItemsSource="{Binding ChildElements}" Style="{StaticResource VerticalItemsControl}" Margin="20,0,0,0" Focusable="False"/>
+        <!--Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"-->
+        <StackPanel Name="HiddenChildrenReplacementTextContainer">
+          <TextBlock Name="HiddenChildrenReplacementText"  Text="..." Visibility="Collapsed" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Name="EndTagAfterChildElements">
+          <TextBlock Text="&lt;/"/>
+          <ToggleButton IsChecked="{Binding IsExpanded}" Cursor="Hand" ToolTip="Click to toggle visibility of this element" Template="{StaticResource ElementTextToggleButton}" Width="Auto" Focusable="False">
+            <TextBlock Text="{Binding Name}"/>
+          </ToggleButton>
+          <TextBlock Text="&gt;"/>
+        </StackPanel>
+      </StackPanel>
+      
+      <DataTemplate.Triggers>
+        
+        <DataTrigger Binding="{Binding IsXPathTarget}" Value="True">
+          <Setter TargetName="XPathTargetHighlight" Property="Visibility" Value="Visible"></Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsXPathStart}" Value="True">
+          <Setter TargetName="XPathStartHighlight" Property="Visibility" Value="Visible"></Setter>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="EndTagAfterChildElements" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="HiddenChildrenReplacementTextContainer" Property="Visibility" Value="Collapsed"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding HasInnerText}" Value="True">
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="InnerText" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="EndTagAfterInnerText" Property="Visibility" Value="Visible"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+          <Setter TargetName="StartTagWithChildTerminator" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="StartTagWithoutChildTerminator" Property="Visibility" Value="Visible"/>
+          <Setter TargetName="OuterStackPanel" Property="Orientation" Value="Horizontal"/>
+          <Setter TargetName="ChildElementsItemsControl" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="InnerText" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="EndTagAfterInnerText" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="HiddenChildrenReplacementText" Property="Visibility" Value="Visible"/>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+    
+    
+    <DataTemplate DataType="{x:Type vm:AttributeViewModel}">
+      <DataTemplate.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource XmlText}"/>
+      </DataTemplate.Resources>
+      
+      <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+        <TextBlock Text="{Binding Name, StringFormat='{}{0}'}" Style="{StaticResource AttributeNameXmlText}"/>
+        <TextBlock Text="{Binding Value, StringFormat='{}=&quot;{0}&quot;'}" Style="{StaticResource AttributeValueXmlText}"/>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.Resources>
+  
+  <Grid>
+    <VisualStateManager.VisualStateGroups>
+      <VisualStateGroup x:Name="ValidXmlGroup">
+        <VisualState x:Name="ValidXml">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+        <VisualState x:Name="InvalidXml">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="InvalidXmlContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+      </VisualStateGroup>
+      <!--<VisualStateGroup x:Name="LoadXmlStates" >
+        <VisualState x:Name="LoadingXml">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlContentContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="LoadingContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+        <VisualState x:Name="XmlLoaded">
+          <Storyboard>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlContentContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="LoadingContainer">
+              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+            </ObjectAnimationUsingKeyFrames>
+          </Storyboard>
+        </VisualState>
+      </VisualStateGroup>-->
+    </VisualStateManager.VisualStateGroups>
+
+    <i:Interaction.Triggers>
+      <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="False">
+        <ei:GoToStateAction x:Name="GoToInvalidXmlVisualStateAction" StateName="InvalidXml"/>
+      </ei:DataTrigger>
+      <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="True">
+        <ei:GoToStateAction x:Name="GoToValidXmlVisualStateAction" StateName="ValidXml"/>
+      </ei:DataTrigger>
+      <!--<ei:DataTrigger Binding="{Binding IsBusy}" Value="True">
+        <ei:GoToStateAction x:Name="GoToLoadingVisualStateAction" StateName="LoadingXml"/>
+      </ei:DataTrigger>
+      <ei:DataTrigger Binding="{Binding IsBusy}" Value="False">
+        <ei:GoToStateAction x:Name="GoToLoadedXmlVisualStateAction" StateName="XmlLoaded"/>
+      </ei:DataTrigger>-->
+    </i:Interaction.Triggers>
+
+    <Grid x:Name="OuterContainer">
+      <!--<Grid x:Name="LoadingContainer" Visibility="Collapsed">
+        <TextBlock Text="Loading..." HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
+        <ProgressBar IsIndeterminate="True" Width="200" VerticalAlignment="Top" Margin="0,100,0,0"/>
+      </Grid>-->
+
+      <Grid x:Name="XmlContentContainer">
+        <Grid x:Name="XmlUtilityContainer">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <Grid Grid.Row="0" Margin="10,10,30,20">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
+            <TextBox Name="XPathTextBox" Grid.Column="1" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="0" Style="{StaticResource XmlTextBox}" Margin="20,0,20,0" Padding="10"/>
+            <StackPanel Grid.Column="2" Orientation="Vertical">
+              <TextBlock Text="{Binding StartOfXPathText, StringFormat='{}Start: {0}'}" Style="{StaticResource XmlText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding StartOfXPathText}" Foreground="#8F8F8F"/>
+            </StackPanel>
+          </Grid>
+          
+          
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" Focusable="False">
+            <ContentPresenter Content="{Binding Root}" Margin="4,4,0,4"/>
+          </ScrollViewer>
+        </Grid>
+
+
+        <Grid x:Name="InvalidXmlContainer" Visibility="Collapsed">
+          <TextBlock Text="Document is not valid Xml" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" Foreground="{DynamicResource LabelTextBrush}" FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"/>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>
+ 
+
+ 

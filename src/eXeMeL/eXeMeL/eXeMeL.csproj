@@ -28,8 +28,8 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>61</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>63</ApplicationRevision>
+    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -125,6 +125,8 @@
     <Compile Include="Messages\ApplicationThemeUpdatedMessage.cs" />
     <Compile Include="Messages\DisplayApplicationStatusMessage.cs" />
     <Compile Include="Messages\DisplayToolInformationMessage.cs" />
+    <Compile Include="Messages\DocumentRefreshCompleted.cs" />
+    <Compile Include="Messages\EditorModeChangedMessage.cs" />
     <Compile Include="Messages\GoToTopOfDocumentMessage.cs" />
     <Compile Include="Messages\SelectTextInEditorMessage.cs" />
     <Compile Include="Messages\SetSearchTextMessage.cs" />
@@ -138,8 +140,8 @@
     <Compile Include="Model\SyntaxHighlightingStyleEnum.cs" />
     <Compile Include="Utilities\EncodedXmlExtractor.cs" />
     <Compile Include="Utilities\Extensions.cs" />
-    <Compile Include="Utilities\XmlParser.cs" />
     <Compile Include="ViewModel\AllSelectionColorizer.cs" />
+    <Compile Include="Utilities\UIThread.cs" />
     <Compile Include="ViewModel\EditorFindViewModel.cs" />
     <Compile Include="ViewModel\DocumentSnapshot.cs" />
     <Compile Include="ViewModel\EditorViewModel.cs" />
@@ -152,6 +154,12 @@
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
+    <Compile Include="ViewModel\XmlUtility\AttributeViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\Messages\CollapseAllOtherElementsMessage.cs" />
+    <Compile Include="ViewModel\XmlUtility\ElementViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\XmlNodeViewModel.cs" />
+    <Compile Include="ViewModel\XmlUtility\XmlUtilityOperations.cs" />
+    <Compile Include="ViewModel\XmlUtility\XmlUtilityViewModel.cs" />
     <Compile Include="View\ChangeLogWindow\ChangeLogWindow.xaml.cs">
       <DependentUpon>ChangeLogWindow.xaml</DependentUpon>
     </Compile>
@@ -163,6 +171,9 @@
     </Compile>
     <Compile Include="View\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\XmlUtilityView.xaml.cs">
+      <DependentUpon>XmlUtilityView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -186,6 +197,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Icons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\XmlUtilityView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

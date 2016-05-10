@@ -32,7 +32,7 @@ namespace eXeMeL.View
 
     private void ResetFontSizeButton_Click(object sender, RoutedEventArgs e)
     {
-      (this.DataContext as Settings).EditorFontSize = Settings.DEFAULT_EDITOR_FONT_SIZE;
+      (this.DataContext as Settings).EditorFontSize = Settings.DefaultEditorFontSize;
     }
 
 
@@ -84,6 +84,7 @@ namespace eXeMeL.View
 
       return (
         from object enumValue in enumValues
+        where DisplayInSettings(enumValue) 
         select new EnumerationMember
         {
           Value = enumValue,
@@ -102,6 +103,19 @@ namespace eXeMeL.View
       return descriptionAttribute != null
         ? descriptionAttribute.Description
         : enumValue.ToString();
+    }
+
+    private bool DisplayInSettings(object enumValue)
+    {
+      var attribute = EnumType
+        .GetField(enumValue.ToString())
+        .GetCustomAttributes(typeof(DoNotDisplayInSettingsAttribute), false)
+        .FirstOrDefault() as DoNotDisplayInSettingsAttribute;
+
+      if (attribute == null)
+        return true;
+      else
+        return false;
     }
 
     public class EnumerationMember

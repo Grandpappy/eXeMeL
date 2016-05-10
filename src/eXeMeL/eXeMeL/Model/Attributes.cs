@@ -33,26 +33,36 @@ namespace eXeMeL.Model
 
 
 
+  public class DoNotDisplayInSettingsAttribute : Attribute
+  {
+
+  }
+
+
+
   [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
   public class AssociatedThemeBrushAttribute : Attribute
   {
     public Brush AssociatedBrush { get; private set; }
     public ApplicationTheme AssociatedTheme { get; private set; }
+    public ThemeBrushTarget Target { get; private set; }
 
 
 
-    public AssociatedThemeBrushAttribute(ApplicationTheme associatedTheme, Brush associatedBrush)
+    public AssociatedThemeBrushAttribute(ApplicationTheme associatedTheme, ThemeBrushTarget target, Brush associatedBrush)
     {
       this.AssociatedBrush = associatedBrush;
       this.AssociatedTheme = associatedTheme;
+      this.Target = target;
     }
 
 
 
-    public AssociatedThemeBrushAttribute(ApplicationTheme associatedTheme, string associatedBrush)
+    public AssociatedThemeBrushAttribute(ApplicationTheme associatedTheme, ThemeBrushTarget target, string associatedBrush)
     {
       this.AssociatedBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(associatedBrush);
       this.AssociatedTheme = associatedTheme;
+      this.Target = target;
     }
   }
 }
