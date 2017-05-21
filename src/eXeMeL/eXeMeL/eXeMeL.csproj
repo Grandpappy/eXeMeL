@@ -196,6 +196,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\SolarizedDarkThemeColors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\Icons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -250,6 +254,7 @@
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd" />
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Dark.xshd" />
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSBlue.xshd" />
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedDark.xshd" />
     <None Include="eXeMeL_1_TemporaryKey.pfx" />
     <None Include="eXeMeL_2_TemporaryKey.pfx" />
     <None Include="eXeMeL_TemporaryKey.pfx" />

@@ -1,4 +1,10 @@
-﻿*5/10/2016 - New XPath Utility
+﻿*5/7/2017 - New Solarized Dark Themes
+
+New application-wide Solarized Dark theme based on Ethan Schoonover's work. See http://ethanschoonover.com/solarized for more information.
+
+New syntax highlighting scheme for the Solarized Dark theme. 
+
+*5/10/2016 - New XPath Utility
 
 New XPath Utility mode has been added.  Get to it by pressing the "Editor" button in the upper left, or press F2.
 

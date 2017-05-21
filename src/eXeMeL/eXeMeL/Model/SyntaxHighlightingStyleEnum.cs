@@ -69,7 +69,20 @@ namespace eXeMeL.Model
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.HoverBackground, "#66666666")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.CurrentXPathTarget, "#AAB99400")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.CurrentXPathStart, "#66B99400")]
-    Dark_Blue
+    Dark_Blue,
+
+    [Description("Solarized (Dark Theme)")]
+    [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedDark.xshd")]
+    [AssociatedThemeBrush(ApplicationTheme.Light, ThemeBrushTarget.EditorContent, "#FF333333")]
+    [AssociatedThemeBrush(ApplicationTheme.Dark, ThemeBrushTarget.EditorContent, "#FFCCCCCC")]
+    [AssociatedThemeBrush(ApplicationTheme.SolarizedDark, ThemeBrushTarget.EditorContent, "#93a1a1")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Element, "#268bd2")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.AttributeName, "#b58900")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.AttributeValue, "#2aa198")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.HoverBackground, "#66666666")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.CurrentXPathTarget, "#2c4c55")]
+    [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.CurrentXPathStart, "#66B99400")]
+    Dark_Solarized
   }
 
 

@@ -122,6 +122,9 @@ namespace eXeMeL.View.ChangeLog
         case ApplicationTheme.Dark:
           return @"pack://application:,,,/Resources/DarkThemeColors.xaml";
 
+        case ApplicationTheme.SolarizedDark:
+          return @"pack://application:,,,/Resources/SolarizedDarkThemeColors.xaml";
+
         default:
           return @"pack://application:,,,/Resources/ThemeColors.xaml";
       }
