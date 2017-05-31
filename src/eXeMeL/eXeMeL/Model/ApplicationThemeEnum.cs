@@ -19,6 +19,10 @@ namespace eXeMeL.Model
     [AssociatedResourceDictionary(@"pack://application:,,,/Resources/DarkThemeColors.xaml")]
     Dark,
 
+    [Description("Solarized (Dark)")]
+    [AssociatedResourceDictionary(@"pack://application:,,,/Resources/SolarizedDarkThemeColors.xaml")]
+    SolarizedDark,
+
     [DoNotDisplayInSettings]
     Any
   }
