@@ -100,6 +100,7 @@ namespace eXeMeL
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<UnselectTextInEditorMessage>(this, HandleUnselectTextInEditorMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<DocumentTextReplacedMessage>(this, HandleDocumentTextReplacedMessage);
       GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<ApplicationThemeUpdatedMessage>(this, HandleApplicationThemeUpdatedMessage);
+      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SetKeyboardFocusToEditor>(this, HandleSetKeyboardFocusToEditorMessage);
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
@@ -304,7 +305,11 @@ namespace eXeMeL
       SetWindowGlow();
     }
 
-
+    private void HandleSetKeyboardFocusToEditorMessage(SetKeyboardFocusToEditor obj)
+    {
+      this.ResetFocusCommand.Execute(null);
+    }
+    
 
     private void SetWindowGlow()
     {
