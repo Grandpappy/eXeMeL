@@ -191,6 +191,9 @@ namespace eXeMeL.ViewModel
 
     private async Task SetDocumentTextFromClipboardAsync()
     {
+      // Unselect text, because reloading can cause exceptions if the new text length is shorter than 
+      // the range (position and length) of the selected text in the viewer control.
+      this.MessengerInstance.Send(new UnselectTextInEditorMessage());
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
       this.IsContentFromFile = false;
@@ -299,7 +302,11 @@ namespace eXeMeL.ViewModel
           return;
 
         var fileContents = await LoadFileContentsAsync(filePath);
-        
+
+        // Unselect text, because reloading can cause exceptions if the new text length is shorter than 
+        // the range (position and length) of the selected text in the viewer control.
+        this.MessengerInstance.Send(new UnselectTextInEditorMessage());
+
         this.IsContentFromFile = true;
         this.FilePath = filePath;
         this.FileName = Path.GetFileName(filePath);
@@ -401,7 +408,11 @@ namespace eXeMeL.ViewModel
 
     private void AddNewSnapshotWithNewText(string text)
     {
-      this.Document = new TextDocument() { Text = text};
+      // Unselect text, because reloading can cause exceptions if the new text length is shorter than 
+      // the range (position and length) of the selected text in the viewer control.
+      this.MessengerInstance.Send(new UnselectTextInEditorMessage());
+
+      this.Document = new TextDocument() { Text = text };
       this.Snapshots.Add(new DocumentSnapshot(this.Document));
 
       RenameAllSnapshots();

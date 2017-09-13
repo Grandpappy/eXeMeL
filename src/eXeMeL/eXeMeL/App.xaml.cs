@@ -44,6 +44,10 @@ namespace eXeMeL
 
     private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
+      // Avoid calling ourselves recursively. Visible when a "staircase" of message boxes are displayed.
+      this.DispatcherUnhandledException -= Application_DispatcherUnhandledException;
+
+
       var error = string.Empty;
       var currentException = e.Exception;
       while (currentException != null)
