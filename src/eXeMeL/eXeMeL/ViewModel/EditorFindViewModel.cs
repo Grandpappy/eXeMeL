@@ -394,6 +394,7 @@ namespace eXeMeL.ViewModel
 
     private void CancelSearch()
     {
+      this.MessengerInstance.Send(new SetKeyboardFocusToEditor());
       this.MessengerInstance.Send(new DisplayToolInformationMessage(string.Empty));
     }
 

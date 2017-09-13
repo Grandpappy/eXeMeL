@@ -146,6 +146,7 @@
     <Compile Include="ViewModel\DocumentSnapshot.cs" />
     <Compile Include="ViewModel\EditorViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="Messages\SetKeyboardFocusToEditor.cs" />
     <Compile Include="ViewModel\SyntaxHighlightManager.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\XmlCleaners\FormatCleaner.cs" />
