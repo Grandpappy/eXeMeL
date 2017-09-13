@@ -1,4 +1,8 @@
-﻿*5/7/2017 - New Solarized Dark Themes
+﻿*9/13/2017 - Bug Fixes
+
+Pressing ESC from the search field will now return control back to the editor.
+
+*5/7/2017 - New Solarized Dark Themes
 
 New application-wide Solarized Dark theme based on Ethan Schoonover's work. See http://ethanschoonover.com/solarized for more information.
 
