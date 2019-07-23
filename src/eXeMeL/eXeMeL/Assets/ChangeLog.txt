@@ -1,4 +1,8 @@
-﻿*9/13/2017 - Bug Fixes
+﻿*7/23/2019 - Republish to server
+
+No new features.  Change the certificate so eXeMeL can be published again.  Looks like it will need to be reinstalled to get automatic updates again.
+
+*9/13/2017 - Bug Fixes
 
 Pressing ESC from the search field will now return control back to the editor.
 
