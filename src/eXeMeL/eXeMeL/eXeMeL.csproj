@@ -149,10 +149,13 @@
     <Compile Include="Messages\SetKeyboardFocusToEditor.cs" />
     <Compile Include="ViewModel\SyntaxHighlightManager.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="ViewModel\XmlCleaners\AddedRootCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\FormatCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\NewLineCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\SurroundingGarbageCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
+    <Compile Include="ViewModel\XmlCleaners\UrlEncodingCleaner.cs" />
+    <Compile Include="ViewModel\XmlCleaners\VisualStudioCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
     <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
     <Compile Include="ViewModel\XmlUtility\AttributeViewModel.cs" />

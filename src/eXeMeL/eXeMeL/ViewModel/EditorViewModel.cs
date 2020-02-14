@@ -94,6 +94,7 @@ namespace eXeMeL.ViewModel
       this.FindViewModel = new EditorFindViewModel();
       this.Cleaners = new List<XmlCleanerBase>()
         {
+          new UrlEncodingCleaner(),
           new TrimCleaner(),
           new NewLineCleaner(),
           new SurroundingGarbageCleaner(),
@@ -174,10 +175,14 @@ namespace eXeMeL.ViewModel
     private bool XmlShouldBeCleaned(string xml)
     {
       int firstLessThanIndex = xml.IndexOf('<');
+      int lastGreaterThanIndex = xml.LastIndexOf('>');
+
+      if (firstLessThanIndex < 0 && lastGreaterThanIndex < 0)
+        return true;
+
       if (firstLessThanIndex < 0)
         return false;
 
-      int lastGreaterThanIndex = xml.LastIndexOf('>');
       if (lastGreaterThanIndex < 0)
         return false;
 

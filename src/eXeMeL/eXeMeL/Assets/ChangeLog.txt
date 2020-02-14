@@ -1,4 +1,8 @@
-﻿*7/23/2019 - Republish to server
+﻿*2/14/2020 - Added URL Encoding Cleaner
+
+New XML cleaner to decode XML that has been encoding with URL encoding such as "%3CCase+CaseID%3D".
+
+*7/23/2019 - Republish to server
 
 No new features.  Change the certificate so eXeMeL can be published again.  Looks like it will need to be reinstalled to get automatic updates again.
 
