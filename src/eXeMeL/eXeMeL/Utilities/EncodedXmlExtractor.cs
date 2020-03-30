@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace eXeMeL.Utilities
 {
@@ -57,7 +57,7 @@ namespace eXeMeL.Utilities
 
         var enclosedText = this.Text.Substring(startOffset, endOffset - startOffset); //this.Document.GetText(startOffset, endOffset - startOffset);
 
-        decodedText = HttpUtility.HtmlDecode(enclosedText);
+        decodedText = WebUtility.HtmlDecode(enclosedText);
       });
 
       return decodedText;

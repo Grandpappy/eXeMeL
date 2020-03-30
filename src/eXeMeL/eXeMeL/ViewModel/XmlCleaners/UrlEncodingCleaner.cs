@@ -1,4 +1,4 @@
-﻿using System.Web;
+﻿using System.Net;
 
 namespace eXeMeL.ViewModel.XmlCleaners
 {
@@ -6,7 +6,7 @@ namespace eXeMeL.ViewModel.XmlCleaners
   {
     public override void CleanXml(XmlCleanerContext context)
     {
-      context.XmlToClean = HttpUtility.UrlDecode(context.XmlToClean);
+      context.XmlToClean = WebUtility.UrlDecode(context.XmlToClean);
     }
   }
 }

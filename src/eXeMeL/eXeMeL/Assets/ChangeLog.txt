@@ -1,4 +1,8 @@
-﻿*2/14/2020 - Added URL Encoding Cleaner
+﻿*3/30/2020 - Updated URL Decoder
+
+The library used for the prior update caused performance issues on startup of eXeMeL.  Changed to a different library for decoding and the startup is back to its prior performance.
+
+*2/14/2020 - Added URL Encoding Cleaner
 
 New XML cleaner to decode XML that has been encoding with URL encoding such as "%3CCase+CaseID%3D".
 
