@@ -76,6 +76,7 @@ namespace eXeMeL.ViewModel
     public ICommand CreateSnapshotCommand { get; private set; }
     public ICommand ChangeToSnapshotCommand { get; private set; }
     public ICommand SaveCommand { get; private set; }
+    public ICommand OpenCommand { get; private set; }
     public EditorFindViewModel FindViewModel { get; private set; }
     public event EventHandler RefreshComplete;
     public TextViewPosition CaretPosition { get; set; }
@@ -90,6 +91,7 @@ namespace eXeMeL.ViewModel
       this.CreateSnapshotCommand = new RelayCommand(CreateSnapshotCommand_Execute);
       this.ChangeToSnapshotCommand = new RelayCommand<DocumentSnapshot>(ChangeToSnapshotCommand_Execute);
       this.SaveCommand = new RelayCommand(SaveCommand_Execute);
+      this.OpenCommand = new RelayCommand(OpenCommand_Execute);
       this.Snapshots = new ObservableCollection<DocumentSnapshot>();
       this.FindViewModel = new EditorFindViewModel();
       this.Cleaners = new List<XmlCleanerBase>()
@@ -392,6 +394,24 @@ namespace eXeMeL.ViewModel
           }
         }
 
+      }
+    }
+
+
+
+    private void OpenCommand_Execute()
+    {
+      var openDialog = new OpenFileDialog();
+      openDialog.DefaultExt = ".xml"; // Default file extension
+      openDialog.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
+      
+      // Show open file dialog box
+      Nullable<bool> result = openDialog.ShowDialog();
+      
+      // Perform file opening
+      if (result == true)
+      {
+        OpenFileAsync(openDialog.FileName);
       }
     }
 
