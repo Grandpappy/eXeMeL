@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:eXeMeL.View"
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" x:Class="eXeMeL.View.XmlUtilityView"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors" x:Class="eXeMeL.View.XmlUtilityView"
              xmlns:mahapps="clr-namespace:MahApps.Metro;assembly=MahApps.Metro"
              mc:Ignorable="d" 
              Name="ControlRoot"
@@ -242,18 +242,18 @@
     </VisualStateManager.VisualStateGroups>
 
     <i:Interaction.Triggers>
-      <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="False">
-        <ei:GoToStateAction x:Name="GoToInvalidXmlVisualStateAction" StateName="InvalidXml"/>
-      </ei:DataTrigger>
-      <ei:DataTrigger Binding="{Binding IsXmlValid}" Value="True">
-        <ei:GoToStateAction x:Name="GoToValidXmlVisualStateAction" StateName="ValidXml"/>
-      </ei:DataTrigger>
-      <!--<ei:DataTrigger Binding="{Binding IsBusy}" Value="True">
-        <ei:GoToStateAction x:Name="GoToLoadingVisualStateAction" StateName="LoadingXml"/>
-      </ei:DataTrigger>
-      <ei:DataTrigger Binding="{Binding IsBusy}" Value="False">
-        <ei:GoToStateAction x:Name="GoToLoadedXmlVisualStateAction" StateName="XmlLoaded"/>
-      </ei:DataTrigger>-->
+      <i:DataTrigger Binding="{Binding IsXmlValid}" Value="False">
+        <i:GoToStateAction x:Name="GoToInvalidXmlVisualStateAction" StateName="InvalidXml"/>
+      </i:DataTrigger>
+      <i:DataTrigger Binding="{Binding IsXmlValid}" Value="True">
+        <i:GoToStateAction x:Name="GoToValidXmlVisualStateAction" StateName="ValidXml"/>
+      </i:DataTrigger>
+      <!--<i:DataTrigger Binding="{Binding IsBusy}" Value="True">
+        <i:GoToStateAction x:Name="GoToLoadingVisualStateAction" StateName="LoadingXml"/>
+      </i:DataTrigger>
+      <i:DataTrigger Binding="{Binding IsBusy}" Value="False">
+        <i:GoToStateAction x:Name="GoToLoadedXmlVisualStateAction" StateName="XmlLoaded"/>
+      </i:DataTrigger>-->
     </i:Interaction.Triggers>
 
     <Grid x:Name="OuterContainer">

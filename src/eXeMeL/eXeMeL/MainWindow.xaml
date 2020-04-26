@@ -6,7 +6,7 @@
   xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+  xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
   ResizeMode="CanResize"
   SaveWindowPosition="True"
   mc:Ignorable="d" 
@@ -142,12 +142,12 @@
 
   <Grid Background="#00000000">
     <i:Interaction.Triggers>
-      <ei:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
-        <ei:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
-      </ei:DataTrigger>
-      <ei:DataTrigger Binding="{Binding EditorMode}" Value="XmlUtility">
-        <ei:GoToStateAction x:Name="GoToXmlUtilityAction" StateName="XmlUtility"/>
-      </ei:DataTrigger>
+      <i:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
+        <i:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
+      </i:DataTrigger>
+      <i:DataTrigger Binding="{Binding EditorMode}" Value="XmlUtility">
+        <i:GoToStateAction x:Name="GoToXmlUtilityAction" StateName="XmlUtility"/>
+      </i:DataTrigger>
     </i:Interaction.Triggers>
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="EditorView">
