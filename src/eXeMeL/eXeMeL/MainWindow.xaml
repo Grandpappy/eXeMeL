@@ -6,7 +6,7 @@
   xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+  xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
   ResizeMode="CanResize"
   SaveWindowPosition="True"
   mc:Ignorable="d" 
@@ -64,6 +64,17 @@
         </StackPanel>
       </Button>
 
+      
+      <Button 
+        Command="{Binding Editor.OpenCommand}" 
+        ToolTip="Load an existing XML file to the editor(Ctrl+O)" Focusable="False"
+        >
+        <StackPanel Orientation="Horizontal" Background="Transparent">
+          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource OpenIconBrush}"/>
+          <TextBlock Text="open" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
+        </StackPanel>
+      </Button>
+
 
       <Button 
         Command="{Binding Editor.SaveCommand}" 
@@ -114,6 +125,7 @@
     <KeyBinding Modifiers="Control" Key="F" Command="{Binding FocusOnFindControlCommand, ElementName=ControlRoot}"/>
     <KeyBinding Key="Escape" Command="{Binding ResetFocusCommand, ElementName=ControlRoot}"/>
     <KeyBinding Modifiers="Control" Key="S" Command="{Binding Editor.SaveCommand}"/>
+    <KeyBinding Modifiers="Control" Key="O" Command="{Binding Editor.OpenCommand}"/>
 
     <KeyBinding Modifiers="Alt" Key="D0" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="0" />
     <KeyBinding Modifiers="Alt+Shift" Key="D0" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="0" />
@@ -142,12 +154,12 @@
 
   <Grid Background="#00000000">
     <i:Interaction.Triggers>
-      <ei:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
-        <ei:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
-      </ei:DataTrigger>
-      <ei:DataTrigger Binding="{Binding EditorMode}" Value="XmlUtility">
-        <ei:GoToStateAction x:Name="GoToXmlUtilityAction" StateName="XmlUtility"/>
-      </ei:DataTrigger>
+      <i:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
+        <i:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
+      </i:DataTrigger>
+      <i:DataTrigger Binding="{Binding EditorMode}" Value="XmlUtility">
+        <i:GoToStateAction x:Name="GoToXmlUtilityAction" StateName="XmlUtility"/>
+      </i:DataTrigger>
     </i:Interaction.Triggers>
     <VisualStateManager.VisualStateGroups>
       <VisualStateGroup x:Name="EditorView">

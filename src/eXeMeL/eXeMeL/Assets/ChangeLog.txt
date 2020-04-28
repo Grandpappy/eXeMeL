@@ -1,4 +1,10 @@
-﻿*3/30/2020 - Updated URL Decoder
+﻿*4/23/2020 - Opening
+
+Added Open feature.  Clicking the new open icon or pressing CTRL+O will open the dialog to browse for a file. 
+
+Icon next to the Editor title displays if the editor's document was loaded from a file or not.
+
+*3/30/2020 - Updated URL Decoder
 
 The library used for the prior update caused performance issues on startup of eXeMeL.  Changed to a different library for decoding and the startup is back to its prior performance.
 
