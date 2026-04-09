@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,12 +12,12 @@ using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.Utilities;
 using eXeMeL.ViewModel.UtilityOperationMessages;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace eXeMeL.ViewModel
 {
-  public class XmlUtilityViewModel : ViewModelBase
+  public class XmlUtilityViewModel : ObservableObject
   {
     public Settings Settings { get; }
     private string _documentText;
@@ -32,9 +32,9 @@ namespace eXeMeL.ViewModel
     {
       this.Settings = settings;
       this.UtilityOperations = new XmlUtilityOperations(settings, () => this.Root, () => this.StartOfXPath);
-      this.MessengerInstance.Register< ReplaceXPathMessage>(this, HandleReplaceXPathMessage);
-      Messenger.Default.Register<DocumentRefreshCompleted>(this, HandleDocumentRefressMessage);
-      Messenger.Default.Register<SetStartElementForXPathMessage>(this, HandleSetStartElementForXPathMessage);
+      WeakReferenceMessenger.Default.Register<ReplaceXPathMessage>(this, (r, m) => HandleReplaceXPathMessage(m));
+      WeakReferenceMessenger.Default.Register<DocumentRefreshCompleted>(this, (r, m) => HandleDocumentRefressMessage(m));
+      WeakReferenceMessenger.Default.Register<SetStartElementForXPathMessage>(this, (r, m) => HandleSetStartElementForXPathMessage(m));
     }
 
 
@@ -61,7 +61,7 @@ namespace eXeMeL.ViewModel
       get { return this._xPath; }
       set
       {
-        Set(() => this.XPath, ref this._xPath, value);
+        SetProperty(ref this._xPath, value);
         UpdateElementsInXPath();
       }
     }
@@ -73,7 +73,7 @@ namespace eXeMeL.ViewModel
       get { return this._startOfXPath; }
       set
       {
-        Set(() => this.StartOfXPath, ref this._startOfXPath, value);
+        SetProperty(ref this._startOfXPath, value, nameof(StartOfXPath));
         UpdateStartOfXPathText();
 
         if (this.Root != null)
@@ -104,7 +104,7 @@ namespace eXeMeL.ViewModel
     public string StartOfXPathText
     {
       get { return this._startOfXPathText; }
-      set { Set(() => this.StartOfXPathText, ref this._startOfXPathText, value); }
+      set { SetProperty(ref this._startOfXPathText, value); }
     }
 
 
@@ -114,17 +114,7 @@ namespace eXeMeL.ViewModel
       get { return this._documentText; }
       set
       {
-        //if (this.DocumentText == value)
-        //{
-        //  Task.Factory.StartNew(() =>
-        //  {
-        //    RaisePropertyChanged(() => this.IsBusy);
-        //  });
-
-        //  return;
-        //}
-
-        Set(() => this.DocumentText, ref this._documentText, value);
+        SetProperty(ref this._documentText, value);
         ParseDocumentText();
       }
     }
@@ -136,17 +126,17 @@ namespace eXeMeL.ViewModel
       get { return this._isXmlValid; }
       set
       {
-        Set(() => this.IsXmlValid, ref this._isXmlValid, value); 
-        RaisePropertyChanged(() => this.IsXmlValid);
+        SetProperty(ref this._isXmlValid, value);
+        OnPropertyChanged(nameof(IsXmlValid));
       }
     }
 
 
-    
+
     public bool IsBusy
     {
       get { return this._isBusy; }
-      set { Set(() => this.IsBusy, ref this._isBusy, value); }
+      set { SetProperty(ref this._isBusy, value); }
     }
 
 
@@ -157,7 +147,7 @@ namespace eXeMeL.ViewModel
       get { return this._root; }
       set
       {
-        Set(() => this.Root, ref this._root, value);
+        SetProperty(ref this._root, value);
         this.StartOfXPath = this.Root;
       }
     }
@@ -235,9 +225,9 @@ namespace eXeMeL.ViewModel
           var attributes = result.OfType<XAttribute>().ToList();
           var foundXElements = result.OfType<XElement>().ToList();
 
-          this.MessengerInstance.Send(new DisplayApplicationStatusMessage(foundXElements.Count + " element found.  " + attributes.Count + " attributes found"));
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(foundXElements.Count + " element found.  " + attributes.Count + " attributes found"));
 
-          
+
           if (this.ElementUpdateCancellation.IsCancellationRequested)
           {
             CompleteCurrentElementUpdateAction();
@@ -274,7 +264,7 @@ namespace eXeMeL.ViewModel
             return;
           }
 
-          // TODO Handle attributes 
+          // TODO Handle attributes
         }
         finally
         {

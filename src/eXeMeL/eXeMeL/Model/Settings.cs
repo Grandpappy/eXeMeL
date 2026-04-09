@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Security.AccessControl;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using eXeMeL.Utilities;
@@ -34,6 +35,16 @@ namespace eXeMeL.Model
     private Brush _currentXPathTargetBrush;
     private Brush _currentXPathStartBrush;
     private bool _highlightOtherInstancesOfSelection;
+    private string _lastLaunchedVersion;
+
+
+
+    [DataMember]
+    public string LastLaunchedVersion
+    {
+      get { return this._lastLaunchedVersion; }
+      set { this._lastLaunchedVersion = value; NotifyPropertyChanged("LastLaunchedVersion"); }
+    }
 
 
 
@@ -105,6 +116,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush EditorBrush
     {
       get { return this._editorBrush; }
@@ -113,6 +125,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush ElementBrush
     {
       get { return this._elementBrush; }
@@ -121,6 +134,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush AttributeNameBrush
     {
       get { return this._attributeNameBrush; }
@@ -129,6 +143,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush AttributeValueBrush
     {
       get { return this._attributeValueBrush; }
@@ -137,6 +152,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush HoverBackgroundBrush
     {
       get { return this._hoverBackgroundBrush; }
@@ -145,6 +161,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush CurrentXPathTargetBrush
     {
       get { return this._currentXPathTargetBrush; }
@@ -153,6 +170,7 @@ namespace eXeMeL.Model
 
 
 
+    [JsonIgnore]
     public Brush CurrentXPathStartBrush
     {
       get { return this._currentXPathStartBrush; }

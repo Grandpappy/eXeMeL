@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -20,7 +20,7 @@ using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.Utilities;
 using eXeMeL.ViewModel;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace eXeMeL.View
 {
@@ -31,7 +31,7 @@ namespace eXeMeL.View
   {
     public XmlUtilityView()
     {
-      Messenger.Default.Register<EditorModeChangedMessage>(this, HandleEditorModeChangedMessage);
+      WeakReferenceMessenger.Default.Register<EditorModeChangedMessage>(this, (r, m) => HandleEditorModeChangedMessage(m));
 
       this.DataContextChanged += XmlUtilityView_DataContextChanged;
       InitializeComponent();
@@ -79,7 +79,7 @@ namespace eXeMeL.View
       var toggleButton = sender as ToggleButton;
       var vm = toggleButton?.DataContext as ElementViewModel;
 
-      // I think this is going to cause a memory leak.  This should probably be pulled into a UserControl made 
+      // I think this is going to cause a memory leak.  This should probably be pulled into a UserControl made
       // specifically for the element
       vm.BringIntoView += (s, e) =>
       {
@@ -94,14 +94,14 @@ namespace eXeMeL.View
 
     //private void ElementOnBringIntoView(object sender, EventArgs eventArgs)
     //{
-      
+
     //}
 
 
 
     //private void ElementStartToggleButton_OnUnloaded(object sender, RoutedEventArgs e)
     //{
-      
+
     //}
   }
 

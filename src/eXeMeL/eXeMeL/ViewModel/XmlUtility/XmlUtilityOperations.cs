@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.UtilityOperationMessages;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace eXeMeL.ViewModel
 {
@@ -22,10 +22,10 @@ namespace eXeMeL.ViewModel
       this.Settings = settings;
       this.GetRoot = getRoot;
       this.GetStartOfXPath = getStartOfXPath;
-      Messenger.Default.Register<CollapseAllOtherElementsMessage>(this, HandleCollapseAllOtherElementsMessage);
-      Messenger.Default.Register<ExpandAllChildElementsMessage>(this, HandleExpandAllChildElementsMessage);
-      Messenger.Default.Register<BuildXPathFromRootMessage>(this, HandleBuildXPathFromRootMessage);
-      Messenger.Default.Register<BuildXPathFromStartMessage>(this, HandleBuildXpathFromStartMessage);
+      WeakReferenceMessenger.Default.Register<CollapseAllOtherElementsMessage>(this, (r, m) => HandleCollapseAllOtherElementsMessage(m));
+      WeakReferenceMessenger.Default.Register<ExpandAllChildElementsMessage>(this, (r, m) => HandleExpandAllChildElementsMessage(m));
+      WeakReferenceMessenger.Default.Register<BuildXPathFromRootMessage>(this, (r, m) => HandleBuildXPathFromRootMessage(m));
+      WeakReferenceMessenger.Default.Register<BuildXPathFromStartMessage>(this, (r, m) => HandleBuildXpathFromStartMessage(m));
     }
 
 
@@ -87,7 +87,7 @@ namespace eXeMeL.ViewModel
     private static void SendOutputBasedOnTarget(string xPath, OutputTarget outputTarget)
     {
       if (outputTarget == OutputTarget.XPathEditor)
-        Messenger.Default.Send(new ReplaceXPathMessage(xPath));
+        WeakReferenceMessenger.Default.Send(new ReplaceXPathMessage(xPath));
       else
         Clipboard.SetText(xPath);
     }

@@ -1,8 +1,8 @@
-﻿using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace eXeMeL.ViewModel
 {
-  public abstract class XmlNodeViewModel : ViewModelBase
+  public abstract class XmlNodeViewModel : ObservableObject
   {
     private bool _isAlongXPath;
     private bool _isXPathTarget;
@@ -17,7 +17,7 @@ namespace eXeMeL.ViewModel
     public bool IsAlongXPath
     {
       get { return this._isAlongXPath; }
-      set { Set(() => this.IsAlongXPath, ref this._isAlongXPath, value); }
+      set { SetProperty(ref this._isAlongXPath, value); }
     }
 
 
@@ -25,7 +25,7 @@ namespace eXeMeL.ViewModel
     public bool IsXPathStart
     {
       get { return this._isXPathStart; }
-      set { Set(() => this.IsXPathStart, ref this._isXPathStart, value); }
+      set { SetProperty(ref this._isXPathStart, value); }
     }
 
 
@@ -33,7 +33,7 @@ namespace eXeMeL.ViewModel
     public bool IsXPathTarget
     {
       get { return this._isXPathTarget; }
-      set { Set(() => this.IsXPathTarget, ref this._isXPathTarget, value); }
+      set { SetProperty(ref this._isXPathTarget, value); }
     }
 
 

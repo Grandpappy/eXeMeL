@@ -1,9 +1,9 @@
-﻿using eXeMeL.Messages;
+using eXeMeL.Messages;
 using eXeMeL.ViewModel;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using MahApps.Metro.Controls;
-using MvvmFoundation.Wpf;
+using eXeMeL.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,8 @@ using System.Windows.Media;
 using System.ComponentModel;
 using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
-using eXeMeL.Utilities;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace eXeMeL
 {
@@ -57,7 +58,7 @@ namespace eXeMeL
       this.AvalonEditor.TextArea.SelectionChanged += (sender, args) => this.AvalonEditor.TextArea.TextView.Redraw();
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
-      
+
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.FoldingStrategy = new XmlFoldingStrategy();
 
@@ -92,15 +93,15 @@ namespace eXeMeL
 
     private void MainWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-      this.TextDocumentObserver = 
+      this.TextDocumentObserver =
         new PropertyObserver<TextDocument>(this.ViewModel.Editor.Document)
           .RegisterHandler(x => x.Text, HandleChangedDocumentText);
 
-      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SelectTextInEditorMessage>(this, HandleSelectTextInEditorMessage);
-      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<UnselectTextInEditorMessage>(this, HandleUnselectTextInEditorMessage);
-      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<DocumentTextReplacedMessage>(this, HandleDocumentTextReplacedMessage);
-      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<ApplicationThemeUpdatedMessage>(this, HandleApplicationThemeUpdatedMessage);
-      GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<SetKeyboardFocusToEditor>(this, HandleSetKeyboardFocusToEditorMessage);
+      WeakReferenceMessenger.Default.Register<SelectTextInEditorMessage>(this, (r, m) => HandleSelectTextInEditorMessage(m));
+      WeakReferenceMessenger.Default.Register<UnselectTextInEditorMessage>(this, (r, m) => HandleUnselectTextInEditorMessage(m));
+      WeakReferenceMessenger.Default.Register<DocumentTextReplacedMessage>(this, (r, m) => HandleDocumentTextReplacedMessage(m));
+      WeakReferenceMessenger.Default.Register<ApplicationThemeUpdatedMessage>(this, (r, m) => HandleApplicationThemeUpdatedMessage(m));
+      WeakReferenceMessenger.Default.Register<SetKeyboardFocusToEditor>(this, (r, m) => HandleSetKeyboardFocusToEditorMessage(m));
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
@@ -118,7 +119,7 @@ namespace eXeMeL
       UpdateDocumentFoldings();
     }
 
-    
+
 
     private void Editor_PropertyChanging(object sender, PropertyChangingEventArgs e)
     {
@@ -129,8 +130,8 @@ namespace eXeMeL
         this.IgnoreNextTextChange = true;
       };
     }
-   
-    
+
+
 
     private void HandleSelectTextInEditorMessage(SelectTextInEditorMessage message)
     {
@@ -155,7 +156,7 @@ namespace eXeMeL
       this.AvalonEditor.CaretOffset = 0;
     }
 
-    
+
 
     private void HandleChangedDocumentText(TextDocument document)
     {
@@ -186,10 +187,11 @@ namespace eXeMeL
       }
 
 
-      if (!ApplicationVersionControl.CurrentVersionIsDifferentFromLastRunVersion())
+      if (!ApplicationVersionControl.CurrentVersionIsDifferentFromLastRunVersion(this.ViewModel.Settings))
       {
         ShowChangeLog();
-        ApplicationVersionControl.WriteCurrentVersionToRegistry();
+        ApplicationVersionControl.WriteCurrentVersion(this.ViewModel.Settings);
+        SettingsIO.SaveSettings(this.ViewModel.Settings);
       }
     }
 
@@ -220,7 +222,7 @@ namespace eXeMeL
     }
 
 
-    
+
     private void AvalonEditor_TextAreaMouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
       var position = this.AvalonEditor.GetPositionFromPoint(e.GetPosition(this.AvalonEditor));
@@ -234,7 +236,7 @@ namespace eXeMeL
 
     private void MainWindow_Closing(object sender, CancelEventArgs e)
     {
-      GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
+      WeakReferenceMessenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
     }
 
 
@@ -249,10 +251,10 @@ namespace eXeMeL
     private void FocusOnFindControlCommand_Executed()
     {
       if (!string.IsNullOrEmpty(this.AvalonEditor.SelectedText))
-      { 
-        GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<SetSearchTextMessage>(new SetSearchTextMessage(this.AvalonEditor.SelectedText));
+      {
+        WeakReferenceMessenger.Default.Send<SetSearchTextMessage>(new SetSearchTextMessage(this.AvalonEditor.SelectedText));
       }
-      
+
       this.EditorFindControl.Focus();
     }
 
@@ -309,7 +311,7 @@ namespace eXeMeL
     {
       this.ResetFocusCommand.Execute(null);
     }
-    
+
 
     private void SetWindowGlow()
     {

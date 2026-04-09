@@ -1,321 +1,76 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6DA3BA00-1FE2-46AE-AD4B-A82A1B559E77}</ProjectGuid>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <UseWPF>true</UseWPF>
     <RootNamespace>eXeMeL</RootNamespace>
     <AssemblyName>eXeMeL</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <ExpressionBlendVersion>5.0.40218.0</ExpressionBlendVersion>
-    <PublishUrl>\\plapvsvprime\Public\eXeMeL\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Unc</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Background</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
-    <WebPage>publish.htm</WebPage>
-    <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>73</ApplicationRevision>
-    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>Assets\eXeMeL Icon.ico</ApplicationIcon>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>43769183C4BD3E903CB98D94D1DFD43F3400FCF3</ManifestCertificateThumbprint>
+
+  <!-- Single-file self-contained publish settings -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>embedded</DebugType>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>eXeMeL_4_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="GalaSoft.MvvmLight.Extras.WPF45">
-      <HintPath>..\packages\MvvmLightLibs.4.1.27.0\lib\net45\GalaSoft.MvvmLight.Extras.WPF45.dll</HintPath>
-    </Reference>
-    <Reference Include="GalaSoft.MvvmLight.WPF45">
-      <HintPath>..\packages\MvvmLightLibs.4.1.27.0\lib\net45\GalaSoft.MvvmLight.WPF45.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.AvalonEdit, Version=4.4.0.9727, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AvalonEdit.4.4.0.9727\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
-    </Reference>
-    <Reference Include="MahApps.Metro, Version=0.12.1.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MahApps.Metro.0.12.1.0\lib\net45\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.ServiceLocation">
-      <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
-    </Reference>
-    <Reference Include="MvvmFoundation.Wpf">
-      <HintPath>..\packages\MvvmFoundation.Wpf.1.0.0\lib\net40\MvvmFoundation.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageReference Include="MahApps.Metro" Version="0.12.1.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
   </ItemGroup>
+
+  <!-- Syntax highlighting schemes as embedded resources with explicit logical names
+       to preserve the resource names that SyntaxHighlightingManager expects -->
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Messages\ActivateSnapshotMessage.cs" />
-    <Compile Include="Messages\ApplicationClosingMessage.cs" />
-    <Compile Include="Messages\ApplicationThemeUpdatedMessage.cs" />
-    <Compile Include="Messages\DisplayApplicationStatusMessage.cs" />
-    <Compile Include="Messages\DisplayToolInformationMessage.cs" />
-    <Compile Include="Messages\DocumentRefreshCompleted.cs" />
-    <Compile Include="Messages\EditorModeChangedMessage.cs" />
-    <Compile Include="Messages\GoToTopOfDocumentMessage.cs" />
-    <Compile Include="Messages\SelectTextInEditorMessage.cs" />
-    <Compile Include="Messages\SetSearchTextMessage.cs" />
-    <Compile Include="Messages\UnselectTextInEditorMessage.cs" />
-    <Compile Include="Model\ApplicationThemeEnum.cs" />
-    <Compile Include="Model\Attributes.cs" />
-    <Compile Include="Model\RegistryAccess.cs" />
-    <Compile Include="Model\Settings.cs" />
-    <Compile Include="Model\ApplicationVersionControl.cs" />
-    <Compile Include="Model\SettingsIO.cs" />
-    <Compile Include="Model\SyntaxHighlightingStyleEnum.cs" />
-    <Compile Include="Utilities\EncodedXmlExtractor.cs" />
-    <Compile Include="Utilities\Extensions.cs" />
-    <Compile Include="ViewModel\AllSelectionColorizer.cs" />
-    <Compile Include="Utilities\UIThread.cs" />
-    <Compile Include="ViewModel\EditorFindViewModel.cs" />
-    <Compile Include="ViewModel\DocumentSnapshot.cs" />
-    <Compile Include="ViewModel\EditorViewModel.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="Messages\SetKeyboardFocusToEditor.cs" />
-    <Compile Include="ViewModel\SyntaxHighlightManager.cs" />
-    <Compile Include="ViewModel\ViewModelLocator.cs" />
-    <Compile Include="ViewModel\XmlCleaners\AddedRootCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\FormatCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\NewLineCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\SurroundingGarbageCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\TrimCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\UrlEncodingCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\VisualStudioCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\VisualStudioVBScriptCleaner.cs" />
-    <Compile Include="ViewModel\XmlCleaners\XmlCleanerBase.cs" />
-    <Compile Include="ViewModel\XmlUtility\AttributeViewModel.cs" />
-    <Compile Include="ViewModel\XmlUtility\Messages\CollapseAllOtherElementsMessage.cs" />
-    <Compile Include="ViewModel\XmlUtility\ElementViewModel.cs" />
-    <Compile Include="ViewModel\XmlUtility\XmlNodeViewModel.cs" />
-    <Compile Include="ViewModel\XmlUtility\XmlUtilityOperations.cs" />
-    <Compile Include="ViewModel\XmlUtility\XmlUtilityViewModel.cs" />
-    <Compile Include="View\ChangeLogWindow\ChangeLogWindow.xaml.cs">
-      <DependentUpon>ChangeLogWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\EditorFindView.xaml.cs">
-      <DependentUpon>EditorFindView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\EditorSnapshotView.xaml.cs">
-      <DependentUpon>EditorSnapshotView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\XmlUtilityView.xaml.cs">
-      <DependentUpon>XmlUtilityView.xaml</DependentUpon>
-    </Compile>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
-    </Page>
-    <Page Include="Resources\CommonStyles.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Resources\SolarizedDarkThemeColors.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Icons.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\XmlUtilityView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Resource Include="Resources\DarkThemeColors.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Resource>
-    <Resource Include="Resources\ThemeColors.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
-    <Page Include="View\ChangeLogWindow\ChangeLogWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\EditorFindView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\EditorSnapshotView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\SettingsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Bright.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.Bright.xshd</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd" />
-    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Dark.xshd" />
-    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSBlue.xshd" />
-    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedDark.xshd" />
-    <None Include="eXeMeL_1_TemporaryKey.pfx" />
-    <None Include="eXeMeL_2_TemporaryKey.pfx" />
-    <None Include="eXeMeL_3_TemporaryKey.pfx" />
-    <None Include="eXeMeL_4_TemporaryKey.pfx" />
-    <None Include="eXeMeL_TemporaryKey.pfx" />
-    <None Include="packages.config" />
-    <None Include="Properties\app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <AppDesigner Include="Properties\" />
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Earthy.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Dark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.Dark.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSBlue.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSBlue.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedDark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedDark.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\ChangeLog.txt">
+      <LogicalName>eXeMeL.Assets.ChangeLog.txt</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
+
+  <!-- Theme color dictionaries must be Resource (not Page) to support pack:// URI loading -->
   <ItemGroup>
-    <None Include="App.config" />
+    <Resource Include="Resources\DarkThemeColors.xaml" />
+    <Resource Include="Resources\ThemeColors.xaml" />
+    <!-- Prevent SDK auto-including these as Page (since they're explicitly Resource) -->
+    <Page Remove="Resources\DarkThemeColors.xaml" />
+    <Page Remove="Resources\ThemeColors.xaml" />
   </ItemGroup>
+
+  <!-- Icon resources -->
   <ItemGroup>
     <Resource Include="Assets\eXeMeL Icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MVVMLight.Nuget.Readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <FileAssociation Include=".xml">
-      <Visible>False</Visible>
-      <Description>XML</Description>
-      <Progid>eXeMeL</Progid>
-      <DefaultIcon>Assets\FileIcon.ico</DefaultIcon>
-    </FileAssociation>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\Bright.xshd" />
-    <EmbeddedResource Include="Assets\ChangeLog.txt" />
     <Content Include="Assets\FileIcon.ico" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="eXeMeL.Tests" />
+  </ItemGroup>
+
 </Project>

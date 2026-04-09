@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using eXeMeL.Model;
 using eXeMeL.ViewModel;
 using eXeMeL.ViewModel.UtilityOperationMessages;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Xunit;
 
 namespace eXeMeL.Tests.ViewModel
@@ -23,7 +23,7 @@ namespace eXeMeL.Tests.ViewModel
 
     public XPathUtilityTests()
     {
-      Messenger.Reset();
+      WeakReferenceMessenger.Default.Reset();
       var xElement = XElement.Parse(TestXml);
       _root = new ElementViewModel(xElement, null);
       _child1 = _root.ChildElements[0];
@@ -34,7 +34,7 @@ namespace eXeMeL.Tests.ViewModel
 
     public void Dispose()
     {
-      Messenger.Reset();
+      WeakReferenceMessenger.Default.Reset();
     }
 
 
@@ -173,12 +173,12 @@ namespace eXeMeL.Tests.ViewModel
     public void HandleBuildXPathFromRootMessage_ProducesCorrectXPath()
     {
       string capturedXPath = null;
-      Messenger.Default.Register<ReplaceXPathMessage>(this, msg => capturedXPath = msg.XPath);
+      WeakReferenceMessenger.Default.Register<ReplaceXPathMessage>(this, (r, msg) => capturedXPath = msg.XPath);
 
       var settings = new Settings();
       var operations = new XmlUtilityOperations(settings, () => _root, () => _root);
 
-      Messenger.Default.Send(
+      WeakReferenceMessenger.Default.Send(
         new BuildXPathFromRootMessage(_grandChild, OutputTarget.XPathEditor));
 
       Assert.NotNull(capturedXPath);
@@ -190,12 +190,12 @@ namespace eXeMeL.Tests.ViewModel
     public void HandleBuildXPathFromRootMessage_ForChild2_ProducesCorrectXPath()
     {
       string capturedXPath = null;
-      Messenger.Default.Register<ReplaceXPathMessage>(this, msg => capturedXPath = msg.XPath);
+      WeakReferenceMessenger.Default.Register<ReplaceXPathMessage>(this, (r, msg) => capturedXPath = msg.XPath);
 
       var settings = new Settings();
       var operations = new XmlUtilityOperations(settings, () => _root, () => _root);
 
-      Messenger.Default.Send(
+      WeakReferenceMessenger.Default.Send(
         new BuildXPathFromRootMessage(_child2, OutputTarget.XPathEditor));
 
       Assert.NotNull(capturedXPath);

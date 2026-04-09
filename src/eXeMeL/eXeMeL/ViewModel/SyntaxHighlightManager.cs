@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,14 +9,15 @@ using System.Windows;
 using System.Xml;
 using eXeMeL.Messages;
 using eXeMeL.Model;
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using MvvmFoundation.Wpf;
+using eXeMeL.Utilities;
 
 namespace eXeMeL.ViewModel
 {
-  public class SettingsWatcherBase : ViewModelBase
+  public class SettingsWatcherBase : ObservableObject
   {
     protected PropertyObserver<Settings> Observer { get; private set; }
     protected Settings Settings { get; private set; }
@@ -34,15 +35,15 @@ namespace eXeMeL.ViewModel
 
   public class SyntaxHighlightingManager : SettingsWatcherBase
   {
-    
+
     private IHighlightingDefinition _HighlightingDefinition;
-    
-    
-    
+
+
+
     public IHighlightingDefinition HighlightingDefinition
     {
       get { return _HighlightingDefinition; }
-      set { Set(() => this.HighlightingDefinition, ref _HighlightingDefinition, value); }
+      set { SetProperty(ref _HighlightingDefinition, value); }
     }
 
 
@@ -101,7 +102,7 @@ namespace eXeMeL.ViewModel
     private void HandleApplicationThemeChange(Settings settings)
     {
       SetApplicationThemeBasedOnSettings();
-      this.MessengerInstance.Send(new ApplicationThemeUpdatedMessage());
+      WeakReferenceMessenger.Default.Send(new ApplicationThemeUpdatedMessage());
     }
 
 

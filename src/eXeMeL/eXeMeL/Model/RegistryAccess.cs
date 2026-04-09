@@ -7,6 +7,7 @@ using Microsoft.Win32;
 
 namespace eXeMeL.Model
 {
+  [Obsolete("Registry storage is deprecated. Use file-based settings.")]
   public class RegistryAccess
   {
     public static RegistryKey OpenRegistryKey()

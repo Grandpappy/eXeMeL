@@ -1,8 +1,9 @@
-﻿using eXeMeL.Messages;
+using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.XmlCleaners;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit;
 using System;
@@ -13,7 +14,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Web;
 using eXeMeL.Utilities;
 using System.Collections.ObjectModel;
 using Microsoft.Win32;
@@ -21,7 +21,7 @@ using Microsoft.Win32;
 
 namespace eXeMeL.ViewModel
 {
-  public class EditorViewModel : ViewModelBase
+  public class EditorViewModel : ObservableObject
   {
     private bool _IsContentFromFile;
     private TextDocument _Document;
@@ -35,27 +35,27 @@ namespace eXeMeL.ViewModel
     public TextDocument Document
     {
       get { return _Document; }
-      private set 
-      { 
-        this.Set(() => Document, ref _Document, value);
+      private set
+      {
+        SetProperty(ref _Document, value);
         this.FindViewModel.Document = this.Document;
       }
     }
 
 
-    
+
     public bool IsContentFromFile
     {
       get { return _IsContentFromFile; }
-      private set { this.Set(() => this.IsContentFromFile, ref _IsContentFromFile, value); }
+      private set { SetProperty(ref _IsContentFromFile, value); }
     }
 
 
-    
+
     public string FilePath
     {
       get { return _FilePath; }
-      private set { this.Set(() => this.FilePath, ref _FilePath, value); }
+      private set { SetProperty(ref _FilePath, value); }
     }
 
 
@@ -63,7 +63,7 @@ namespace eXeMeL.ViewModel
     public string FileName
     {
       get { return _FileName; }
-      private set { this.Set(() => this.FileName, ref _FileName, value); }
+      private set { SetProperty(ref _FileName, value); }
     }
 
 
@@ -107,7 +107,7 @@ namespace eXeMeL.ViewModel
         };
 
 
-      if (IsInDesignMode)
+      if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
       {
         this.Document = new TextDocument() { Text = "<Root IsValue=\"true\"><FirstChild Name=\"Robby\" Address=\"1521 Greenway Dr\"><Toys>All of them</Toys></FirstChild></Root>" };
         this.Snapshots.Add(new DocumentSnapshot(new TextDocument(), "Original"));
@@ -129,7 +129,7 @@ namespace eXeMeL.ViewModel
     }
 
 
-    
+
     public async Task<string> CleanXmlIfPossibleAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
@@ -154,18 +154,18 @@ namespace eXeMeL.ViewModel
 
             if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
             {
-              this.MessengerInstance.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
+              WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
               return;
             }
           }
 
           if (context.ParsedXml != null)
           {
-            this.MessengerInstance.Send(new DisplayApplicationStatusMessage("XML parsed correctly"));
+            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("XML parsed correctly"));
           }
           else
           {
-            this.MessengerInstance.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
+            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
           }
         });
 
@@ -198,9 +198,9 @@ namespace eXeMeL.ViewModel
 
     private async Task SetDocumentTextFromClipboardAsync()
     {
-      // Unselect text, because reloading can cause exceptions if the new text length is shorter than 
+      // Unselect text, because reloading can cause exceptions if the new text length is shorter than
       // the range (position and length) of the selected text in the viewer control.
-      this.MessengerInstance.Send(new UnselectTextInEditorMessage());
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
       var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
 
       this.IsContentFromFile = false;
@@ -209,9 +209,9 @@ namespace eXeMeL.ViewModel
 
       ReplaceOldDocumentWithNewDocument(text);
 
-      this.MessengerInstance.Send(new DisplayToolInformationMessage(string.Empty));
-      this.MessengerInstance.Send(new DocumentRefreshCompleted(text));
-      
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
+      WeakReferenceMessenger.Default.Send(new DocumentRefreshCompleted(text));
+
       var handler = this.RefreshComplete;
       handler?.Invoke(this, EventArgs.Empty);
     }
@@ -232,7 +232,7 @@ namespace eXeMeL.ViewModel
       this.Document = new TextDocument() { Text = newText };
       ResetSnapshots();
 
-      this.MessengerInstance.Send(new DocumentTextReplacedMessage());
+      WeakReferenceMessenger.Default.Send(new DocumentTextReplacedMessage());
     }
 
 
@@ -240,7 +240,7 @@ namespace eXeMeL.ViewModel
     private void ReplaceCurrentDocumentText(string newText)
     {
       this.Document.Text = newText;
-      this.MessengerInstance.Send(new DocumentTextReplacedMessage());
+      WeakReferenceMessenger.Default.Send(new DocumentTextReplacedMessage());
     }
 
 
@@ -310,9 +310,9 @@ namespace eXeMeL.ViewModel
 
         var fileContents = await LoadFileContentsAsync(filePath);
 
-        // Unselect text, because reloading can cause exceptions if the new text length is shorter than 
+        // Unselect text, because reloading can cause exceptions if the new text length is shorter than
         // the range (position and length) of the selected text in the viewer control.
-        this.MessengerInstance.Send(new UnselectTextInEditorMessage());
+        WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
         this.IsContentFromFile = true;
         this.FilePath = filePath;
@@ -322,11 +322,11 @@ namespace eXeMeL.ViewModel
 
         RaiseRefreshComplete();
 
-        this.MessengerInstance.Send(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
+        WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
       }
       catch (Exception ex)
       {
-        this.MessengerInstance.Send(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
+        WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Error opening file: " + ex.Message));
       }
     }
 
@@ -404,10 +404,10 @@ namespace eXeMeL.ViewModel
       var openDialog = new OpenFileDialog();
       openDialog.DefaultExt = ".xml"; // Default file extension
       openDialog.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
-      
+
       // Show open file dialog box
       Nullable<bool> result = openDialog.ShowDialog();
-      
+
       // Perform file opening
       if (result == true)
       {
@@ -433,9 +433,9 @@ namespace eXeMeL.ViewModel
 
     private void AddNewSnapshotWithNewText(string text)
     {
-      // Unselect text, because reloading can cause exceptions if the new text length is shorter than 
+      // Unselect text, because reloading can cause exceptions if the new text length is shorter than
       // the range (position and length) of the selected text in the viewer control.
-      this.MessengerInstance.Send(new UnselectTextInEditorMessage());
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
       this.Document = new TextDocument() { Text = text };
       this.Snapshots.Add(new DocumentSnapshot(this.Document));
@@ -499,6 +499,6 @@ namespace eXeMeL.ViewModel
 
     #endregion
 
-    
+
   }
 }
