@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -25,6 +23,9 @@ namespace eXeMeL.ViewModel
     private ElementViewModel _root;
     private bool _isBusy;
     private string _xPath;
+
+    // O(1) lookup from XElement to its ViewModel — rebuilt when tree is parsed
+    private Dictionary<XElement, ElementViewModel> _elementIndex;
 
 
 
@@ -78,17 +79,29 @@ namespace eXeMeL.ViewModel
 
         if (this.Root != null)
         {
-          foreach (var x in this.Root.GetElementAndAllDescendents())
-          {
-            x.IsXPathTarget = false;
-            x.IsXPathStart = false;
-          }
+          // Only reset XPath markers on the previously-marked elements, not the entire tree
+          ClearAllXPathMarkers();
 
           if (this.StartOfXPath != null)
           {
             this.StartOfXPath.IsXPathStart = true;
           }
         }
+      }
+    }
+
+
+
+    private void ClearAllXPathMarkers()
+    {
+      if (_elementIndex == null) return;
+
+      foreach (var element in _elementIndex.Values)
+      {
+        if (element.IsXPathTarget)
+          element.IsXPathTarget = false;
+        if (element.IsXPathStart)
+          element.IsXPathStart = false;
       }
     }
 
@@ -124,11 +137,7 @@ namespace eXeMeL.ViewModel
     public bool IsXmlValid
     {
       get { return this._isXmlValid; }
-      set
-      {
-        SetProperty(ref this._isXmlValid, value);
-        OnPropertyChanged(nameof(IsXmlValid));
-      }
+      set { SetProperty(ref this._isXmlValid, value); }
     }
 
 
@@ -166,16 +175,28 @@ namespace eXeMeL.ViewModel
           {
             var root = XElement.Parse(this.DocumentText);
 
-            ParseElement(root);
+            // Build the entire ViewModel tree on the background thread
+            var rootVm = new ElementViewModel(root, null);
 
+            // Build the O(1) index on background thread
+            var index = BuildElementIndex(rootVm);
+
+            // Set properties — WPF auto-marshals PropertyChanged to the UI thread
+            _elementIndex = index;
+            this.Root = rootVm;
             this.IsXmlValid = true;
+          }
+          catch (Exception)
+          {
+            _elementIndex = null;
+            this.Root = null;
+            this.IsXmlValid = false;
           }
           finally
           {
             this.IsBusy = false;
           }
         });
-
       }
       catch (Exception)
       {
@@ -186,10 +207,21 @@ namespace eXeMeL.ViewModel
 
 
 
-    private void ParseElement(XElement root)
+    private static Dictionary<XElement, ElementViewModel> BuildElementIndex(ElementViewModel root)
     {
-      this.Root = new ElementViewModel(root, null);
-      //this.Root.Populate();
+      var index = new Dictionary<XElement, ElementViewModel>();
+      BuildElementIndexRecursive(root, index);
+      return index;
+    }
+
+
+    private static void BuildElementIndexRecursive(ElementViewModel element, Dictionary<XElement, ElementViewModel> index)
+    {
+      index[element.InternalElement] = element;
+      foreach (var child in element.ChildElements)
+      {
+        BuildElementIndexRecursive(child, index);
+      }
     }
 
 
@@ -210,8 +242,15 @@ namespace eXeMeL.ViewModel
       {
         try
         {
-          var allElements = this.Root.GetElementAndAllDescendents();
-          allElements.ForEach(x => x.IsXPathTarget = false);
+          // Clear previous XPath targets using the index (no full tree traversal needed)
+          if (_elementIndex != null)
+          {
+            foreach (var element in _elementIndex.Values)
+            {
+              if (element.IsXPathTarget)
+                element.IsXPathTarget = false;
+            }
+          }
 
           var result = (IEnumerable)xPathRoot.InternalElement.XPathEvaluate(xPathToUse);
           if (this.ElementUpdateCancellation.IsCancellationRequested)
@@ -225,44 +264,36 @@ namespace eXeMeL.ViewModel
 
           WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(foundXElements.Count + " element found.  " + attributes.Count + " attributes found"));
 
-
           if (this.ElementUpdateCancellation.IsCancellationRequested)
           {
             CompleteCurrentElementUpdateAction();
             return;
           }
 
+          // O(1) lookup per match instead of O(n) nested loop
           var bringNextIntoView = true;
-
           foreach (var foundXElement in foundXElements)
           {
-            foreach (var currentElement in allElements)
+            if (this.ElementUpdateCancellation.IsCancellationRequested)
             {
-              if (this.ElementUpdateCancellation.IsCancellationRequested)
-              {
-                CompleteCurrentElementUpdateAction();
-                return;
-              }
+              CompleteCurrentElementUpdateAction();
+              return;
+            }
 
-              if (currentElement.InternalElement == foundXElement)
+            if (_elementIndex != null && _elementIndex.TryGetValue(foundXElement, out var vm))
+            {
+              vm.IsXPathTarget = true;
+              if (bringNextIntoView)
               {
-                currentElement.IsXPathTarget = true;
-                if (bringNextIntoView)
-                {
-                  currentElement.RaiseBringIntoView();
-                  bringNextIntoView = false;
-                }
+                vm.RaiseBringIntoView();
+                bringNextIntoView = false;
               }
             }
           }
-
-          if (this.ElementUpdateCancellation.IsCancellationRequested)
-          {
-            CompleteCurrentElementUpdateAction();
-            return;
-          }
-
-          // TODO Handle attributes
+        }
+        catch (Exception)
+        {
+          // XPath evaluation can throw on invalid expressions — silently ignore
         }
         finally
         {
