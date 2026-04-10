@@ -24,6 +24,8 @@
         Width="200"
         Margin="0,0,10,0"
         FontSize="14"
+        Foreground="{DynamicResource BlackBrush}"
+        Background="{DynamicResource WhiteBrush}"
         PreviewKeyDown="FindSearchText_PreviewKeyDown"
         IsTabStop="False"
         GotFocus="FindSearchText_GotFocus"

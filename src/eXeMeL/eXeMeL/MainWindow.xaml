@@ -16,7 +16,19 @@
   x:Name="ControlRoot"
   WindowStyle="None"
   Background="{DynamicResource WhiteBrush}"
+  BorderBrush="#FF888888"
+  BorderThickness="1"
   >
+
+  <Window.Style>
+    <Style TargetType="Window">
+      <Style.Triggers>
+        <Trigger Property="IsActive" Value="True">
+          <Setter Property="BorderBrush" Value="#FFD4AA00"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Style>
 
   <WindowChrome.WindowChrome>
     <WindowChrome

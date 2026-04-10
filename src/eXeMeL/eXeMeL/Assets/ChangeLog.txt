@@ -1,4 +1,18 @@
-﻿*4/23/2020 - Opening
+﻿*4/9/2026 - .NET 9 Migration
+
+Major platform update. eXeMeL has been migrated from .NET Framework 4.5 to .NET 9.
+
+- Modernized to .NET 9 with SDK-style project
+- Replaced MvvmLight (unmaintained) with CommunityToolkit.Mvvm
+- Replaced MahApps.Metro with MaterialDesignInXamlToolkit for a clean, modern UI
+- Upgraded AvalonEdit from 4.4 to 6.3
+- Settings now stored in %LOCALAPPDATA%\eXeMeL\settings.json (auto-migrated from Registry on first run)
+- Application is now a single self-contained .exe — no installer or .NET runtime required
+- ClickOnce deployment has been removed in favor of direct executable distribution
+- Command-line argument support: pass a file path to open it directly
+- All existing features preserved: clipboard workflow, XML cleaning, XPath utility, syntax highlighting, themes, snapshots, and keyboard shortcuts
+
+*4/23/2020 - Opening
 
 Added Open feature.  Clicking the new open icon or pressing CTRL+O will open the dialog to browse for a file. 
 
