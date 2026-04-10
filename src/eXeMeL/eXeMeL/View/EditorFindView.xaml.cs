@@ -39,5 +39,15 @@ namespace eXeMeL.View
         this.FindNextButton.Command.Execute(null);
       }
     }
+
+
+
+    private void FindSearchText_GotFocus(object sender, RoutedEventArgs e)
+    {
+      if (sender is TextBox textBox)
+      {
+        textBox.SelectAll();
+      }
+    }
   }
 }

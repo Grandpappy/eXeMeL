@@ -2,7 +2,6 @@ using eXeMeL.Messages;
 using eXeMeL.ViewModel;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
-using MahApps.Metro.Controls;
 using eXeMeL.Utilities;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ namespace eXeMeL
   /// <summary>
   /// Interaction logic for MainWindow.xaml
   /// </summary>
-  public partial class MainWindow : MetroWindow
+  public partial class MainWindow : Window
   {
     private FoldingManager FoldingManager { get; set; }
     private XmlFoldingStrategy FoldingStrategy { get; set; }
@@ -35,6 +34,8 @@ namespace eXeMeL
     public ICommand FoldLevelCommand { get; private set; }
     public ICommand UnFoldLevelCommand { get; private set; }
 
+    private bool _isSettingsOpen;
+
 
     public MainWindow()
     {
@@ -43,6 +44,7 @@ namespace eXeMeL
       this.Closing += MainWindow_Closing;
       this.Loaded += MainWindow_Loaded;
       this.DataContextChanged += MainWindow_DataContextChanged;
+      this.StateChanged += MainWindow_StateChanged;
       this.AllowDrop = true;
       this.Drop += MainWindow_Drop;
       this.FocusOnFindControlCommand = new RelayCommand(FocusOnFindControlCommand_Executed);
@@ -63,7 +65,8 @@ namespace eXeMeL
       this.FoldingStrategy = new XmlFoldingStrategy();
 
       this.IgnoreNextTextChange = false;
-      SetWindowGlow();
+
+      RestoreWindowPosition();
     }
 
     private void AvalonEditor_TextChanged(object sender, EventArgs e)
@@ -105,8 +108,6 @@ namespace eXeMeL
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
-
-      //this.SelectionColorizer.Settings = this.ViewModel.Settings;
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
     }
@@ -207,11 +208,6 @@ namespace eXeMeL
 
     private void AvalonEditor_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-      //if (e.Key == Key.V && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-      //{
-      //  var cleanText = this.ViewModel.Editor.CleanXmlIfPossible(Clipboard.GetText());
-      //  Clipboard.SetText(cleanText);
-      //}
     }
 
 
@@ -236,6 +232,7 @@ namespace eXeMeL
 
     private void MainWindow_Closing(object sender, CancelEventArgs e)
     {
+      SaveWindowPosition();
       WeakReferenceMessenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
     }
 
@@ -243,7 +240,44 @@ namespace eXeMeL
 
     private void OpenSettingsButton_Click(object sender, RoutedEventArgs e)
     {
-      this.SettingsFlyout.IsOpen = !this.SettingsFlyout.IsOpen;
+      ToggleSettingsPanel();
+    }
+
+
+
+    private void CloseSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+      CloseSettingsPanel();
+    }
+
+
+
+    private void ToggleSettingsPanel()
+    {
+      if (_isSettingsOpen)
+      {
+        CloseSettingsPanel();
+      }
+      else
+      {
+        OpenSettingsPanel();
+      }
+    }
+
+
+
+    private void OpenSettingsPanel()
+    {
+      _isSettingsOpen = true;
+      SettingsPanelColumn.Width = new GridLength(370);
+    }
+
+
+
+    private void CloseSettingsPanel()
+    {
+      _isSettingsOpen = false;
+      SettingsPanelColumn.Width = new GridLength(0);
     }
 
 
@@ -304,18 +338,12 @@ namespace eXeMeL
 
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
-      SetWindowGlow();
+      // Theme updated via resource dictionary swap - no additional action needed
     }
 
     private void HandleSetKeyboardFocusToEditorMessage(SetKeyboardFocusToEditor obj)
     {
       this.ResetFocusCommand.Execute(null);
-    }
-
-
-    private void SetWindowGlow()
-    {
-      this.GlowBrush.Color = (Color)FindResource("WindowGlowColor");
     }
 
 
@@ -332,5 +360,85 @@ namespace eXeMeL
       var changeLogWindow = new ChangeLogWindow(this.ViewModel.Settings.ApplicationTheme) { Owner = this };
       changeLogWindow.Show();
     }
+
+
+
+    #region Window Chrome Button Handlers
+
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.WindowState = WindowState.Minimized;
+    }
+
+    private void MaximizeRestoreButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (this.WindowState == WindowState.Maximized)
+      {
+        this.WindowState = WindowState.Normal;
+      }
+      else
+      {
+        this.WindowState = WindowState.Maximized;
+      }
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.Close();
+    }
+
+    private void MainWindow_StateChanged(object sender, EventArgs e)
+    {
+      // Update the maximize/restore glyph
+      if (this.MaximizeRestoreGlyph != null)
+      {
+        // E739 = Maximize (full screen), E923 = Restore (overlapping windows)
+        this.MaximizeRestoreGlyph.Text = this.WindowState == WindowState.Maximized ? "\uE923" : "\uE739";
+      }
+    }
+
+    #endregion
+
+
+
+    #region Window Position Save/Restore
+
+    private void SaveWindowPosition()
+    {
+      if (this.ViewModel?.Settings == null) return;
+
+      var settings = this.ViewModel.Settings;
+
+      if (this.WindowState == WindowState.Normal)
+      {
+        settings.WindowLeft = this.Left;
+        settings.WindowTop = this.Top;
+        settings.WindowWidth = this.Width;
+        settings.WindowHeight = this.Height;
+      }
+      settings.WindowState = (int)this.WindowState;
+    }
+
+    private void RestoreWindowPosition()
+    {
+      // ViewModel may not be set yet during construction; defer to Loaded if needed
+      if (this.ViewModel?.Settings == null) return;
+
+      var settings = this.ViewModel.Settings;
+
+      if (!double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0)
+        this.Width = settings.WindowWidth;
+      if (!double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0)
+        this.Height = settings.WindowHeight;
+      if (!double.IsNaN(settings.WindowLeft))
+        this.Left = settings.WindowLeft;
+      if (!double.IsNaN(settings.WindowTop))
+        this.Top = settings.WindowTop;
+
+      if (settings.WindowState == (int)WindowState.Maximized)
+        this.WindowState = WindowState.Maximized;
+    }
+
+    #endregion
   }
 }

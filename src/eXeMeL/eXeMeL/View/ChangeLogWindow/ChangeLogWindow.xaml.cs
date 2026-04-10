@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -16,14 +16,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using eXeMeL.Model;
 using ICSharpCode.AvalonEdit.Utils;
-using MahApps.Metro.Controls;
 
 namespace eXeMeL.View.ChangeLog
 {
   /// <summary>
   /// Interaction logic for ChangeLogWindow.xaml
   /// </summary>
-  public partial class ChangeLogWindow : MetroWindow
+  public partial class ChangeLogWindow : Window
   {
     public ObservableCollection<ChangeLogEntry> Entries { get; private set; }
 
@@ -93,21 +92,17 @@ namespace eXeMeL.View.ChangeLog
 
     #region Theme Control
 
-    // TODO: This should be extracted out so it can be shared by this window and the main application
-
     private void SetApplicationThemeBasedOnSettings(ApplicationTheme theme)
     {
-      Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
-
-      if (this.Resources.MergedDictionaries.Count == 6)
-      {
-        this.Resources.MergedDictionaries.RemoveAt(5);
-      }
+      // Remove old theme dictionary if present (look for marker key)
+      var existingTheme = this.Resources.MergedDictionaries
+          .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
+      if (existingTheme != null)
+        this.Resources.MergedDictionaries.Remove(existingTheme);
 
       var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(theme), UriKind.RelativeOrAbsolute) };
+      dict["IsEXeMeLTheme"] = true;
       this.Resources.MergedDictionaries.Add(dict);
-
-      this.GlowBrush.Color = (Color)this.FindResource("WindowGlowColor");
     }
 
 

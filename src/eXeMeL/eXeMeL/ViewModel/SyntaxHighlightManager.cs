@@ -109,14 +109,15 @@ namespace eXeMeL.ViewModel
 
     private void SetApplicationThemeBasedOnSettings()
     {
-      //Debug.Assert(Application.Current.Resources.MergedDictionaries.Count <= 6, "There are more resource dictionaries than expected.");
+      // Remove the old theme dictionary (look for one with our marker key)
+      var existingTheme = Application.Current.Resources.MergedDictionaries
+          .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
+      if (existingTheme != null)
+        Application.Current.Resources.MergedDictionaries.Remove(existingTheme);
 
-      if (Application.Current.Resources.MergedDictionaries.Count == 6)
-      {
-        Application.Current.Resources.MergedDictionaries.RemoveAt(5);
-      }
-
+      // Add the new theme dictionary
       var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(), UriKind.RelativeOrAbsolute) };
+      dict["IsEXeMeLTheme"] = true; // marker
       Application.Current.Resources.MergedDictionaries.Add(dict);
     }
 

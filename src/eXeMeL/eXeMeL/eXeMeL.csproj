@@ -27,7 +27,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageReference Include="MahApps.Metro" Version="0.12.1.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
+    <PackageReference Include="MaterialDesignColors" Version="3.1.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
   </ItemGroup>
 
@@ -58,9 +59,11 @@
   <ItemGroup>
     <Resource Include="Resources\DarkThemeColors.xaml" />
     <Resource Include="Resources\ThemeColors.xaml" />
+    <Resource Include="Resources\SolarizedDarkThemeColors.xaml" />
     <!-- Prevent SDK auto-including these as Page (since they're explicitly Resource) -->
     <Page Remove="Resources\DarkThemeColors.xaml" />
     <Page Remove="Resources\ThemeColors.xaml" />
+    <Page Remove="Resources\SolarizedDarkThemeColors.xaml" />
   </ItemGroup>
 
   <!-- Icon resources -->

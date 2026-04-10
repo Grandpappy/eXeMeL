@@ -36,6 +36,11 @@ namespace eXeMeL.Model
     private Brush _currentXPathStartBrush;
     private bool _highlightOtherInstancesOfSelection;
     private string _lastLaunchedVersion;
+    private double _windowLeft = double.NaN;
+    private double _windowTop = double.NaN;
+    private double _windowWidth = 800;
+    private double _windowHeight = 600;
+    private int _windowState = 0;
 
 
 
@@ -112,6 +117,51 @@ namespace eXeMeL.Model
     {
       get { return this._highlightOtherInstancesOfSelection; }
       set { this._highlightOtherInstancesOfSelection = value; NotifyPropertyChanged("HighlightOtherInstancesOfSelection"); }
+    }
+
+
+
+    [DataMember]
+    public double WindowLeft
+    {
+      get { return this._windowLeft; }
+      set { this._windowLeft = value; NotifyPropertyChanged("WindowLeft"); }
+    }
+
+
+
+    [DataMember]
+    public double WindowTop
+    {
+      get { return this._windowTop; }
+      set { this._windowTop = value; NotifyPropertyChanged("WindowTop"); }
+    }
+
+
+
+    [DataMember]
+    public double WindowWidth
+    {
+      get { return this._windowWidth; }
+      set { this._windowWidth = value; NotifyPropertyChanged("WindowWidth"); }
+    }
+
+
+
+    [DataMember]
+    public double WindowHeight
+    {
+      get { return this._windowHeight; }
+      set { this._windowHeight = value; NotifyPropertyChanged("WindowHeight"); }
+    }
+
+
+
+    [DataMember]
+    public int WindowState
+    {
+      get { return this._windowState; }
+      set { this._windowState = value; NotifyPropertyChanged("WindowState"); }
     }
 
 
