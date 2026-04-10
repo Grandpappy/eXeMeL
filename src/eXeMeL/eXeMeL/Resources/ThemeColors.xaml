@@ -11,10 +11,6 @@
   <Color x:Key="BlackColor">#FF252525</Color>
   <Color x:Key="WhiteColor">#FFEDEDED</Color>
 
-  <!-- Editor-specific accent (gold — preserved for XPath highlights and syntax accents) -->
-  <Color x:Key="AccentColor">#CCD4AA00</Color>
-  <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource AccentColor}"/>
-
   <!-- Core brushes still referenced by views -->
   <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColor}" />
   <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}" />

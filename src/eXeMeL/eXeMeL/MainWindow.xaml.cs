@@ -57,14 +57,14 @@ namespace eXeMeL
         var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(this);
         if (chrome != null)
         {
-          chrome.CaptionHeight = 40;
+          chrome.CaptionHeight = 46;
           chrome.UseAeroCaptionButtons = false;
         }
         else
         {
           System.Windows.Shell.WindowChrome.SetWindowChrome(this, new System.Windows.Shell.WindowChrome
           {
-            CaptionHeight = 40,
+            CaptionHeight = 46,
             ResizeBorderThickness = new Thickness(5),
             GlassFrameThickness = new Thickness(0),
             UseAeroCaptionButtons = false
