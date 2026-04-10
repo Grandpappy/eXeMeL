@@ -98,7 +98,7 @@ namespace eXeMeL.Model
     public ApplicationTheme ApplicationTheme
     {
       get { return this._applicationTheme; }
-      set { this._applicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); NotifyPropertyChanged("EditorBrush"); }
+      set { this._applicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); UpdateBrushes(); }
     }
 
 
