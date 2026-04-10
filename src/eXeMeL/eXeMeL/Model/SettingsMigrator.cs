@@ -43,7 +43,7 @@ namespace eXeMeL.Model
 
     private static Settings TryReadFromRegistry()
     {
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0612, CS0618 // Type or member is obsolete
       try
       {
         using (var registryKey = RegistryAccess.OpenRegistryKey())
@@ -66,14 +66,14 @@ namespace eXeMeL.Model
       {
         return null;
       }
-#pragma warning restore CS0612
+#pragma warning restore CS0612, CS0618
     }
 
 
 
     private static string TryReadLastLaunchedVersionFromRegistry()
     {
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0612, CS0618 // Type or member is obsolete
       try
       {
         using (var registryKey = RegistryAccess.OpenRegistryKey())
@@ -85,7 +85,7 @@ namespace eXeMeL.Model
       {
         return null;
       }
-#pragma warning restore CS0612
+#pragma warning restore CS0612, CS0618
     }
   }
 }

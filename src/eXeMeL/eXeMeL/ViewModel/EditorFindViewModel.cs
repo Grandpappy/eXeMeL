@@ -47,7 +47,7 @@ namespace eXeMeL.ViewModel
         if (value != null && value.Length == 0)
           CancelSearch();
         else
-          PerformFindNextSearchAsync();
+          _ = PerformFindNextSearchAsync();
       }
     }
 
