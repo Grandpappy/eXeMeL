@@ -24,7 +24,8 @@
   
   <!--Margin="0,0,0,60" Padding="0,0,5,0"-->
   
-  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Padding="5,0">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Padding="5,0"
+                TextElement.Foreground="{DynamicResource FlyoutForegroundBrush}">
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
@@ -70,7 +71,7 @@
         <TextBlock Grid.Column="0" Grid.Row="0" Text="Font Size" FontFamily="Segoe UI" FontSize="16" Margin="0,0,10,0" Opacity="0.65"/>
         <Slider Grid.Column="1" Grid.Row="0" Value="{Binding EditorFontSize}" Minimum="12" Maximum="30" Focusable="False"/>
 
-        <Button Grid.Column="1" Grid.Row="1" x:Name="ResetFontSizeButton" Content="Reset Font Size" HorizontalAlignment="Right" Margin="0,5,0,0" Click="ResetFontSizeButton_Click"/>
+        <Button Grid.Column="1" Grid.Row="1" x:Name="ResetFontSizeButton" Content="Reset Font Size" HorizontalAlignment="Right" Margin="0,5,0,0" Click="ResetFontSizeButton_Click" Foreground="{DynamicResource FlyoutForegroundBrush}"/>
       </Grid>
 
       
@@ -88,7 +89,8 @@
         SelectedValue="{Binding SyntaxHighlightingStyle}"  
         SelectedValuePath="Value"  
         FontSize="14"
-        Height="30"/>
+        Height="30"
+        Foreground="{DynamicResource FlyoutForegroundBrush}"/>
 
       
       <TextBlock 
@@ -107,7 +109,8 @@
         SelectedValuePath="Value"  
         FontSize="14"
         Height="30"
-        Margin="0,10,0,0"/>
+        Margin="0,10,0,0"
+        Foreground="{DynamicResource FlyoutForegroundBrush}"/>
 
 
       <TextBlock 
@@ -125,7 +128,8 @@
         SelectedValuePath="Source"  
         FontSize="14"
         Height="30"
-        Margin="0,10,0,0"/>
+        Margin="0,10,0,0"
+        Foreground="{DynamicResource FlyoutForegroundBrush}"/>
 
       <TextBlock
         Grid.Row="6" Grid.Column="0"

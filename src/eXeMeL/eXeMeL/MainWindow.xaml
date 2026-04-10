@@ -559,6 +559,7 @@
         Background="{DynamicResource FlyoutBackgroundBrush}"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1,0,0,0"
+        TextElement.Foreground="{DynamicResource FlyoutForegroundBrush}"
         >
         <Grid>
           <Grid.RowDefinitions>
@@ -577,7 +578,7 @@
           <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical">
               <views:SettingsView DataContext="{Binding Settings}"/>
-              <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left" Focusable="False"/>
+              <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left" Focusable="False" Foreground="{DynamicResource FlyoutForegroundBrush}"/>
             </StackPanel>
           </ScrollViewer>
         </Grid>
