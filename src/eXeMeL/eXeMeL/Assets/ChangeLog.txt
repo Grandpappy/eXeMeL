@@ -1,34 +1,13 @@
-﻿*4/10/2026 - eXeMeL 2 — Fluent Design Overhaul
+﻿*4/9/2026 - eXeMeL 2
 
-Complete UI redesign with Windows 11 Fluent Design using WPF-UI.
+Major platform update
 
-- New FluentWindow with Mica backdrop for a native Windows 11 look
-- Custom title bar with integrated toolbar: refresh, copy, open, save, find, and settings
-- Centered find bar in the title bar with next/prev arrows that appear when searching
-- Tabbed interface: Editor and XPath Tool tabs at the top of the content area
-- Editor tab dynamically shows the filename when a file is opened, or "Clipboard Content" for clipboard data
-- Snapshots bar appears inline with tabs when multiple snapshots exist
-- Card-based Settings panel with grouped toggle switches and combo boxes
-- Gold accent preserved in status bar border and "eXeMeL 2" title branding
-- Muted icon-only toolbar buttons with opacity hover effects
-- Updated VS Blue syntax highlighting to match actual Visual Studio Dark theme colors
-- Fixed theme brush initialization bug that caused dark-on-dark text on first launch
-- Removed MaterialDesignInXamlToolkit dependency, replaced with WPF-UI 4.2
-- Modernized codebase: Settings now uses ObservableObject, removed DataContract attributes, replaced obsolete Task and XML patterns
-
-*4/9/2026 - .NET 9 Migration
-
-Major platform update. eXeMeL has been migrated from .NET Framework 4.5 to .NET 9.
-
-- Modernized to .NET 9 with SDK-style project
-- Replaced MvvmLight (unmaintained) with CommunityToolkit.Mvvm
-- Replaced MahApps.Metro with MaterialDesignInXamlToolkit for a clean, modern UI
-- Upgraded AvalonEdit from 4.4 to 6.3
+- Modernized to .NET 9
+- Updated UI design from Material to Fluent for a more native Windows experience
 - Settings now stored in %LOCALAPPDATA%\eXeMeL\settings.json (auto-migrated from Registry on first run)
 - Application is now a single self-contained .exe — no installer or .NET runtime required
 - ClickOnce deployment has been removed in favor of direct executable distribution
 - Command-line argument support: pass a file path to open it directly
-- All existing features preserved: clipboard workflow, XML cleaning, XPath utility, syntax highlighting, themes, snapshots, and keyboard shortcuts
 
 *4/23/2020 - Opening
 
