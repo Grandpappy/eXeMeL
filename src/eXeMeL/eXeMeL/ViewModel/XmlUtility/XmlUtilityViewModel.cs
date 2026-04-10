@@ -157,9 +157,16 @@ namespace eXeMeL.ViewModel
       set
       {
         SetProperty(ref this._root, value);
+        OnPropertyChanged(nameof(RootItems));
         this.StartOfXPath = this.Root;
       }
     }
+
+    /// <summary>
+    /// Wraps Root in a single-item list for TreeView binding.
+    /// </summary>
+    public List<ElementViewModel> RootItems =>
+      this.Root != null ? new List<ElementViewModel> { this.Root } : new List<ElementViewModel>();
 
 
 
