@@ -7,39 +7,29 @@
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
              mc:Ignorable="d"
              Name="ControlRoot"
-             d:DesignHeight="36" d:DesignWidth="500"
+             d:DesignHeight="32" d:DesignWidth="500"
              d:DataContext="{d:DesignInstance Type=vm:EditorViewModel, IsDesignTimeCreatable=True}"
       >
 
-  <!-- Entire control hidden when only 1 snapshot (the default) -->
-  <UserControl.Style>
-    <Style TargetType="UserControl">
-      <Setter Property="Visibility" Value="Visible"/>
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding Snapshots.Count}" Value="1">
-          <Setter Property="Visibility" Value="Collapsed"/>
-        </DataTrigger>
-      </Style.Triggers>
-    </Style>
-  </UserControl.Style>
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
-  <Border Padding="12,4,12,4"
-          BorderThickness="0,0,0,1"
-          BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}">
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
+    <!-- Snapshot list (only visible when >1 snapshot) -->
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+      <StackPanel.Style>
+        <Style TargetType="StackPanel">
+          <Setter Property="Visibility" Value="Visible"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Snapshots.Count}" Value="1">
+              <Setter Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </StackPanel.Style>
 
-      <!-- Label -->
-      <TextBlock Grid.Column="0" Text="Snapshots:" FontSize="12" FontWeight="SemiBold"
-                 Opacity="0.7" VerticalAlignment="Center" Margin="0,0,8,0"/>
+      <TextBlock Text="Snapshots:" FontSize="11" Opacity="0.6"
+                 VerticalAlignment="Center" Margin="0,0,6,0"/>
 
-      <!-- Snapshot list -->
-      <ItemsControl Grid.Column="1" ItemsSource="{Binding Snapshots}"
-                    VerticalAlignment="Center">
+      <ItemsControl ItemsSource="{Binding Snapshots}" VerticalAlignment="Center">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <StackPanel Orientation="Horizontal"/>
@@ -51,9 +41,9 @@
               Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}"
               CommandParameter="{Binding}"
               Content="{Binding Identifier}"
-              MinWidth="28" Height="24"
-              Padding="8,2" Margin="0,0,4,0"
-              FontSize="12"
+              MinWidth="24" Height="22"
+              Padding="6,1" Margin="0,0,3,0"
+              FontSize="11"
               Focusable="False">
               <Button.ToolTip>
                 <TextBlock Text="Go to this snapshot"/>
@@ -62,15 +52,28 @@
           </DataTemplate>
         </ItemsControl.ItemTemplate>
       </ItemsControl>
+    </StackPanel>
 
-      <!-- Add snapshot button -->
-      <ui:Button Grid.Column="2"
-                 Appearance="Transparent"
-                 Icon="{ui:SymbolIcon Add24}"
-                 Command="{Binding CreateSnapshotCommand}"
-                 ToolTip="Add a new snapshot"
-                 Focusable="False"
-                 Padding="4" FontSize="14"/>
-    </Grid>
-  </Border>
+    <!-- Always-visible add snapshot button -->
+    <Button Command="{Binding CreateSnapshotCommand}"
+            ToolTip="Create snapshot"
+            Focusable="False"
+            Background="Transparent" BorderThickness="0"
+            Padding="6,0" Opacity="0.6" Cursor="Hand"
+            VerticalAlignment="Center">
+      <Button.Template>
+        <ControlTemplate TargetType="Button">
+          <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Opacity" Value="1.0"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Button.Template>
+      <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="16"/>
+    </Button>
+  </StackPanel>
 </UserControl>

@@ -137,7 +137,6 @@
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="40"/>
-      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
@@ -179,43 +178,6 @@
           <ui:SymbolIcon Symbol="Save24" FontSize="16"/>
         </Button>
 
-        <Border Width="1" Height="14" Margin="6,0"
-                Background="{DynamicResource DividerStrokeColorDefaultBrush}"/>
-
-        <!-- File status -->
-        <ui:SymbolIcon Symbol="Document24" FontSize="14" Opacity="0.45" Margin="2,0"
-                       ToolTip="{Binding Editor.FilePath}">
-          <ui:SymbolIcon.Style>
-            <Style TargetType="ui:SymbolIcon">
-              <Setter Property="Visibility" Value="Collapsed"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="True">
-                  <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </ui:SymbolIcon.Style>
-        </ui:SymbolIcon>
-        <ui:SymbolIcon Symbol="Clipboard24" FontSize="14" Opacity="0.45" Margin="2,0"
-                       ToolTip="Clipboard content (not saved to file)">
-          <ui:SymbolIcon.Style>
-            <Style TargetType="ui:SymbolIcon">
-              <Setter Property="Visibility" Value="Collapsed"/>
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="False">
-                  <Setter Property="Visibility" Value="Visible"/>
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </ui:SymbolIcon.Style>
-        </ui:SymbolIcon>
-
-        <Border Width="1" Height="14" Margin="6,0"
-                Background="{DynamicResource DividerStrokeColorDefaultBrush}"/>
-        <Button Command="{Binding Editor.CreateSnapshotCommand}" ToolTip="Create snapshot"
-                Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="16"/>
-        </Button>
       </StackPanel>
 
       <!-- Center: Find bar (columns 1-*-2-*-3 give true centering) -->
@@ -226,16 +188,8 @@
         VerticalAlignment="Center"
         WindowChrome.IsHitTestVisibleInChrome="True"/>
 
-      <!-- Right: Mode toggle + Settings -->
+      <!-- Right: Settings only (mode toggle moved to tabs) -->
       <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
-        <Button x:Name="ModeToggleButton" Style="{StaticResource TitleBarIconButton}"
-                Command="{Binding ToggleEditorModeCommand}" ToolTip="Switch view mode (F2)"
-                Opacity="0.65">
-          <StackPanel Orientation="Horizontal">
-            <ui:SymbolIcon Symbol="Code24" FontSize="16" Margin="0,0,4,0"/>
-            <TextBlock x:Name="ModeToggleLabel" Text="Editor" FontSize="12" VerticalAlignment="Center"/>
-          </StackPanel>
-        </Button>
         <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
                 Style="{StaticResource TitleBarIconButton}">
           <ui:SymbolIcon Symbol="Settings24" FontSize="16"/>
@@ -259,114 +213,140 @@
       </StackPanel>
     </Grid>
 
-    <!-- Snapshot bar (auto-hides when only 1 snapshot) -->
-    <views:EditorSnapshotView
-      x:Name="EditorSnapshotControl"
-      Grid.Row="1"
-      DataContext="{Binding Editor}"/>
-
     <!-- Main content area -->
-    <Grid Grid.Row="2">
-      <i:Interaction.Triggers>
-        <i:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
-          <i:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
-        </i:DataTrigger>
-        <i:DataTrigger Binding="{Binding EditorMode}" Value="XmlUtility">
-          <i:GoToStateAction x:Name="GoToXmlUtilityAction" StateName="XmlUtility"/>
-        </i:DataTrigger>
-      </i:Interaction.Triggers>
-
-      <VisualStateManager.VisualStateGroups>
-        <VisualStateGroup x:Name="EditorView">
-          <VisualState x:Name="Editor">
-            <Storyboard>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityView">
-                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-              </ObjectAnimationUsingKeyFrames>
-            </Storyboard>
-          </VisualState>
-          <VisualState x:Name="XmlUtility">
-            <Storyboard>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityView">
-                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-              </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="AvalonEditor">
-                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-              </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="EditorFindControl">
-                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-              </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="EditorSnapshotControl">
-                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-              </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Text)" Storyboard.TargetName="ModeToggleLabel">
-                <DiscreteObjectKeyFrame KeyTime="0" Value="XPath Utility"/>
-              </ObjectAnimationUsingKeyFrames>
-            </Storyboard>
-          </VisualState>
-        </VisualStateGroup>
-      </VisualStateManager.VisualStateGroups>
-
+    <Grid Grid.Row="1">
       <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
 
-      <!-- Editor + Settings Panel -->
-      <Grid Grid.Row="0">
+      <!-- Tab header row + Snapshots -->
+      <Grid Grid.Row="0" Margin="8,4,8,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Tab headers -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal">
+          <Border x:Name="EditorTabHeader" MouseLeftButtonDown="EditorTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0"
+                  Background="{DynamicResource LayerFillColorDefaultBrush}"
+                  BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                  BorderThickness="1,1,1,0">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="Document24" FontSize="14" Margin="0,0,6,0">
+                <ui:SymbolIcon.Style>
+                  <Style TargetType="ui:SymbolIcon">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </ui:SymbolIcon.Style>
+              </ui:SymbolIcon>
+              <ui:SymbolIcon Symbol="Clipboard24" FontSize="14" Margin="0,0,6,0">
+                <ui:SymbolIcon.Style>
+                  <Style TargetType="ui:SymbolIcon">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="False">
+                        <Setter Property="Visibility" Value="Visible"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </ui:SymbolIcon.Style>
+              </ui:SymbolIcon>
+              <TextBlock x:Name="EditorTabLabel" Text="Clipboard Content" VerticalAlignment="Center" FontSize="12"/>
+            </StackPanel>
+          </Border>
+
+          <Border x:Name="XPathTabHeader" MouseLeftButtonDown="XPathTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0" Margin="2,0,0,0"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  BorderThickness="1,1,1,0">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="BranchFork24" FontSize="14" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="XPath Tool" VerticalAlignment="Center" FontSize="12" Opacity="0.6"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- Snapshots inline with tabs (right-aligned) -->
+        <views:EditorSnapshotView
+          x:Name="EditorSnapshotControl"
+          Grid.Column="1"
+          DataContext="{Binding Editor}"
+          VerticalAlignment="Center"
+          HorizontalAlignment="Right"/>
+      </Grid>
+
+      <!-- Tab content -->
+      <Grid Grid.Row="1">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
           <ColumnDefinition x:Name="SettingsPanelColumn" Width="0"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Editor Content -->
-        <Grid Grid.Column="0" Margin="12,8,12,8" DataContext="{Binding Editor}">
-          <Border CornerRadius="8"
-                  Background="{DynamicResource LayerFillColorDefaultBrush}"
-                  BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-                  BorderThickness="1"
-                  Padding="2">
-            <avalonEdit:TextEditor
-              x:Name="AvalonEditor"
-              FontFamily="{Binding Settings.FontFamily}"
-              FontSize="{Binding Settings.EditorFontSize}"
-              SyntaxHighlighting="{Binding DataContext.HighlightingManager.HighlightingDefinition, Mode=OneWay, ElementName=ControlRoot}"
-              BorderThickness="0"
-              Document="{Binding Document}"
-              VerticalScrollBarVisibility="Auto"
-              HorizontalScrollBarVisibility="Auto"
-              ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
-              WordWrap="{Binding Settings.WrapEditorText}"
-              Background="Transparent"
-              Foreground="{Binding Settings.EditorBrush}"
-              MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
-              >
-              <avalonEdit:TextEditor.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="Copy" Command="Copy"/>
-                  <MenuItem Header="Cut" Command="Cut"/>
-                  <MenuItem Header="Paste" Command="Paste"/>
-                  <Separator/>
-                  <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
-                  <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
-                </ContextMenu>
-              </avalonEdit:TextEditor.ContextMenu>
-              <avalonEdit:TextEditor.Options>
-                <avalonEdit:TextEditorOptions
-                  EnableHyperlinks="False"
-                  EnableEmailHyperlinks="False"
-                  AllowScrollBelowDocument="True"
-                  />
-              </avalonEdit:TextEditor.Options>
-            </avalonEdit:TextEditor>
-          </Border>
+        <!-- Editor content (visible by default) -->
+        <Border x:Name="EditorPanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="0,6,6,6"
+                Padding="2"
+                DataContext="{Binding Editor}">
+          <avalonEdit:TextEditor
+            x:Name="AvalonEditor"
+            FontFamily="{Binding Settings.FontFamily}"
+            FontSize="{Binding Settings.EditorFontSize}"
+            SyntaxHighlighting="{Binding DataContext.HighlightingManager.HighlightingDefinition, Mode=OneWay, ElementName=ControlRoot}"
+            BorderThickness="0"
+            Document="{Binding Document}"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto"
+            ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
+            WordWrap="{Binding Settings.WrapEditorText}"
+            Background="Transparent"
+            Foreground="{Binding Settings.EditorBrush}"
+            MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
+            >
+            <avalonEdit:TextEditor.ContextMenu>
+              <ContextMenu>
+                <MenuItem Header="Copy" Command="Copy"/>
+                <MenuItem Header="Cut" Command="Cut"/>
+                <MenuItem Header="Paste" Command="Paste"/>
+                <Separator/>
+                <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
+                <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
+              </ContextMenu>
+            </avalonEdit:TextEditor.ContextMenu>
+            <avalonEdit:TextEditor.Options>
+              <avalonEdit:TextEditorOptions
+                EnableHyperlinks="False"
+                EnableEmailHyperlinks="False"
+                AllowScrollBelowDocument="True"
+                />
+            </avalonEdit:TextEditor.Options>
+          </avalonEdit:TextEditor>
+        </Border>
 
+        <!-- XPath content (hidden by default) -->
+        <Border x:Name="XPathPanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="6,0,6,6"
+                Padding="2"
+                Visibility="Collapsed">
           <views:XmlUtilityView
             x:Name="XmlUtilityView"
-            Visibility="Collapsed"
-            DataContext="{Binding DataContext.XmlUtility, ElementName=ControlRoot}"
-            />
-        </Grid>
+            DataContext="{Binding XmlUtility}"/>
+        </Border>
 
         <!-- Settings Panel (slide-in from right) -->
         <Border
@@ -403,7 +383,7 @@
       </Grid>
 
       <!-- Footer / Status Bar with gold accent -->
-      <Border Grid.Row="1" Padding="12,6"
+      <Border Grid.Row="2" Padding="12,6"
               BorderThickness="0,1,0,0" BorderBrush="#D4AA00">
         <Grid>
           <Grid.ColumnDefinitions>

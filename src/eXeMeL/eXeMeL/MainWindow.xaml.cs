@@ -123,9 +123,11 @@ namespace eXeMeL
       WeakReferenceMessenger.Default.Register<DocumentTextReplacedMessage>(this, (r, m) => HandleDocumentTextReplacedMessage(m));
       WeakReferenceMessenger.Default.Register<ApplicationThemeUpdatedMessage>(this, (r, m) => HandleApplicationThemeUpdatedMessage(m));
       WeakReferenceMessenger.Default.Register<SetKeyboardFocusToEditor>(this, (r, m) => HandleSetKeyboardFocusToEditorMessage(m));
+      WeakReferenceMessenger.Default.Register<EditorModeChangedMessage>(this, (r, m) => HandleEditorModeChangedMessage(m));
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
+      this.ViewModel.Editor.PropertyChanged += Editor_PropertyChanged;
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
     }
@@ -215,6 +217,28 @@ namespace eXeMeL
     }
 
 
+
+    private void Editor_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == "IsContentFromFile" || e.PropertyName == "FilePath")
+      {
+        UpdateEditorTabLabel();
+      }
+    }
+
+    private void UpdateEditorTabLabel()
+    {
+      if (this.EditorTabLabel == null || this.ViewModel?.Editor == null) return;
+
+      if (this.ViewModel.Editor.IsContentFromFile && !string.IsNullOrEmpty(this.ViewModel.Editor.FilePath))
+      {
+        this.EditorTabLabel.Text = System.IO.Path.GetFileName(this.ViewModel.Editor.FilePath);
+      }
+      else
+      {
+        this.EditorTabLabel.Text = "Clipboard Content";
+      }
+    }
 
     private void Editor_RefreshComplete(object sender, EventArgs e)
     {
@@ -384,6 +408,51 @@ namespace eXeMeL
     #endregion
 
 
+
+    private void EditorTabHeader_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      if (this.ViewModel.EditorMode != EditorMode.Editor)
+        this.ViewModel.ToggleEditorModeCommand.Execute(null);
+    }
+
+    private void XPathTabHeader_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      if (this.ViewModel.EditorMode != EditorMode.XmlUtility)
+        this.ViewModel.ToggleEditorModeCommand.Execute(null);
+    }
+
+    private void HandleEditorModeChangedMessage(EditorModeChangedMessage message)
+    {
+      UpdateTabVisuals(message.EditorMode);
+    }
+
+    private void UpdateTabVisuals(EditorMode mode)
+    {
+      if (this.EditorTabHeader == null) return;
+
+      if (mode == EditorMode.Editor)
+      {
+        this.EditorPanel.Visibility = Visibility.Visible;
+        this.XPathPanel.Visibility = Visibility.Collapsed;
+        // Active tab
+        this.EditorTabHeader.Background = (System.Windows.Media.Brush)FindResource("LayerFillColorDefaultBrush");
+        this.EditorTabHeader.BorderBrush = (System.Windows.Media.Brush)FindResource("ControlStrokeColorDefaultBrush");
+        // Inactive tab
+        this.XPathTabHeader.Background = System.Windows.Media.Brushes.Transparent;
+        this.XPathTabHeader.BorderBrush = System.Windows.Media.Brushes.Transparent;
+      }
+      else
+      {
+        this.EditorPanel.Visibility = Visibility.Collapsed;
+        this.XPathPanel.Visibility = Visibility.Visible;
+        // Active tab
+        this.XPathTabHeader.Background = (System.Windows.Media.Brush)FindResource("LayerFillColorDefaultBrush");
+        this.XPathTabHeader.BorderBrush = (System.Windows.Media.Brush)FindResource("ControlStrokeColorDefaultBrush");
+        // Inactive tab
+        this.EditorTabHeader.Background = System.Windows.Media.Brushes.Transparent;
+        this.EditorTabHeader.BorderBrush = System.Windows.Media.Brushes.Transparent;
+      }
+    }
 
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
