@@ -42,6 +42,8 @@ namespace eXeMeL.ViewModel
 
         SetProperty(ref this._currentFindValue, value);
         OnPropertyChanged(nameof(HasSearchText));
+        (FindNextCommand as RelayCommand)?.NotifyCanExecuteChanged();
+        (FindPreviousCommand as RelayCommand)?.NotifyCanExecuteChanged();
         this.Matches = null;
 
         if (value != null && value.Length == 0)
