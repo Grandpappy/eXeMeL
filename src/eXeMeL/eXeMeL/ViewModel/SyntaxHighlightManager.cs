@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 using eXeMeL.Messages;
@@ -68,13 +64,9 @@ namespace eXeMeL.ViewModel
     {
       var resourceName = GetSyntaxHighlightingResource();
 
-      using (Stream stream = this.GetType().Assembly.GetManifestResourceStream(resourceName))
-      {
-        using (XmlTextReader reader = new XmlTextReader(stream))
-        {
-          return HighlightingLoader.Load(reader, HighlightingManager.Instance);
-        }
-      }
+      using var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
+      using var reader = XmlReader.Create(stream);
+      return HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }
 
 

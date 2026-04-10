@@ -365,35 +365,24 @@ namespace eXeMeL.ViewModel
     {
       if (this.IsContentFromFile)
       {
-        using (var file = new StreamWriter(this.FilePath))
-        {
-          await file.WriteAsync(this.Document.Text);
-        }
+        await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
       }
       else
       {
-        var saveDialog = new SaveFileDialog();
-        //dlg.FileName = "Document"; // Default file name
-        saveDialog.DefaultExt = ".xml"; // Default file extension
-        saveDialog.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
-
-        // Show save file dialog box
-        Nullable<bool> result = saveDialog.ShowDialog();
-
-        // Process save file dialog box results
-        if (result == true)
+        var saveDialog = new SaveFileDialog
         {
-          // Save document
+          DefaultExt = ".xml",
+          Filter = "XML documents (.xml)|*.xml"
+        };
+
+        if (saveDialog.ShowDialog() == true)
+        {
           this.FilePath = saveDialog.FileName;
           this.FileName = Path.GetFileName(this.FilePath);
           this.IsContentFromFile = true;
 
-          using (var file = new StreamWriter(this.FilePath))
-          {
-            await file.WriteAsync(this.Document.Text);
-          }
+          await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
         }
-
       }
     }
 

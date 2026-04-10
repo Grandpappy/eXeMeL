@@ -16,6 +16,7 @@ namespace eXeMeL.Model
     private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
     {
       WriteIndented = true,
+      NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
       Converters = { new JsonStringEnumConverter() }
     };
 

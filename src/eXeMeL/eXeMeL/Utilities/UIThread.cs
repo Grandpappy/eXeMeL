@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -70,7 +67,7 @@ namespace eXeMeL.Utilities
     // Queue up an action to run once all current items on the UI thread is complete
     public static void Queue(Action action)
     {
-      Task.Factory.StartNew(() => Run(action));
+      Task.Run(() => Run(action));
     }
   }
 }

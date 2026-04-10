@@ -160,7 +160,7 @@ namespace eXeMeL.ViewModel
       {
         this.IsBusy = true;
 
-        Task t = new Task(() =>
+        _ = Task.Run(() =>
         {
           try
           {
@@ -175,8 +175,6 @@ namespace eXeMeL.ViewModel
             this.IsBusy = false;
           }
         });
-
-        t.Start();
 
       }
       catch (Exception)
@@ -325,13 +323,12 @@ namespace eXeMeL.ViewModel
       if (actionToRun == null)
         return;
 
-      var t = new Task(() => actionToRun());
-      t.Start();
+      _ = Task.Run(() => actionToRun());
     }
 
 
     private CancellationTokenSource ElementUpdateCancellation { get; set; }
-    private object _elementUpdateLock = new object();
+    private readonly object _elementUpdateLock = new object();
     private ElementViewModel _startOfXPath;
     private string _startOfXPathText;
     private Action CurrentElementAction { get; set; }

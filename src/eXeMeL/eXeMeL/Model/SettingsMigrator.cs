@@ -33,7 +33,7 @@ namespace eXeMeL.Model
           SettingsIO.SaveSettings(migratedSettings);
         }
       }
-      catch
+      catch (Exception)
       {
         // Migration failed — the app will fall back to defaults via SettingsIO.LoadSettings
       }
@@ -62,7 +62,7 @@ namespace eXeMeL.Model
           }
         }
       }
-      catch
+      catch (Exception)
       {
         return null;
       }
@@ -81,7 +81,7 @@ namespace eXeMeL.Model
           return registryKey.GetValue("LastLaunchedVersion", null) as string;
         }
       }
-      catch
+      catch (Exception)
       {
         return null;
       }

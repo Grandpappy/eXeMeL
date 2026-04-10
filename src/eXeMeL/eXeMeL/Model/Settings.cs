@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
+using System;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Security.AccessControl;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using eXeMeL.Utilities;
-using Microsoft.Win32;
 
 namespace eXeMeL.Model
 {
-  [DataContract]
-  public class Settings : INotifyPropertyChanged
+  public class Settings : ObservableObject
   {
-    private SyntaxHighlightingStyle _syntaxHighlightingStyle;
-    private ApplicationTheme _applicationTheme;
     public const double DefaultEditorFontSize = 16;
 
-
+    private SyntaxHighlightingStyle _syntaxHighlightingStyle;
+    private ApplicationTheme _applicationTheme;
     private bool _wrapEditorText;
     private bool _showEditorLineNumbers;
     private double _editorFontSize;
     private string _fontFamily;
+    private bool _highlightOtherInstancesOfSelection;
+    private string _lastLaunchedVersion;
+    private double _windowLeft = double.NaN;
+    private double _windowTop = double.NaN;
+    private double _windowWidth = 800;
+    private double _windowHeight = 600;
+    private int _windowState;
+
     private Brush _editorBrush;
     private Brush _elementBrush;
     private Brush _attributeNameBrush;
@@ -34,244 +32,175 @@ namespace eXeMeL.Model
     private Brush _hoverBackgroundBrush;
     private Brush _currentXPathTargetBrush;
     private Brush _currentXPathStartBrush;
-    private bool _highlightOtherInstancesOfSelection;
-    private string _lastLaunchedVersion;
-    private double _windowLeft = double.NaN;
-    private double _windowTop = double.NaN;
-    private double _windowWidth = 800;
-    private double _windowHeight = 600;
-    private int _windowState = 0;
 
 
-
-    [DataMember]
     public string LastLaunchedVersion
     {
-      get { return this._lastLaunchedVersion; }
-      set { this._lastLaunchedVersion = value; NotifyPropertyChanged("LastLaunchedVersion"); }
+      get => _lastLaunchedVersion;
+      set => SetProperty(ref _lastLaunchedVersion, value);
     }
 
-
-
-    [DataMember]
     public bool ShowEditorLineNumbers
     {
-      get { return this._showEditorLineNumbers; }
-      set { this._showEditorLineNumbers = value; NotifyPropertyChanged("ShowEditorLineNumbers"); }
+      get => _showEditorLineNumbers;
+      set => SetProperty(ref _showEditorLineNumbers, value);
     }
 
-
-
-    [DataMember]
     public bool WrapEditorText
     {
-      get { return this._wrapEditorText; }
-      set { this._wrapEditorText = value; NotifyPropertyChanged("WrapEditorText"); }
+      get => _wrapEditorText;
+      set => SetProperty(ref _wrapEditorText, value);
     }
 
-
-
-    [DataMember]
     public double EditorFontSize
     {
-      get { return this._editorFontSize; }
-      set { this._editorFontSize = value; NotifyPropertyChanged("EditorFontSize"); }
+      get => _editorFontSize;
+      set => SetProperty(ref _editorFontSize, value);
     }
 
-
-
-    [DataMember]
     public SyntaxHighlightingStyle SyntaxHighlightingStyle
     {
-      get { return this._syntaxHighlightingStyle; }
+      get => _syntaxHighlightingStyle;
       set
       {
-        this._syntaxHighlightingStyle = value;
-        NotifyPropertyChanged("SyntaxHighlightingStyle");
-        UpdateBrushes();
+        if (SetProperty(ref _syntaxHighlightingStyle, value))
+          UpdateBrushes();
       }
     }
 
-
-
-    [DataMember]
     public ApplicationTheme ApplicationTheme
     {
-      get { return this._applicationTheme; }
-      set { this._applicationTheme = value; NotifyPropertyChanged("ApplicationTheme"); UpdateBrushes(); }
+      get => _applicationTheme;
+      set
+      {
+        if (SetProperty(ref _applicationTheme, value))
+          UpdateBrushes();
+      }
     }
 
-
-
-    [DataMember]
     public string FontFamily
     {
-      get { return this._fontFamily; }
-      set { this._fontFamily = value; NotifyPropertyChanged("FontFamily"); }
+      get => _fontFamily;
+      set => SetProperty(ref _fontFamily, value);
     }
 
-
-
-    [DataMember]
     public bool HighlightOtherInstancesOfSelection
     {
-      get { return this._highlightOtherInstancesOfSelection; }
-      set { this._highlightOtherInstancesOfSelection = value; NotifyPropertyChanged("HighlightOtherInstancesOfSelection"); }
+      get => _highlightOtherInstancesOfSelection;
+      set => SetProperty(ref _highlightOtherInstancesOfSelection, value);
     }
 
-
-
-    [DataMember]
     public double WindowLeft
     {
-      get { return this._windowLeft; }
-      set { this._windowLeft = value; NotifyPropertyChanged("WindowLeft"); }
+      get => _windowLeft;
+      set => SetProperty(ref _windowLeft, value);
     }
 
-
-
-    [DataMember]
     public double WindowTop
     {
-      get { return this._windowTop; }
-      set { this._windowTop = value; NotifyPropertyChanged("WindowTop"); }
+      get => _windowTop;
+      set => SetProperty(ref _windowTop, value);
     }
 
-
-
-    [DataMember]
     public double WindowWidth
     {
-      get { return this._windowWidth; }
-      set { this._windowWidth = value; NotifyPropertyChanged("WindowWidth"); }
+      get => _windowWidth;
+      set => SetProperty(ref _windowWidth, value);
     }
 
-
-
-    [DataMember]
     public double WindowHeight
     {
-      get { return this._windowHeight; }
-      set { this._windowHeight = value; NotifyPropertyChanged("WindowHeight"); }
+      get => _windowHeight;
+      set => SetProperty(ref _windowHeight, value);
     }
 
-
-
-    [DataMember]
     public int WindowState
     {
-      get { return this._windowState; }
-      set { this._windowState = value; NotifyPropertyChanged("WindowState"); }
+      get => _windowState;
+      set => SetProperty(ref _windowState, value);
     }
-
 
 
     [JsonIgnore]
     public Brush EditorBrush
     {
-      get { return this._editorBrush; }
-      set { this._editorBrush = value; NotifyPropertyChanged("EditorBrush"); }
+      get => _editorBrush;
+      set => SetProperty(ref _editorBrush, value);
     }
-
-
 
     [JsonIgnore]
     public Brush ElementBrush
     {
-      get { return this._elementBrush; }
-      set { this._elementBrush = value; NotifyPropertyChanged("ElementBrush"); }
+      get => _elementBrush;
+      set => SetProperty(ref _elementBrush, value);
     }
-
-
 
     [JsonIgnore]
     public Brush AttributeNameBrush
     {
-      get { return this._attributeNameBrush; }
-      set { this._attributeNameBrush = value; NotifyPropertyChanged("AttributeNameBrush"); }
+      get => _attributeNameBrush;
+      set => SetProperty(ref _attributeNameBrush, value);
     }
-
-
 
     [JsonIgnore]
     public Brush AttributeValueBrush
     {
-      get { return this._attributeValueBrush; }
-      set {this._attributeValueBrush = value; NotifyPropertyChanged("AttributeValueBrush"); }
+      get => _attributeValueBrush;
+      set => SetProperty(ref _attributeValueBrush, value);
     }
-
-
 
     [JsonIgnore]
     public Brush HoverBackgroundBrush
     {
-      get { return this._hoverBackgroundBrush; }
-      set { this._hoverBackgroundBrush = value; NotifyPropertyChanged("HoverBackgroundBrush"); }
+      get => _hoverBackgroundBrush;
+      set => SetProperty(ref _hoverBackgroundBrush, value);
     }
-
-
 
     [JsonIgnore]
     public Brush CurrentXPathTargetBrush
     {
-      get { return this._currentXPathTargetBrush; }
-      set { this._currentXPathTargetBrush = value; NotifyPropertyChanged("CurrentXPathTargetBrush"); }
+      get => _currentXPathTargetBrush;
+      set => SetProperty(ref _currentXPathTargetBrush, value);
     }
-
-
 
     [JsonIgnore]
     public Brush CurrentXPathStartBrush
     {
-      get { return this._currentXPathStartBrush; }
-      set { this._currentXPathStartBrush = value; NotifyPropertyChanged("CurrentXPathStartBrush"); }
+      get => _currentXPathStartBrush;
+      set => SetProperty(ref _currentXPathStartBrush, value);
     }
-
 
 
     public Settings()
     {
-      this.ShowEditorLineNumbers = true;
-      this.WrapEditorText = true;
-      this.EditorFontSize = DefaultEditorFontSize;
-      this.SyntaxHighlightingStyle = SyntaxHighlightingStyle.Light_Earthy;
-      this.ApplicationTheme = ApplicationTheme.Light;
-      this.FontFamily = "Consolas";
+      ShowEditorLineNumbers = true;
+      WrapEditorText = true;
+      EditorFontSize = DefaultEditorFontSize;
+      SyntaxHighlightingStyle = SyntaxHighlightingStyle.Light_Earthy;
+      ApplicationTheme = ApplicationTheme.Light;
+      FontFamily = "Consolas";
     }
-
 
 
     private void UpdateBrushes()
     {
-      this.EditorBrush = GetBrushForCurrentTheme(ThemeBrushTarget.EditorContent);
-      this.ElementBrush = GetBrushForCurrentTheme(ThemeBrushTarget.Element);
-      this.AttributeNameBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeName);
-      this.AttributeValueBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeValue);
-      this.HoverBackgroundBrush = GetBrushForCurrentTheme(ThemeBrushTarget.HoverBackground);
-      this.CurrentXPathTargetBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathTarget);
-      this.CurrentXPathStartBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathStart);
+      EditorBrush = GetBrushForCurrentTheme(ThemeBrushTarget.EditorContent);
+      ElementBrush = GetBrushForCurrentTheme(ThemeBrushTarget.Element);
+      AttributeNameBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeName);
+      AttributeValueBrush = GetBrushForCurrentTheme(ThemeBrushTarget.AttributeValue);
+      HoverBackgroundBrush = GetBrushForCurrentTheme(ThemeBrushTarget.HoverBackground);
+      CurrentXPathTargetBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathTarget);
+      CurrentXPathStartBrush = GetBrushForCurrentTheme(ThemeBrushTarget.CurrentXPathStart);
     }
-
 
 
     private Brush GetBrushForCurrentTheme(ThemeBrushTarget target)
     {
-      var attribute = this.SyntaxHighlightingStyle.GetAttributes<AssociatedThemeBrushAttribute>()
-         .FirstOrDefault(x => (x.AssociatedTheme == this.ApplicationTheme || x.AssociatedTheme == ApplicationTheme.Any)
+      var attribute = SyntaxHighlightingStyle.GetAttributes<AssociatedThemeBrushAttribute>()
+         .FirstOrDefault(x => (x.AssociatedTheme == ApplicationTheme || x.AssociatedTheme == ApplicationTheme.Any)
                               && x.Target == target);
 
       return attribute?.AssociatedBrush ?? new SolidColorBrush(Colors.Red);
     }
-
-
-
-    protected void NotifyPropertyChanged(string propertyName)
-    {
-      var handler = this.PropertyChanged;
-      handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
   }
-
 }
