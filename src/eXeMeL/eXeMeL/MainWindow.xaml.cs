@@ -41,6 +41,7 @@ namespace eXeMeL
       this.Closing += MainWindow_Closing;
       this.Loaded += MainWindow_Loaded;
       this.DataContextChanged += MainWindow_DataContextChanged;
+      this.StateChanged += MainWindow_StateChanged;
       this.AllowDrop = true;
       this.Drop += MainWindow_Drop;
       this.FocusOnFindControlCommand = new RelayCommand(FocusOnFindControlCommand_Executed);
@@ -49,6 +50,27 @@ namespace eXeMeL
       this.UnFoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, false));
 
       InitializeComponent();
+
+      // Override FluentWindow's WindowChrome so our custom title bar supports drag/double-click
+      this.Loaded += (s, e) =>
+      {
+        var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(this);
+        if (chrome != null)
+        {
+          chrome.CaptionHeight = 40;
+          chrome.UseAeroCaptionButtons = false;
+        }
+        else
+        {
+          System.Windows.Shell.WindowChrome.SetWindowChrome(this, new System.Windows.Shell.WindowChrome
+          {
+            CaptionHeight = 40,
+            ResizeBorderThickness = new Thickness(5),
+            GlassFrameThickness = new Thickness(0),
+            UseAeroCaptionButtons = false
+          });
+        }
+      };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
       this.AvalonEditor.TextArea.DocumentChanged += TextArea_DocumentChanged;
@@ -329,6 +351,37 @@ namespace eXeMeL
       var itemsToFold = level != "-" ? this.FoldingLevels[level[0] - '0'] : this.FoldingManager.AllFoldings.ToList();
       itemsToFold.ForEach(f => f.IsFolded = fold);
     }
+
+
+
+    #region Window Chrome Button Handlers
+
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.WindowState = WindowState.Minimized;
+    }
+
+    private void MaximizeRestoreButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.WindowState = this.WindowState == WindowState.Maximized
+        ? WindowState.Normal
+        : WindowState.Maximized;
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.Close();
+    }
+
+    private void MainWindow_StateChanged(object sender, EventArgs e)
+    {
+      if (this.MaximizeRestoreGlyph != null)
+      {
+        this.MaximizeRestoreGlyph.Text = this.WindowState == WindowState.Maximized ? "\uE923" : "\uE739";
+      }
+    }
+
+    #endregion
 
 
 

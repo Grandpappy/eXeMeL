@@ -41,6 +41,7 @@ namespace eXeMeL.ViewModel
         }
 
         SetProperty(ref this._currentFindValue, value);
+        OnPropertyChanged(nameof(HasSearchText));
         this.Matches = null;
 
         if (value != null && value.Length == 0)
@@ -49,6 +50,10 @@ namespace eXeMeL.ViewModel
           PerformFindNextSearchAsync();
       }
     }
+
+
+
+    public bool HasSearchText => !string.IsNullOrEmpty(SearchText);
 
 
 

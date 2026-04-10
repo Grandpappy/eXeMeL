@@ -12,28 +12,39 @@
     <KeyBinding Key="Escape" Command="{Binding FindViewModel.CancelSearchCommand}"/>
   </UserControl.InputBindings>
 
-  <StackPanel Orientation="Horizontal">
+  <StackPanel Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
     <ui:TextBox
       x:Name="FindSearchText"
       PlaceholderText="Find..."
       ClearButtonEnabled="True"
       Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}"
-      Width="200"
-      Margin="0,0,4,0"
-      FontSize="13"
+      Width="220"
+      Margin="0,0,2,0"
+      FontSize="12"
       PreviewKeyDown="FindSearchText_PreviewKeyDown"
       IsTabStop="False"
       GotFocus="FindSearchText_GotFocus"
       />
 
+    <!-- Next/Prev arrows — only visible when there's search text -->
     <ui:Button
       x:Name="FindNextButton"
       Command="{Binding FindViewModel.FindNextCommand}"
       Appearance="Transparent"
       Icon="{ui:SymbolIcon ChevronDown24}"
       ToolTip="Find Next (F3)"
-      Padding="6"
-      Margin="0,0,2,0"/>
+      Padding="4" Margin="0,0,1,0">
+      <ui:Button.Style>
+        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+          <Setter Property="Visibility" Value="Hidden"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding FindViewModel.HasSearchText}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ui:Button.Style>
+    </ui:Button>
 
     <ui:Button
       x:Name="FindPreviousButton"
@@ -41,6 +52,17 @@
       Appearance="Transparent"
       Icon="{ui:SymbolIcon ChevronUp24}"
       ToolTip="Find Previous (Shift+F3)"
-      Padding="6"/>
+      Padding="4">
+      <ui:Button.Style>
+        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+          <Setter Property="Visibility" Value="Hidden"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding FindViewModel.HasSearchText}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ui:Button.Style>
+    </ui:Button>
   </StackPanel>
 </UserControl>

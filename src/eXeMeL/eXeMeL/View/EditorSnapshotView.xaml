@@ -7,66 +7,70 @@
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
              mc:Ignorable="d"
              Name="ControlRoot"
-             d:DesignHeight="40" d:DesignWidth="300"
+             d:DesignHeight="36" d:DesignWidth="500"
              d:DataContext="{d:DesignInstance Type=vm:EditorViewModel, IsDesignTimeCreatable=True}"
       >
-	<UserControl.Resources>
-		<DataTemplate x:Key="SnapshotDataTemplate">
-			<Border Margin="2,0">
-        <Button
-          x:Name="SelectSnapshotButton"
-          Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}"
-          CommandParameter="{Binding}"
-          Content="{Binding Identifier}"
-          MinWidth="30" Height="28"
-          Padding="8,2"
-          Focusable="False">
-          <Button.ToolTip>
-            <StackPanel Orientation="Vertical">
-              <TextBlock Text="Go to this snapshot"/>
-            </StackPanel>
-          </Button.ToolTip>
-        </Button>
-      </Border>
-		</DataTemplate>
-	</UserControl.Resources>
 
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
+  <!-- Entire control hidden when only 1 snapshot (the default) -->
+  <UserControl.Style>
+    <Style TargetType="UserControl">
+      <Setter Property="Visibility" Value="Visible"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Snapshots.Count}" Value="1">
+          <Setter Property="Visibility" Value="Collapsed"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Style>
 
-    <ItemsControl
-      x:Name="SnapshotItemsControl"
-      Grid.Column="0"
-      HorizontalAlignment="Right" VerticalAlignment="Center"
-      ItemsSource="{Binding Snapshots}" ItemTemplate="{DynamicResource SnapshotDataTemplate}" BorderThickness="0,0,10,0">
-		  <ItemsControl.ItemsPanel>
-			  <ItemsPanelTemplate>
-				  <StackPanel Orientation="Horizontal"/>
-			  </ItemsPanelTemplate>
-		  </ItemsControl.ItemsPanel>
+  <Border Padding="12,4,12,4"
+          BorderThickness="0,0,0,1"
+          BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}">
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
 
-      <ItemsControl.Style>
-        <Style TargetType="ItemsControl">
-          <Setter Property="Visibility" Value="Visible"/>
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding Snapshots.Count}" Value="1">
-              <Setter Property="Visibility" Value="Collapsed"/>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </ItemsControl.Style>
-	  </ItemsControl>
+      <!-- Label -->
+      <TextBlock Grid.Column="0" Text="Snapshots:" FontSize="12" FontWeight="SemiBold"
+                 Opacity="0.7" VerticalAlignment="Center" Margin="0,0,8,0"/>
 
-    <ui:Button
-      Grid.Column="1"
-      Appearance="Transparent"
-      Icon="{ui:SymbolIcon BookmarkAdd24}"
-      ToolTip="Add a new snapshot from this version of the document"
-      Command="{Binding CreateSnapshotCommand}"
-      Focusable="False"
-      Padding="6"/>
-  </Grid>
+      <!-- Snapshot list -->
+      <ItemsControl Grid.Column="1" ItemsSource="{Binding Snapshots}"
+                    VerticalAlignment="Center">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Button
+              Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}"
+              CommandParameter="{Binding}"
+              Content="{Binding Identifier}"
+              MinWidth="28" Height="24"
+              Padding="8,2" Margin="0,0,4,0"
+              FontSize="12"
+              Focusable="False">
+              <Button.ToolTip>
+                <TextBlock Text="Go to this snapshot"/>
+              </Button.ToolTip>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Add snapshot button -->
+      <ui:Button Grid.Column="2"
+                 Appearance="Transparent"
+                 Icon="{ui:SymbolIcon Add24}"
+                 Command="{Binding CreateSnapshotCommand}"
+                 ToolTip="Add a new snapshot"
+                 Focusable="False"
+                 Padding="4" FontSize="14"/>
+    </Grid>
+  </Border>
 </UserControl>

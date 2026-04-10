@@ -9,7 +9,7 @@
   xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
   mc:Ignorable="d"
   x:Class="eXeMeL.MainWindow"
-  Title="eXeMeL"
+  Title="eXeMeL 2"
   Icon="Assets\eXeMeL Icon.ico"
   d:DesignWidth="800" d:DesignHeight="600"
   x:Name="ControlRoot"
@@ -53,18 +53,220 @@
     <KeyBinding Modifiers="Alt+Shift" Key="OemMinus" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
   </Window.InputBindings>
 
+  <Window.Resources>
+    <!-- Muted icon button for the title bar: no background, opacity-based hover -->
+    <Style x:Key="TitleBarIconButton" TargetType="Button">
+      <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="1.0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.2"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Window chrome button (min/max/close) -->
+    <Style x:Key="ChromeButton" TargetType="Button">
+      <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#18FFFFFF"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#28FFFFFF"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="ChromeCloseButton" BasedOn="{StaticResource ChromeButton}" TargetType="Button">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="{TemplateBinding Background}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#E81123"/>
+                <Setter Property="Foreground" Value="White"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#F1707A"/>
+                <Setter Property="Foreground" Value="White"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
   <Grid>
     <Grid.RowDefinitions>
+      <RowDefinition Height="40"/>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
-    <!-- Title Bar -->
-    <ui:TitleBar Grid.Row="0" Title="eXeMeL"/>
+    <!-- Custom Title Bar (full-width Grid for true centering) -->
+    <Grid Grid.Row="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
 
-    <!-- Main content area (includes toolbar, editor, footer) -->
-    <!-- VisualStateManager scope: all named elements must be descendants -->
-    <Grid Grid.Row="1">
+      <!-- Left: Icon + Title + Tool buttons -->
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+        <Image Source="Assets\eXeMeL Icon.ico" Width="16" Height="16" Margin="0,0,10,0"
+               RenderOptions.BitmapScalingMode="HighQuality"
+               WindowChrome.IsHitTestVisibleInChrome="False"/>
+        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="0,0,16,0">
+          <Run Text="eXeMeL" FontWeight="SemiBold"/>
+          <Run Text=" 2" FontWeight="SemiBold" Foreground="#D4AA00"/>
+        </TextBlock>
+
+        <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Refresh from clipboard (F5)"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="16"/>
+        </Button>
+        <Button Command="{Binding Editor.CopyCommand}" ToolTip="Copy all to clipboard"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="Copy24" FontSize="16"/>
+        </Button>
+        <Button Command="{Binding Editor.OpenCommand}" ToolTip="Open file (Ctrl+O)"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="FolderOpen24" FontSize="16"/>
+        </Button>
+        <Button Command="{Binding Editor.SaveCommand}" ToolTip="Save (Ctrl+S)"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="Save24" FontSize="16"/>
+        </Button>
+
+        <Border Width="1" Height="14" Margin="6,0"
+                Background="{DynamicResource DividerStrokeColorDefaultBrush}"/>
+
+        <!-- File status -->
+        <ui:SymbolIcon Symbol="Document24" FontSize="14" Opacity="0.45" Margin="2,0"
+                       ToolTip="{Binding Editor.FilePath}">
+          <ui:SymbolIcon.Style>
+            <Style TargetType="ui:SymbolIcon">
+              <Setter Property="Visibility" Value="Collapsed"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="True">
+                  <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </ui:SymbolIcon.Style>
+        </ui:SymbolIcon>
+        <ui:SymbolIcon Symbol="Clipboard24" FontSize="14" Opacity="0.45" Margin="2,0"
+                       ToolTip="Clipboard content (not saved to file)">
+          <ui:SymbolIcon.Style>
+            <Style TargetType="ui:SymbolIcon">
+              <Setter Property="Visibility" Value="Collapsed"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="False">
+                  <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </ui:SymbolIcon.Style>
+        </ui:SymbolIcon>
+
+        <Border Width="1" Height="14" Margin="6,0"
+                Background="{DynamicResource DividerStrokeColorDefaultBrush}"/>
+        <Button Command="{Binding Editor.CreateSnapshotCommand}" ToolTip="Create snapshot"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="16"/>
+        </Button>
+      </StackPanel>
+
+      <!-- Center: Find bar (columns 1-*-2-*-3 give true centering) -->
+      <views:EditorFindView
+        x:Name="EditorFindControl"
+        Grid.Column="2"
+        DataContext="{Binding Editor}"
+        VerticalAlignment="Center"
+        WindowChrome.IsHitTestVisibleInChrome="True"/>
+
+      <!-- Right: Mode toggle + Settings -->
+      <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
+        <Button x:Name="ModeToggleButton" Style="{StaticResource TitleBarIconButton}"
+                Command="{Binding ToggleEditorModeCommand}" ToolTip="Switch view mode (F2)"
+                Opacity="0.65">
+          <StackPanel Orientation="Horizontal">
+            <ui:SymbolIcon Symbol="Code24" FontSize="16" Margin="0,0,4,0"/>
+            <TextBlock x:Name="ModeToggleLabel" Text="Editor" FontSize="12" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="Settings24" FontSize="16"/>
+        </Button>
+      </StackPanel>
+
+      <!-- Window chrome buttons (min/max/close) — vertically stretched to match row height -->
+      <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Stretch">
+        <Button Style="{StaticResource ChromeButton}" Click="MinimizeButton_Click">
+          <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+        </Button>
+        <Button Style="{StaticResource ChromeButton}" Click="MaximizeRestoreButton_Click">
+          <TextBlock x:Name="MaximizeRestoreGlyph" Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+        </Button>
+        <Button Style="{StaticResource ChromeCloseButton}" Click="CloseButton_Click">
+          <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- Snapshot bar (auto-hides when only 1 snapshot) -->
+    <views:EditorSnapshotView
+      x:Name="EditorSnapshotControl"
+      Grid.Row="1"
+      DataContext="{Binding Editor}"/>
+
+    <!-- Main content area -->
+    <Grid Grid.Row="2">
       <i:Interaction.Triggers>
         <i:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
           <i:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
@@ -97,7 +299,7 @@
               <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="EditorSnapshotControl">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
               </ObjectAnimationUsingKeyFrames>
-              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentControl.Content)" Storyboard.TargetName="ModeToggleButton">
+              <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Text)" Storyboard.TargetName="ModeToggleLabel">
                 <DiscreteObjectKeyFrame KeyTime="0" Value="XPath Utility"/>
               </ObjectAnimationUsingKeyFrames>
             </Storyboard>
@@ -106,116 +308,12 @@
       </VisualStateManager.VisualStateGroups>
 
       <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
 
-      <!-- Toolbar -->
-      <Border Grid.Row="0" Padding="8,4" BorderThickness="0,0,0,1"
-              BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-
-          <!-- Left: Action buttons -->
-          <StackPanel Grid.Column="0" Orientation="Horizontal">
-            <ui:Button Appearance="Transparent"
-                       Icon="{ui:SymbolIcon ArrowClockwise24}"
-                       Command="{Binding Editor.RefreshCommand}"
-                       ToolTip="Replace text with clipboard contents (F5)"
-                       Padding="8,6" Margin="0,0,2,0"/>
-            <ui:Button Appearance="Transparent"
-                       Icon="{ui:SymbolIcon Copy24}"
-                       Command="{Binding Editor.CopyCommand}"
-                       ToolTip="Copy all text to clipboard"
-                       Padding="8,6" Margin="0,0,2,0"/>
-            <ui:Button Appearance="Transparent"
-                       Icon="{ui:SymbolIcon FolderOpen24}"
-                       Command="{Binding Editor.OpenCommand}"
-                       ToolTip="Open XML file (Ctrl+O)"
-                       Padding="8,6" Margin="0,0,2,0"/>
-            <ui:Button Appearance="Transparent"
-                       Icon="{ui:SymbolIcon Save24}"
-                       Command="{Binding Editor.SaveCommand}"
-                       ToolTip="Save (Ctrl+S)"
-                       Padding="8,6"/>
-
-            <!-- Separator -->
-            <Border Width="1" Height="20" Margin="8,0"
-                    Background="{DynamicResource DividerStrokeColorDefaultBrush}"/>
-
-            <!-- File status indicator -->
-            <ui:SymbolIcon Symbol="Document24" FontSize="16" Margin="0,0,4,0"
-                           ToolTip="{Binding Editor.FilePath}">
-              <ui:SymbolIcon.Style>
-                <Style TargetType="ui:SymbolIcon">
-                  <Setter Property="Visibility" Value="Collapsed"/>
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="True">
-                      <Setter Property="Visibility" Value="Visible"/>
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </ui:SymbolIcon.Style>
-            </ui:SymbolIcon>
-            <ui:SymbolIcon Symbol="Clipboard24" FontSize="16" Margin="0,0,4,0"
-                           ToolTip="Clipboard content (not saved to file)">
-              <ui:SymbolIcon.Style>
-                <Style TargetType="ui:SymbolIcon">
-                  <Setter Property="Visibility" Value="Collapsed"/>
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="False">
-                      <Setter Property="Visibility" Value="Visible"/>
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </ui:SymbolIcon.Style>
-            </ui:SymbolIcon>
-          </StackPanel>
-
-          <!-- Right: Snapshots, Find, Mode Toggle, Settings -->
-          <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-            <views:EditorSnapshotView
-              x:Name="EditorSnapshotControl"
-              DataContext="{Binding Editor}"
-              VerticalAlignment="Center"
-              Margin="0,0,8,0"/>
-
-            <views:EditorFindView
-              x:Name="EditorFindControl"
-              DataContext="{Binding Editor}"
-              VerticalAlignment="Center"
-              Margin="0,0,8,0"/>
-
-            <!-- Separator -->
-            <Border Width="1" Height="20" Margin="4,0,8,0"
-                    Background="{DynamicResource DividerStrokeColorDefaultBrush}"/>
-
-            <!-- Mode toggle -->
-            <ui:Button x:Name="ModeToggleButton"
-                       Appearance="Transparent"
-                       Content="Editor"
-                       Icon="{ui:SymbolIcon Code24}"
-                       Command="{Binding ToggleEditorModeCommand}"
-                       ToolTip="Switch view mode (F2)"
-                       Padding="8,6" Margin="0,0,4,0"/>
-
-            <!-- Settings -->
-            <ui:Button Appearance="Transparent"
-                       Icon="{ui:SymbolIcon Settings24}"
-                       Click="OpenSettingsButton_Click"
-                       ToolTip="Settings"
-                       Padding="8,6"/>
-          </StackPanel>
-        </Grid>
-      </Border>
-
       <!-- Editor + Settings Panel -->
-      <Grid Grid.Row="1">
+      <Grid Grid.Row="0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
           <ColumnDefinition x:Name="SettingsPanelColumn" Width="0"/>
@@ -304,10 +402,9 @@
         </Border>
       </Grid>
 
-      <!-- Footer / Status Bar -->
-      <Border Grid.Row="2" Padding="12,6"
-              BorderThickness="0,1,0,0"
-              BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}">
+      <!-- Footer / Status Bar with gold accent -->
+      <Border Grid.Row="1" Padding="12,6"
+              BorderThickness="0,1,0,0" BorderBrush="#D4AA00">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -315,9 +412,9 @@
           </Grid.ColumnDefinitions>
           <TextBlock Grid.Column="0" Text="{Binding Status}"
                      TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"
-                     FontSize="12" Opacity="0.6" VerticalAlignment="Center"/>
+                     FontSize="12" Opacity="0.7" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="1" Text="{Binding ToolInformation}"
-                     TextTrimming="CharacterEllipsis" FontSize="12" Opacity="0.6"
+                     TextTrimming="CharacterEllipsis" FontSize="12" Opacity="0.7"
                      HorizontalAlignment="Right" VerticalAlignment="Center"/>
         </Grid>
       </Border>
