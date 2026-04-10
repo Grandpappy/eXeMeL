@@ -1,54 +1,51 @@
-﻿<UserControl x:Class="eXeMeL.View.EditorSnapshotView"
+<UserControl x:Class="eXeMeL.View.EditorSnapshotView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
-             mc:Ignorable="d" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d"
              Name="ControlRoot"
              d:DesignHeight="40" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance Type=vm:EditorViewModel, IsDesignTimeCreatable=True}"
       >
-	<UserControl.Resources>
-		<DataTemplate x:Key="SnapshotDataTemplate">
-			<Border Margin="2,0">
-        <Button 
-          x:Name="SelectSnapshotButton" 
-          Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}" 
+  <UserControl.Resources>
+    <DataTemplate x:Key="SnapshotDataTemplate">
+      <Border Margin="2,0">
+        <ui:Button
+          x:Name="SelectSnapshotButton"
+          Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}"
           CommandParameter="{Binding}"
-          Content="{Binding Identifier}" 
-          MinWidth="30" Height="30"
+          Content="{Binding Identifier}"
+          MinWidth="28" Height="28"
           Focusable="False"
+          Appearance="Secondary"
+          Padding="6,2"
+          FontSize="12"
           >
-          <Button.ToolTip>
+          <ui:Button.ToolTip>
             <StackPanel Orientation="Vertical">
               <TextBlock Text="Go to this snapshot"/>
             </StackPanel>
-          </Button.ToolTip>
-        </Button>
+          </ui:Button.ToolTip>
+        </ui:Button>
       </Border>
-		</DataTemplate>
-	</UserControl.Resources>
-  
-  <Grid >
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
+    </DataTemplate>
+  </UserControl.Resources>
 
-    <ItemsControl 
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+    <ItemsControl
       x:Name="SnapshotItemsControl"
-      Grid.Column="0" 
       HorizontalAlignment="Right" VerticalAlignment="Center"
-      ItemsSource="{Binding Snapshots}" ItemTemplate="{DynamicResource SnapshotDataTemplate}" BorderThickness="0,0,10,0"
-      
+      ItemsSource="{Binding Snapshots}" ItemTemplate="{DynamicResource SnapshotDataTemplate}" BorderThickness="0"
       >
-		  <ItemsControl.ItemsPanel>
-			  <ItemsPanelTemplate>
-				  <StackPanel Orientation="Horizontal"/>
-			  </ItemsPanelTemplate>
-		  </ItemsControl.ItemsPanel>
-      
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Orientation="Horizontal"/>
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+
       <ItemsControl.Style>
         <Style TargetType="ItemsControl">
           <Setter Property="Visibility" Value="Visible"/>
@@ -59,18 +56,18 @@
           </Style.Triggers>
         </Style>
       </ItemsControl.Style>
-	  </ItemsControl>
+    </ItemsControl>
 
-    <Button 
-      Grid.Column="1"
-      Style="{DynamicResource IconButtonStyle}"
-      Background="{DynamicResource BlackBrush}"
-      OpacityMask="{DynamicResource AddSnapshotBrush}"
-      VerticalAlignment="Center" 
-      ToolTip="Add a new snapshot from this version of the document.  The document's contents and the undo stack will be included in the new snapshot."
-      Command="{Binding CreateSnapshotCommand}" 
+    <ui:Button
+      Appearance="Transparent"
+      VerticalAlignment="Center"
+      ToolTip="Add a new snapshot from this version of the document"
+      Command="{Binding CreateSnapshotCommand}"
       Focusable="False"
-      >
-    </Button>
-  </Grid>
+      Padding="6,4"
+      BorderThickness="0"
+      Cursor="Hand">
+      <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="16"/>
+    </ui:Button>
+  </StackPanel>
 </UserControl>

@@ -24,6 +24,11 @@
 	<Color x:Key="WhiteColor">#002b36</Color>
 
 
+  <!-- Semi-transparent layer backgrounds for Mica integration -->
+  <SolidColorBrush x:Key="LayerBrush" Color="#0AFFFFFF"/>
+  <SolidColorBrush x:Key="CardBrush" Color="#06FFFFFF"/>
+  <SolidColorBrush x:Key="StatusBarBrush" Color="#08FFFFFF"/>
+
   <Color x:Key="Gray1">#FFF9F9F9</Color>
   <Color x:Key="Gray2">#FF7F7F7F</Color>
   <Color x:Key="Gray7">#FF7E7E7E</Color>

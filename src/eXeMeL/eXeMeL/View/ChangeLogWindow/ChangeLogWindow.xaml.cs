@@ -16,13 +16,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using eXeMeL.Model;
 using ICSharpCode.AvalonEdit.Utils;
+using Wpf.Ui.Controls;
 
 namespace eXeMeL.View.ChangeLog
 {
   /// <summary>
   /// Interaction logic for ChangeLogWindow.xaml
   /// </summary>
-  public partial class ChangeLogWindow : Window
+  public partial class ChangeLogWindow : FluentWindow
   {
     public ObservableCollection<ChangeLogEntry> Entries { get; private set; }
 

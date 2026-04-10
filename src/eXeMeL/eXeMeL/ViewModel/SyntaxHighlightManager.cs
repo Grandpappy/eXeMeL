@@ -119,6 +119,12 @@ namespace eXeMeL.ViewModel
       var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(), UriKind.RelativeOrAbsolute) };
       dict["IsEXeMeLTheme"] = true; // marker
       Application.Current.Resources.MergedDictionaries.Add(dict);
+
+      // Synchronize WPF UI's Fluent theme with our application theme
+      var wpfUiTheme = this.Settings.ApplicationTheme == ApplicationTheme.Light
+          ? Wpf.Ui.Appearance.ApplicationTheme.Light
+          : Wpf.Ui.Appearance.ApplicationTheme.Dark;
+      Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfUiTheme);
     }
 
 

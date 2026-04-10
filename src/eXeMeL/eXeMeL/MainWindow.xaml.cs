@@ -14,13 +14,14 @@ using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Wpf.Ui.Controls;
 
 namespace eXeMeL
 {
   /// <summary>
   /// Interaction logic for MainWindow.xaml
   /// </summary>
-  public partial class MainWindow : Window
+  public partial class MainWindow : FluentWindow
   {
     private FoldingManager FoldingManager { get; set; }
     private XmlFoldingStrategy FoldingStrategy { get; set; }
@@ -44,7 +45,6 @@ namespace eXeMeL
       this.Closing += MainWindow_Closing;
       this.Loaded += MainWindow_Loaded;
       this.DataContextChanged += MainWindow_DataContextChanged;
-      this.StateChanged += MainWindow_StateChanged;
       this.AllowDrop = true;
       this.Drop += MainWindow_Drop;
       this.FocusOnFindControlCommand = new RelayCommand(FocusOnFindControlCommand_Executed);
@@ -269,7 +269,7 @@ namespace eXeMeL
     private void OpenSettingsPanel()
     {
       _isSettingsOpen = true;
-      SettingsPanelColumn.Width = new GridLength(370);
+      SettingsPanelColumn.Width = new GridLength(380);
     }
 
 
@@ -360,44 +360,6 @@ namespace eXeMeL
       var changeLogWindow = new ChangeLogWindow(this.ViewModel.Settings.ApplicationTheme) { Owner = this };
       changeLogWindow.Show();
     }
-
-
-
-    #region Window Chrome Button Handlers
-
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-    {
-      this.WindowState = WindowState.Minimized;
-    }
-
-    private void MaximizeRestoreButton_Click(object sender, RoutedEventArgs e)
-    {
-      if (this.WindowState == WindowState.Maximized)
-      {
-        this.WindowState = WindowState.Normal;
-      }
-      else
-      {
-        this.WindowState = WindowState.Maximized;
-      }
-    }
-
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-      this.Close();
-    }
-
-    private void MainWindow_StateChanged(object sender, EventArgs e)
-    {
-      // Update the maximize/restore glyph
-      if (this.MaximizeRestoreGlyph != null)
-      {
-        // E739 = Maximize (full screen), E923 = Restore (overlapping windows)
-        this.MaximizeRestoreGlyph.Text = this.WindowState == WindowState.Maximized ? "\uE923" : "\uE739";
-      }
-    }
-
-    #endregion
 
 
 

@@ -1,172 +1,176 @@
-﻿<UserControl
+<UserControl
   x:Class="eXeMeL.View.SettingsView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:local="clr-namespace:eXeMeL.View"
   xmlns:model="clr-namespace:eXeMeL.Model"
-  xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   mc:Ignorable="d"
-  d:DesignHeight="300" d:DesignWidth="300"
+  d:DesignHeight="600" d:DesignWidth="360"
   d:DataContext="{d:DesignInstance model:Settings}"
-  Width="350"
+  Width="360"
   Name="ControlRoot">
 
   <UserControl.Resources>
     <Style x:Key="SettingGroupHeaderStyle" TargetType="TextBlock">
-      <Setter Property="FontFamily" Value="Segoe UI"/>
-      <Setter Property="FontSize" Value="18"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
       <Setter Property="Foreground" Value="{DynamicResource FlyoutForegroundBrush}"/>
-      <Setter Property="Opacity" Value="0.85"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="Margin" Value="16,16,16,8"/>
+    </Style>
+    <Style x:Key="SettingCardStyle" TargetType="Border">
+      <Setter Property="Background" Value="{DynamicResource GrayBrush10}"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="16,12"/>
+      <Setter Property="Margin" Value="16,2"/>
+    </Style>
+    <Style x:Key="SettingLabelStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="Foreground" Value="{DynamicResource FlyoutForegroundBrush}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="SettingDescriptionStyle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="{DynamicResource FlyoutForegroundBrush}"/>
+      <Setter Property="Opacity" Value="0.6"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Setter Property="Margin" Value="0,2,0,0"/>
     </Style>
   </UserControl.Resources>
-  
-  <!--Margin="0,0,0,60" Padding="0,0,5,0"-->
-  
-  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Padding="5,0"
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Padding="0"
                 TextElement.Foreground="{DynamicResource FlyoutForegroundBrush}">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="Auto"/>
+    <StackPanel>
 
-      </Grid.RowDefinitions>
-      
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition/>
-        <ColumnDefinition Width="10"/>
-        <ColumnDefinition/>
-      </Grid.ColumnDefinitions>
+      <!-- Editor Settings Group -->
+      <TextBlock Text="EDITOR" Style="{StaticResource SettingGroupHeaderStyle}"/>
 
-      <TextBlock Text="Editor Settings" Style="{StaticResource SettingGroupHeaderStyle}"/>
-      
-      <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,8,0,0">
-        <TextBlock Text="Line Numbers" FontFamily="Segoe UI" FontSize="14" Opacity="0.65" Margin="0,0,0,4"/>
-        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding ShowEditorLineNumbers}"/>
-      </StackPanel>
-      <StackPanel Grid.Column="2" Grid.Row="1" Margin="0,8,0,0">
-        <TextBlock Text="Wrap Editor Text" FontFamily="Segoe UI" FontSize="14" Opacity="0.65" Margin="0,0,0,4"/>
-        <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" IsChecked="{Binding WrapEditorText}"/>
-      </StackPanel>
-      
-      <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" Margin="10,20,0,20">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto"/>
-          <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+      <!-- Line Numbers Toggle -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" VerticalAlignment="Center">
+            <TextBlock Text="Line Numbers" Style="{StaticResource SettingLabelStyle}"/>
+            <TextBlock Text="Show line numbers in the editor" Style="{StaticResource SettingDescriptionStyle}"/>
+          </StackPanel>
+          <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowEditorLineNumbers}" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
 
-        <TextBlock Grid.Column="0" Grid.Row="0" Text="Font Size" FontFamily="Segoe UI" FontSize="16" Margin="0,0,10,0" Opacity="0.65"/>
-        <Slider Grid.Column="1" Grid.Row="0" Value="{Binding EditorFontSize}" Minimum="12" Maximum="30" Focusable="False"/>
+      <!-- Wrap Text Toggle -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" VerticalAlignment="Center">
+            <TextBlock Text="Wrap Text" Style="{StaticResource SettingLabelStyle}"/>
+            <TextBlock Text="Wrap long lines in the editor" Style="{StaticResource SettingDescriptionStyle}"/>
+          </StackPanel>
+          <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding WrapEditorText}" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
 
-        <Button Grid.Column="1" Grid.Row="1" x:Name="ResetFontSizeButton" Content="Reset Font Size" HorizontalAlignment="Right" Margin="0,5,0,0" Click="ResetFontSizeButton_Click" Foreground="{DynamicResource FlyoutForegroundBrush}"/>
-      </Grid>
+      <!-- Highlight Selection Toggle -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Grid.Column="0" VerticalAlignment="Center">
+            <TextBlock Text="Highlight Selection" Style="{StaticResource SettingLabelStyle}"/>
+            <TextBlock Text="Highlight all instances of selected text" Style="{StaticResource SettingDescriptionStyle}"/>
+          </StackPanel>
+          <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding HighlightOtherInstancesOfSelection}" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
 
-      
-      <TextBlock 
-        Grid.Row="3" Grid.Column="0"
-        Text="Syntax Highlighting Scheme" 
-        Style="{StaticResource SettingGroupHeaderStyle}"
-        TextWrapping="Wrap"
-        />
+      <!-- Font Size -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <StackPanel>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Font Size" Style="{StaticResource SettingLabelStyle}"/>
+            <TextBlock Grid.Column="1" Text="{Binding EditorFontSize, StringFormat='{}{0:F0}'}" Style="{StaticResource SettingLabelStyle}" Opacity="0.6"/>
+          </Grid>
+          <Slider Value="{Binding EditorFontSize}" Minimum="12" Maximum="30" Focusable="False" Margin="0,8,0,4"/>
+          <ui:Button Content="Reset" HorizontalAlignment="Right" Click="ResetFontSizeButton_Click" Appearance="Secondary" Padding="12,4" FontSize="12"/>
+        </StackPanel>
+      </Border>
 
-      <ComboBox 
-        Grid.Row="3" Grid.Column="2"
-        ItemsSource="{Binding Source={local:Enumeration {x:Type model:SyntaxHighlightingStyle}}}" 
-        DisplayMemberPath="Description" 
-        SelectedValue="{Binding SyntaxHighlightingStyle}"  
-        SelectedValuePath="Value"  
-        FontSize="14"
-        Height="30"
-        Foreground="{DynamicResource FlyoutForegroundBrush}"/>
+      <!-- Appearance Group -->
+      <TextBlock Text="APPEARANCE" Style="{StaticResource SettingGroupHeaderStyle}"/>
 
-      
-      <TextBlock 
-        Grid.Row="4" Grid.Column="0"
-        Text="Application Theme" 
-        Style="{StaticResource SettingGroupHeaderStyle}"
-        TextWrapping="Wrap"
-        Margin="0,10,0,0"
-        />
+      <!-- Application Theme -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <StackPanel>
+          <TextBlock Text="Application Theme" Style="{StaticResource SettingLabelStyle}" Margin="0,0,0,8"/>
+          <ComboBox
+            ItemsSource="{Binding Source={local:Enumeration {x:Type model:ApplicationTheme}}}"
+            DisplayMemberPath="Description"
+            SelectedValue="{Binding ApplicationTheme}"
+            SelectedValuePath="Value"
+            FontSize="14"
+            Foreground="{DynamicResource FlyoutForegroundBrush}"/>
+        </StackPanel>
+      </Border>
 
-      <ComboBox 
-        Grid.Row="4" Grid.Column="2"
-        ItemsSource="{Binding Source={local:Enumeration {x:Type model:ApplicationTheme}}}" 
-        DisplayMemberPath="Description" 
-        SelectedValue="{Binding ApplicationTheme}"  
-        SelectedValuePath="Value"  
-        FontSize="14"
-        Height="30"
-        Margin="0,10,0,0"
-        Foreground="{DynamicResource FlyoutForegroundBrush}"/>
+      <!-- Syntax Highlighting -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <StackPanel>
+          <TextBlock Text="Syntax Highlighting" Style="{StaticResource SettingLabelStyle}" Margin="0,0,0,8"/>
+          <ComboBox
+            ItemsSource="{Binding Source={local:Enumeration {x:Type model:SyntaxHighlightingStyle}}}"
+            DisplayMemberPath="Description"
+            SelectedValue="{Binding SyntaxHighlightingStyle}"
+            SelectedValuePath="Value"
+            FontSize="14"
+            Foreground="{DynamicResource FlyoutForegroundBrush}"/>
+        </StackPanel>
+      </Border>
 
+      <!-- Font Family -->
+      <Border Style="{StaticResource SettingCardStyle}">
+        <StackPanel>
+          <TextBlock Text="Font Family" Style="{StaticResource SettingLabelStyle}" Margin="0,0,0,8"/>
+          <ComboBox
+            ItemsSource="{Binding Source={x:Static Fonts.SystemFontFamilies}}"
+            SelectedValue="{Binding FontFamily}"
+            SelectedValuePath="Source"
+            FontSize="14"
+            Foreground="{DynamicResource FlyoutForegroundBrush}"/>
+        </StackPanel>
+      </Border>
 
-      <TextBlock 
-        Grid.Row="5" Grid.Column="0"
-        Text="Font" 
-        Style="{StaticResource SettingGroupHeaderStyle}"
-        TextWrapping="Wrap"
-        Margin="0,10,0,0"
-        />
+      <!-- About Group -->
+      <TextBlock Text="ABOUT" Style="{StaticResource SettingGroupHeaderStyle}"/>
 
-      <ComboBox 
-        Grid.Row="5" Grid.Column="2"
-        ItemsSource="{Binding Source={x:Static Fonts.SystemFontFamilies}}" 
-        SelectedValue="{Binding FontFamily}"  
-        SelectedValuePath="Source"  
-        FontSize="14"
-        Height="30"
-        Margin="0,10,0,0"
-        Foreground="{DynamicResource FlyoutForegroundBrush}"/>
+      <Border Style="{StaticResource SettingCardStyle}">
+        <StackPanel>
+          <TextBlock
+            Text="{Binding CurrentVersion, ElementName=ControlRoot, StringFormat='Version {0}'}"
+            Style="{StaticResource SettingLabelStyle}"
+            Margin="0,0,0,8"/>
+          <TextBlock Style="{StaticResource SettingDescriptionStyle}" TextWrapping="Wrap">
+            <Run Text="Built with AvalonEdit, CommunityToolkit.Mvvm, WPF UI, and ModernUIIcons"/>
+          </TextBlock>
+        </StackPanel>
+      </Border>
 
-      <TextBlock
-        Grid.Row="6" Grid.Column="0"
-        Text="Highlight all intances of selected text" 
-        Style="{StaticResource SettingGroupHeaderStyle}"
-        TextWrapping="Wrap"
-        Margin="0,10,0,0"
-        />
-      
-      <CheckBox
-        Grid.Row="6" Grid.Column="2"
-        IsChecked="{Binding HighlightOtherInstancesOfSelection}"
-        Height="30" Width="30"
-        HorizontalAlignment="Left"
-        VerticalAlignment="Center"
-        Margin="0,10,0,0"
-        />
+      <!-- Bottom spacing -->
+      <Border Height="16"/>
 
-
-      <TextBlock 
-        Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" 
-        Text="{Binding CurrentVersion, ElementName=ControlRoot, StringFormat='Current Version: {0}'}" 
-        Style="{StaticResource SettingGroupHeaderStyle}"
-        Margin="0,40,0,0"
-        />
-
-      <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,40,0,0" Style="{StaticResource SettingGroupHeaderStyle}">
-        <Run Text="Makes use of "/>
-        <LineBreak/>
-        <Run Text="  AvalonEdit"/>
-        <LineBreak/>
-        <Run Text="  CommunityToolkit.Mvvm"/>
-        <LineBreak/>
-        <Run Text="  MaterialDesignInXaml"/>
-        <LineBreak/>
-        <Run Text="  ModernUIIcons.com"/>
-      </TextBlock>
-    </Grid>
+    </StackPanel>
   </ScrollViewer>
 </UserControl>
