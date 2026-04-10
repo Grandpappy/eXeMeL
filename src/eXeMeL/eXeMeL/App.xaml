@@ -6,7 +6,8 @@
   StartupUri="MainWindow.xaml" 
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:vm="clr-namespace:eXeMeL.ViewModel" 
+  xmlns:vm="clr-namespace:eXeMeL.ViewModel"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   mc:Ignorable="d"
   DispatcherUnhandledException="Application_DispatcherUnhandledException"
   >
@@ -15,9 +16,8 @@
       <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
 
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-        <ResourceDictionary Source="Resources/CommonStyles.xaml"/>
-        <ResourceDictionary Source="Resources/Icons.xaml"/>
+        <ui:ControlsDictionary />
+        <ui:ThemesDictionary Theme="Dark" />
       </ResourceDictionary.MergedDictionaries>
 
     </ResourceDictionary>

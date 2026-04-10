@@ -22,7 +22,7 @@ namespace eXeMeL.View.ChangeLog
   /// <summary>
   /// Interaction logic for ChangeLogWindow.xaml
   /// </summary>
-  public partial class ChangeLogWindow : Window
+  public partial class ChangeLogWindow : Wpf.Ui.Controls.FluentWindow
   {
     public ObservableCollection<ChangeLogEntry> Entries { get; private set; }
 

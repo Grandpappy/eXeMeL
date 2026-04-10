@@ -3,56 +3,44 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" >
-
 
   <UserControl.InputBindings>
     <KeyBinding Key="F3" Command="{Binding FindViewModel.FindNextCommand}"/>
     <KeyBinding Modifiers="Shift" Key="F3" Command="{Binding FindViewModel.FindPreviousCommand}"/>
-    <KeyBinding Key="Escape" Command="{Binding FindViewModel.CancelSearchCommand}"></KeyBinding>
+    <KeyBinding Key="Escape" Command="{Binding FindViewModel.CancelSearchCommand}"/>
   </UserControl.InputBindings>
 
+  <StackPanel Orientation="Horizontal">
+    <ui:TextBox
+      x:Name="FindSearchText"
+      PlaceholderText="Find..."
+      ClearButtonEnabled="True"
+      Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}"
+      Width="200"
+      Margin="0,0,4,0"
+      FontSize="13"
+      PreviewKeyDown="FindSearchText_PreviewKeyDown"
+      IsTabStop="False"
+      GotFocus="FindSearchText_GotFocus"
+      />
 
-  <Grid>
-    <StackPanel Orientation="Horizontal">
-      <TextBox
-        x:Name="FindSearchText"
-        Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}"
-        materialDesign:HintAssist.Hint="Find..."
-        materialDesign:TextFieldAssist.HasClearButton="True"
-        Width="200"
-        Margin="0,0,10,0"
-        FontSize="14"
-        Foreground="{DynamicResource BlackBrush}"
-        Background="{DynamicResource WhiteBrush}"
-        PreviewKeyDown="FindSearchText_PreviewKeyDown"
-        IsTabStop="False"
-        GotFocus="FindSearchText_GotFocus"
-        />
+    <ui:Button
+      x:Name="FindNextButton"
+      Command="{Binding FindViewModel.FindNextCommand}"
+      Appearance="Transparent"
+      Icon="{ui:SymbolIcon ChevronDown24}"
+      ToolTip="Find Next (F3)"
+      Padding="6"
+      Margin="0,0,2,0"/>
 
-      <Button
-        x:Name="FindNextButton"
-        Command="{Binding FindViewModel.FindNextCommand}"
-        Style="{DynamicResource IconButtonStyle}"
-        Background="{DynamicResource BlackBrush}"
-        OpacityMask="{DynamicResource FindNextIconBrush}"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        ToolTip="Find Next (F3)"
-        Margin="0,0,10,0"
-        />
-
-      <Button
-        x:Name="FindPreviousButton"
-        Command="{Binding FindViewModel.FindPreviousCommand}"
-        Style="{DynamicResource IconButtonStyle}"
-        Background="{DynamicResource BlackBrush}"
-        OpacityMask="{DynamicResource FindPreviousIconBrush}"
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        ToolTip="Find Previous (Shift F3)"
-        />
-    </StackPanel>
-  </Grid>
+    <ui:Button
+      x:Name="FindPreviousButton"
+      Command="{Binding FindViewModel.FindPreviousCommand}"
+      Appearance="Transparent"
+      Icon="{ui:SymbolIcon ChevronUp24}"
+      ToolTip="Find Previous (Shift+F3)"
+      Padding="6"/>
+  </StackPanel>
 </UserControl>

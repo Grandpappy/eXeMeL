@@ -115,10 +115,20 @@ namespace eXeMeL.ViewModel
       if (existingTheme != null)
         Application.Current.Resources.MergedDictionaries.Remove(existingTheme);
 
-      // Add the new theme dictionary
+      // Add the new theme dictionary (editor-specific brushes)
       var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(), UriKind.RelativeOrAbsolute) };
       dict["IsEXeMeLTheme"] = true; // marker
       Application.Current.Resources.MergedDictionaries.Add(dict);
+
+      // Sync WPF-UI theme system for Fluent control styling
+      var wpfUiTheme = this.Settings.ApplicationTheme switch
+      {
+        Model.ApplicationTheme.Light => Wpf.Ui.Appearance.ApplicationTheme.Light,
+        Model.ApplicationTheme.Dark => Wpf.Ui.Appearance.ApplicationTheme.Dark,
+        Model.ApplicationTheme.SolarizedDark => Wpf.Ui.Appearance.ApplicationTheme.Dark,
+        _ => Wpf.Ui.Appearance.ApplicationTheme.Light
+      };
+      Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfUiTheme);
     }
 
 
