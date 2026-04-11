@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:eXeMeL.View"
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors" x:Class="eXeMeL.View.XmlUtilityView"
              mc:Ignorable="d"
              Name="ControlRoot"
@@ -68,7 +69,25 @@
               <ItemsPresenter x:Name="ItemsHost"
                               Margin="20,0,0,0"
                               Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+              <!-- Closing tag after children (only when expanded and has children) -->
+              <StackPanel x:Name="ClosingTag" Orientation="Horizontal"
+                          Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel.Resources>
+                  <Style TargetType="TextBlock" BasedOn="{StaticResource ElementXmlText}"/>
+                </StackPanel.Resources>
+                <TextBlock Text="&lt;/"/>
+                <TextBlock Text="{Binding Name}"/>
+                <TextBlock Text="&gt;"/>
+              </StackPanel>
             </StackPanel>
+            <ControlTemplate.Triggers>
+              <DataTrigger Binding="{Binding ChildElements.Count}" Value="0">
+                <Setter TargetName="ClosingTag" Property="Visibility" Value="Collapsed"/>
+              </DataTrigger>
+              <DataTrigger Binding="{Binding HasInnerText}" Value="True">
+                <Setter TargetName="ClosingTag" Property="Visibility" Value="Collapsed"/>
+              </DataTrigger>
+            </ControlTemplate.Triggers>
           </ControlTemplate>
         </Setter.Value>
       </Setter>
@@ -224,7 +243,12 @@
           </Grid.ColumnDefinitions>
 
           <TextBlock Grid.Column="0" Text="XPath" VerticalAlignment="Top" Style="{StaticResource XmlText}"/>
-          <TextBox Name="XPathTextBox" Grid.Column="1" Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TabIndex="0" Style="{StaticResource XmlTextBox}" Margin="20,0,20,0" Padding="10"/>
+          <ui:TextBox Name="XPathTextBox" Grid.Column="1"
+                     Text="{Binding XPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     PlaceholderText="Enter XPath expression..."
+                     TabIndex="0" Margin="20,0,20,0" Padding="10"
+                     FontSize="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"
+                     FontFamily="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
           <StackPanel Grid.Column="2" Orientation="Vertical">
             <TextBlock Text="{Binding StartOfXPathText, StringFormat='{}Start: {0}'}" Style="{StaticResource XmlText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding StartOfXPathText}" Foreground="#8F8F8F"/>
           </StackPanel>
