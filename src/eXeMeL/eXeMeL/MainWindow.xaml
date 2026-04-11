@@ -141,7 +141,7 @@
     </Grid.RowDefinitions>
 
     <!-- Custom Title Bar (full-width Grid for true centering) -->
-    <Grid Grid.Row="0">
+    <Grid Grid.Row="0" Background="{DynamicResource ChromeTintOverlayBrush}">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
@@ -222,7 +222,7 @@
       </Grid.RowDefinitions>
 
       <!-- Tab header row + Snapshots -->
-      <Grid Grid.Row="0" Margin="8,4,8,0">
+      <Grid Grid.Row="0" Margin="8,4,8,0" Background="{DynamicResource ChromeTintOverlayBrush}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto"/>
           <ColumnDefinition Width="*"/>
@@ -402,7 +402,7 @@
         <Border
           x:Name="SettingsPanel"
           Grid.Column="1"
-          Background="{DynamicResource LayerFillColorDefaultBrush}"
+          Background="{DynamicResource ChromeTintOverlayBrush}"
           BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
           BorderThickness="1,0,0,0">
           <Grid>
@@ -434,7 +434,8 @@
 
       <!-- Footer / Status Bar with gold accent -->
       <Border Grid.Row="2" Padding="12,6"
-              BorderThickness="0,1,0,0" BorderBrush="#D4AA00">
+              BorderThickness="0,1,0,0" BorderBrush="#D4AA00"
+              Background="{DynamicResource ChromeTintOverlayBrush}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>

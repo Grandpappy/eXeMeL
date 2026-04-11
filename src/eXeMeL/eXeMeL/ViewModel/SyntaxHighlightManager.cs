@@ -113,6 +113,7 @@ namespace eXeMeL.ViewModel
       : base(settings)
     {
       this.Observer.RegisterHandler(x => x.ApplicationTheme, HandleApplicationThemeChange);
+      this.Observer.RegisterHandler(x => x.ChromeTintColor, HandleChromeTintColorChange);
       SetApplicationThemeBasedOnSettings();
     }
 
@@ -122,6 +123,16 @@ namespace eXeMeL.ViewModel
     {
       SetApplicationThemeBasedOnSettings();
       WeakReferenceMessenger.Default.Send(new ApplicationThemeUpdatedMessage());
+    }
+
+    private void HandleChromeTintColorChange(Settings settings)
+    {
+      // Re-apply theme to update the ChromeTintOverlayBrush with the new color
+      if (settings.ApplicationTheme.SupportsTint())
+      {
+        SetApplicationThemeBasedOnSettings();
+        WeakReferenceMessenger.Default.Send(new ApplicationThemeUpdatedMessage());
+      }
     }
 
 
