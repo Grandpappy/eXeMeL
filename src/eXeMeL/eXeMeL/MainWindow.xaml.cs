@@ -254,19 +254,17 @@ namespace eXeMeL
       if (this.ViewModel?.Editor == null) return;
 
       var editor = this.ViewModel.Editor;
-      var appName = _currentContentType == DocumentContentType.Json ? "JaSON 2" : "eXeMeL 2";
-
       if (editor.IsContentFromFile && !string.IsNullOrEmpty(editor.FilePath))
       {
-        this.Title = $"{System.IO.Path.GetFileName(editor.FilePath)} — {appName}";
+        this.Title = $"{System.IO.Path.GetFileName(editor.FilePath)} — eXeMeL";
       }
       else
       {
         var preview = GetContentPreview(editor.Document?.Text, _currentContentType);
         if (!string.IsNullOrEmpty(preview))
-          this.Title = $"{preview} — {appName}";
+          this.Title = $"{preview} — eXeMeL";
         else
-          this.Title = appName;
+          this.Title = "eXeMeL";
       }
     }
 
