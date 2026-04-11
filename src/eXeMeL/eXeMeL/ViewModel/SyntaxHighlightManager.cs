@@ -115,6 +115,7 @@ namespace eXeMeL.ViewModel
       this.Observer.RegisterHandler(x => x.ApplicationTheme, HandleApplicationThemeChange);
       this.Observer.RegisterHandler(x => x.ChromeTintColor, HandleChromeTintColorChange);
       this.Observer.RegisterHandler(x => x.EditorTintIntensity, HandleChromeTintColorChange);
+      this.Observer.RegisterHandler(x => x.ChromeOpacity, HandleChromeTintColorChange);
       SetApplicationThemeBasedOnSettings();
     }
 
@@ -128,12 +129,32 @@ namespace eXeMeL.ViewModel
 
     private void HandleChromeTintColorChange(Settings settings)
     {
-      // Re-apply theme to update the ChromeTintOverlayBrush with the new color
-      if (settings.ApplicationTheme.SupportsTint())
+      if (!settings.ApplicationTheme.SupportsTint())
+        return;
+
+      // Update tint brushes in-place without reloading the entire theme dictionary
+      var existingDict = Application.Current.Resources.MergedDictionaries
+          .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
+      if (existingDict == null) return;
+
+      try
       {
-        SetApplicationThemeBasedOnSettings();
-        WeakReferenceMessenger.Default.Send(new ApplicationThemeUpdatedMessage());
+        var tintColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
+        var chromeAlpha = (byte)(settings.ChromeOpacity * 255);
+        tintColor.A = chromeAlpha;
+        existingDict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(tintColor);
+
+        // Editor tint: darker than chrome, controlled by intensity
+        var editorAlpha = (byte)(settings.EditorTintIntensity * 255);
+        var editorTint = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
+        // Make editor darker by mixing with black
+        editorTint.R = (byte)(editorTint.R * 0.4);
+        editorTint.G = (byte)(editorTint.G * 0.4);
+        editorTint.B = (byte)(editorTint.B * 0.4);
+        editorTint.A = editorAlpha;
+        existingDict["EditorTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(editorTint);
       }
+      catch { /* Invalid color */ }
     }
 
 
@@ -154,14 +175,20 @@ namespace eXeMeL.ViewModel
       {
         try
         {
-          var tintColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.ChromeTintColor);
-          var alpha = this.Settings.ApplicationTheme.IsGlassTheme() ? (byte)0x40 : (byte)0xCC;
-          tintColor.A = alpha;
-          dict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(tintColor);
+          var baseColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.ChromeTintColor);
 
-          // Editor tint: same color but darker, with user-controllable intensity
+          // Chrome tint — alpha controlled by ChromeOpacity slider
+          var chromeAlpha = (byte)(this.Settings.ChromeOpacity * 255);
+          var chromeTint = baseColor;
+          chromeTint.A = chromeAlpha;
+          dict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(chromeTint);
+
+          // Editor tint: darker than chrome, controlled by intensity slider
           var editorAlpha = (byte)(this.Settings.EditorTintIntensity * 255);
-          var editorTint = tintColor;
+          var editorTint = baseColor;
+          editorTint.R = (byte)(editorTint.R * 0.4);
+          editorTint.G = (byte)(editorTint.G * 0.4);
+          editorTint.B = (byte)(editorTint.B * 0.4);
           editorTint.A = editorAlpha;
           dict["EditorTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(editorTint);
         }

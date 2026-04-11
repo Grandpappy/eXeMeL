@@ -20,6 +20,7 @@ namespace eXeMeL.Model
     private bool _highlightOtherInstancesOfSelection;
     private string _chromeTintColor = "#3366CC";
     private double _editorTintIntensity = 0.3;
+    private double _chromeOpacity = 0.5;
     private string _lastLaunchedVersion;
     private double _windowLeft = double.NaN;
     private double _windowTop = double.NaN;
@@ -102,6 +103,12 @@ namespace eXeMeL.Model
     {
       get => _editorTintIntensity;
       set => SetProperty(ref _editorTintIntensity, value);
+    }
+
+    public double ChromeOpacity
+    {
+      get => _chromeOpacity;
+      set => SetProperty(ref _chromeOpacity, value);
     }
 
     public double WindowLeft
