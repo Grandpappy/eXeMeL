@@ -3,17 +3,11 @@
   <Color name="StringValue" foreground="Blue" />
   <Color name="Number" foreground="DarkCyan" />
   <Color name="Keywords" foreground="DarkBlue" fontWeight="bold" />
-  <Color name="Punctuation" foreground="#333333" />
+  <Color name="Punctuation" foreground="#999999" />
 
   <RuleSet>
-    <Rule color="PropertyKey">"[^"\\]*(?:\\.[^"\\]*)*"\s*(?=:)</Rule>
-    <Span color="StringValue">
-      <Begin>"</Begin>
-      <End>"|$</End>
-      <RuleSet>
-        <Rule color="StringValue">\\.</Rule>
-      </RuleSet>
-    </Span>
+    <Rule color="PropertyKey">"[^"\\]*(?:\\.[^"\\]*)*"(?=\s*:)</Rule>
+    <Rule color="StringValue">"[^"\\]*(?:\\.[^"\\]*)*"</Rule>
     <Rule color="Number">-?\b\d+(\.\d+)?([eE][+-]?\d+)?\b</Rule>
     <Rule color="Keywords">\b(true|false|null)\b</Rule>
     <Rule color="Punctuation">[{}\[\]:,]</Rule>

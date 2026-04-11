@@ -117,13 +117,12 @@
                HorizontalAlignment="Center" VerticalAlignment="Top"
                Margin="0,30,0,0"
                Foreground="{DynamicResource LabelTextBrush}"
-               FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI"
-               Visibility="{Binding IsJsonValid, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
+               FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI">
       <TextBlock.Style>
         <Style TargetType="TextBlock">
           <Setter Property="Visibility" Value="Collapsed"/>
           <Style.Triggers>
-            <DataTrigger Binding="{Binding IsJsonValid}" Value="False">
+            <DataTrigger Binding="{Binding ShowInvalidMessage}" Value="True">
               <Setter Property="Visibility" Value="Visible"/>
             </DataTrigger>
           </Style.Triggers>

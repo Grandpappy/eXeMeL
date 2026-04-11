@@ -41,8 +41,14 @@ namespace eXeMeL.ViewModel.JsonUtility
     public bool IsJsonValid
     {
       get => _isJsonValid;
-      set => SetProperty(ref _isJsonValid, value);
+      set
+      {
+        SetProperty(ref _isJsonValid, value);
+        OnPropertyChanged(nameof(ShowInvalidMessage));
+      }
     }
+
+    public bool ShowInvalidMessage => !IsJsonValid && !string.IsNullOrWhiteSpace(DocumentText);
 
     public bool IsBusy
     {
