@@ -179,6 +179,7 @@ namespace eXeMeL
     {
       this.AvalonEditor.ScrollToHome();
       this.AvalonEditor.CaretOffset = 0;
+      UpdateWindowTitle();
     }
 
 
@@ -253,7 +254,6 @@ namespace eXeMeL
       if (this.ViewModel?.Editor == null) return;
 
       var editor = this.ViewModel.Editor;
-      var typeName = _currentContentType == DocumentContentType.Json ? "JSON" : "XML";
       var appName = _currentContentType == DocumentContentType.Json ? "JaSON 2" : "eXeMeL 2";
 
       if (editor.IsContentFromFile && !string.IsNullOrEmpty(editor.FilePath))
@@ -264,7 +264,7 @@ namespace eXeMeL
       {
         var preview = GetContentPreview(editor.Document?.Text, _currentContentType);
         if (!string.IsNullOrEmpty(preview))
-          this.Title = $"{typeName} — {preview} — {appName}";
+          this.Title = $"{preview} — {appName}";
         else
           this.Title = appName;
       }
@@ -301,7 +301,7 @@ namespace eXeMeL
         var root = doc.Name.LocalName == "AddedRoot" && doc.Elements().Any()
           ? doc.Elements().First()
           : doc;
-        return $"<{root.Name.LocalName}>";
+        return root.Name.LocalName;
       }
       catch
       {
@@ -310,7 +310,7 @@ namespace eXeMeL
         if (match.Success)
         {
           var name = match.Groups[1].Value;
-          return name == "AddedRoot" ? null : $"<{name}>";
+          return name == "AddedRoot" ? null : name;
         }
         return null;
       }
@@ -338,13 +338,13 @@ namespace eXeMeL
             if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.Object ||
                 prop.Value.ValueKind == System.Text.Json.JsonValueKind.Array)
             {
-              return $"{{{prop.Name}}}";
+              return prop.Name;
             }
           }
         }
         else if (root.ValueKind == System.Text.Json.JsonValueKind.Array)
         {
-          return $"[{root.GetArrayLength()} items]";
+          return $"{root.GetArrayLength()} items";
         }
       }
       catch { }
