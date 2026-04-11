@@ -2,6 +2,7 @@ using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.XmlCleaners;
 using eXeMeL.ViewModel.JsonCleaners;
+using eXeMeL.ViewModel.YamlCleaners;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -29,8 +30,9 @@ namespace eXeMeL.ViewModel
     private string _FileName;
     private DocumentContentType _contentType = DocumentContentType.Xml;
 
-    private List<XmlCleanerBase> XmlCleaners;
-    private List<JsonCleanerBase> JsonCleaners;
+    private readonly List<XmlCleanerBase> XmlCleaners;
+    private readonly List<JsonCleanerBase> JsonCleaners;
+    private readonly List<YamlCleanerBase> YamlCleaners;
     public ObservableCollection<DocumentSnapshot> Snapshots { get; set; }
 
 
@@ -130,6 +132,12 @@ namespace eXeMeL.ViewModel
         new JsonFormatCleaner()
       };
 
+      this.YamlCleaners = new List<YamlCleanerBase>()
+      {
+        new YamlTrimCleaner(),
+        new YamlFormatCleaner()
+      };
+
       if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
       {
         this.Document = new TextDocument() { Text = "<Root IsValue=\"true\"><FirstChild Name=\"Robby\" Address=\"1521 Greenway Dr\"><Toys>All of them</Toys></FirstChild></Root>" };
@@ -158,10 +166,13 @@ namespace eXeMeL.ViewModel
       // Detect content type from the raw text
       ContentType = ContentTypeDetector.Detect(text);
 
-      if (ContentType == DocumentContentType.Json)
-        return await CleanJsonAsync(text);
-      else
-        return await CleanXmlAsync(text);
+      return ContentType switch
+      {
+        DocumentContentType.Json => await CleanJsonAsync(text),
+        DocumentContentType.Yaml => await CleanYamlAsync(text),
+        DocumentContentType.Text => await CleanTextAsync(text),
+        _ => await CleanXmlAsync(text)
+      };
     }
 
 
@@ -225,7 +236,43 @@ namespace eXeMeL.ViewModel
 
 
 
-    private bool XmlShouldBeCleaned(string xml)
+    private async Task<string> CleanYamlAsync(string yaml)
+    {
+      var context = new YamlCleanerContext() { TextToClean = yaml };
+
+      await Task.Run(() =>
+      {
+        foreach (var cleaner in this.YamlCleaners)
+        {
+          cleaner.Clean(context);
+
+          if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
+          {
+            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
+            return;
+          }
+        }
+
+        if (context.IsParsedSuccessfully)
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("YAML parsed correctly"));
+        else
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed as YAML"));
+      });
+
+      return context.TextToClean;
+    }
+
+
+
+    private static Task<string> CleanTextAsync(string text)
+    {
+      WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Plain text loaded"));
+      return Task.FromResult(text);
+    }
+
+
+
+    private static bool XmlShouldBeCleaned(string xml)
     {
       int firstLessThanIndex = xml.IndexOf('<');
       int lastGreaterThanIndex = xml.LastIndexOf('>');
@@ -362,10 +409,8 @@ namespace eXeMeL.ViewModel
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
         // Detect content type from file extension first, fall back to content detection
-        var ext = Path.GetExtension(filePath)?.ToLowerInvariant();
-        ContentType = ext == ".json"
-          ? DocumentContentType.Json
-          : ContentTypeDetector.Detect(fileContents);
+        ContentType = ContentTypeDetector.DetectFromFileExtension(filePath)
+                      ?? ContentTypeDetector.Detect(fileContents);
 
         this.IsContentFromFile = true;
         this.FilePath = filePath;
@@ -419,10 +464,13 @@ namespace eXeMeL.ViewModel
       }
       else
       {
-        var defaultExt = ContentType == DocumentContentType.Json ? ".json" : ".xml";
-        var filter = ContentType == DocumentContentType.Json
-          ? "JSON files (.json)|*.json|All files (*.*)|*.*"
-          : "XML documents (.xml)|*.xml|All files (*.*)|*.*";
+        var (defaultExt, filter) = ContentType switch
+        {
+          DocumentContentType.Json => (".json", "JSON files (.json)|*.json|All files (*.*)|*.*"),
+          DocumentContentType.Yaml => (".yaml", "YAML files (.yaml)|*.yaml;*.yml|All files (*.*)|*.*"),
+          DocumentContentType.Text => (".txt", "Text files (.txt)|*.txt|All files (*.*)|*.*"),
+          _ => (".xml", "XML documents (.xml)|*.xml|All files (*.*)|*.*")
+        };
 
         var saveDialog = new SaveFileDialog
         {
@@ -448,7 +496,7 @@ namespace eXeMeL.ViewModel
       var openDialog = new OpenFileDialog
       {
         DefaultExt = ".xml",
-        Filter = "XML and JSON files|*.xml;*.json|XML documents (.xml)|*.xml|JSON files (.json)|*.json|All files (*.*)|*.*"
+        Filter = "All supported|*.xml;*.json;*.yaml;*.yml;*.txt|XML documents|*.xml|JSON files|*.json|YAML files|*.yaml;*.yml|Text files|*.txt|All files|*.*"
       };
 
       if (openDialog.ShowDialog() == true)

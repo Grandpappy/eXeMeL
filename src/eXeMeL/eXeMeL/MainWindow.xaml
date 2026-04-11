@@ -286,6 +286,18 @@
               <TextBlock Text="JSON Tree" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
             </StackPanel>
           </Border>
+
+          <Border x:Name="YamlTreeTabHeader" MouseLeftButtonDown="YamlTreeTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0" Margin="2,0,0,0"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  BorderThickness="1,1,1,0"
+                  Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="BranchFork24" FontSize="16" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="YAML Tree" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
+            </StackPanel>
+          </Border>
         </StackPanel>
 
         <!-- Snapshots inline with tabs (right-aligned) -->
@@ -371,6 +383,19 @@
           <views:JsonUtilityView
             x:Name="JsonUtilityView"
             DataContext="{Binding JsonUtility}"/>
+        </Border>
+
+        <!-- YAML Tree content (hidden by default) -->
+        <Border x:Name="YamlTreePanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="6,0,6,6"
+                Padding="2"
+                Visibility="Collapsed">
+          <views:YamlUtilityView
+            x:Name="YamlUtilityView"
+            DataContext="{Binding YamlUtility}"/>
         </Border>
 
         <!-- Settings Panel (slide-in from right) -->

@@ -4,22 +4,18 @@
   xmlns:sys="clr-namespace:System;assembly=System.Runtime"
   >
 
-  <!-- Theme marker for runtime dictionary swap -->
   <sys:Boolean x:Key="IsEXeMeLTheme">True</sys:Boolean>
 
-  <!-- Base colors (inverted for dark) -->
   <Color x:Key="BlackColor">#FFFFFFFF</Color>
   <Color x:Key="WhiteColor">#FF1E1E1E</Color>
 
-  <!-- Core brushes still referenced by views -->
   <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColor}" />
   <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}" />
   <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource BlackColor}" />
 
-  <!-- Chrome tint (transparent for non-tinted themes) -->
-  <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="Transparent"/>
+  <!-- Tinted: opaque chrome tint (will be overridden at runtime with user color) -->
+  <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="#CC3366CC"/>
 
-  <!-- AvalonEdit editor content foreground -->
   <Color x:Key="Gray7">#FF7E7E7E</Color>
   <SolidColorBrush x:Key="EditorTextBrush" Color="{DynamicResource Gray7}"/>
 

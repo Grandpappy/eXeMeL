@@ -67,9 +67,16 @@ namespace eXeMeL.ViewModel
 
     private IHighlightingDefinition GetSyntaxHighlighting()
     {
-      var resourceName = _contentType == DocumentContentType.Json
-        ? GetJsonSyntaxHighlightingResource()
-        : GetXmlSyntaxHighlightingResource();
+      // Text mode: no syntax highlighting
+      if (_contentType == DocumentContentType.Text)
+        return null;
+
+      var resourceName = _contentType switch
+      {
+        DocumentContentType.Json => GetJsonSyntaxHighlightingResource(),
+        DocumentContentType.Yaml => GetYamlSyntaxHighlightingResource(),
+        _ => GetXmlSyntaxHighlightingResource()
+      };
 
       using var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
       using var reader = XmlReader.Create(stream);
@@ -81,6 +88,13 @@ namespace eXeMeL.ViewModel
     private string GetXmlSyntaxHighlightingResource()
     {
       return this.Settings.SyntaxHighlightingStyle.GetResourceName();
+    }
+
+
+
+    private string GetYamlSyntaxHighlightingResource()
+    {
+      return this.Settings.SyntaxHighlightingStyle.GetYamlResourceName();
     }
 
 
@@ -123,11 +137,26 @@ namespace eXeMeL.ViewModel
       dict["IsEXeMeLTheme"] = true;
       Application.Current.Resources.MergedDictionaries.Add(dict);
 
+      // Apply tint color for glass/tinted themes
+      if (this.Settings.ApplicationTheme.SupportsTint())
+      {
+        try
+        {
+          var tintColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.ChromeTintColor);
+          var alpha = this.Settings.ApplicationTheme.IsGlassTheme() ? (byte)0x40 : (byte)0xCC;
+          tintColor.A = alpha;
+          dict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(tintColor);
+        }
+        catch { /* Invalid color string — skip tint */ }
+      }
+
       var wpfUiTheme = this.Settings.ApplicationTheme switch
       {
-        Model.ApplicationTheme.Light => Wpf.Ui.Appearance.ApplicationTheme.Light,
-        Model.ApplicationTheme.Dark => Wpf.Ui.Appearance.ApplicationTheme.Dark,
-        Model.ApplicationTheme.SolarizedDark => Wpf.Ui.Appearance.ApplicationTheme.Dark,
+        Model.ApplicationTheme.Light or Model.ApplicationTheme.GlassLight or Model.ApplicationTheme.TintedLight
+          => Wpf.Ui.Appearance.ApplicationTheme.Light,
+        Model.ApplicationTheme.Dark or Model.ApplicationTheme.GlassDark or Model.ApplicationTheme.TintedDark
+          or Model.ApplicationTheme.SolarizedDark
+          => Wpf.Ui.Appearance.ApplicationTheme.Dark,
         _ => Wpf.Ui.Appearance.ApplicationTheme.Light
       };
       Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfUiTheme);

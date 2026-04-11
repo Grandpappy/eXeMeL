@@ -16,6 +16,9 @@
   <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}" />
   <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource BlackColor}" />
 
+  <!-- Chrome tint (transparent for non-tinted themes) -->
+  <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="Transparent"/>
+
   <!-- AvalonEdit editor content foreground -->
   <Color x:Key="Gray7">#FF7E7E7E</Color>
   <SolidColorBrush x:Key="EditorTextBrush" Color="{DynamicResource Gray7}"/>

@@ -65,6 +65,21 @@
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\JsonSolarizedDark.xshd">
       <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.JsonSolarizedDark.xshd</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\YamlBright.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.YamlBright.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\YamlEarthy.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.YamlEarthy.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\YamlDark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.YamlDark.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\YamlVSBlue.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.YamlVSBlue.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\YamlSolarizedDark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.YamlSolarizedDark.xshd</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Assets\ChangeLog.txt">
       <LogicalName>eXeMeL.Assets.ChangeLog.txt</LogicalName>
     </EmbeddedResource>
@@ -75,10 +90,18 @@
     <Resource Include="Resources\DarkThemeColors.xaml" />
     <Resource Include="Resources\ThemeColors.xaml" />
     <Resource Include="Resources\SolarizedDarkThemeColors.xaml" />
+    <Resource Include="Resources\GlassLightThemeColors.xaml" />
+    <Resource Include="Resources\GlassDarkThemeColors.xaml" />
+    <Resource Include="Resources\TintedLightThemeColors.xaml" />
+    <Resource Include="Resources\TintedDarkThemeColors.xaml" />
     <!-- Prevent SDK auto-including these as Page (since they're explicitly Resource) -->
     <Page Remove="Resources\DarkThemeColors.xaml" />
     <Page Remove="Resources\ThemeColors.xaml" />
     <Page Remove="Resources\SolarizedDarkThemeColors.xaml" />
+    <Page Remove="Resources\GlassLightThemeColors.xaml" />
+    <Page Remove="Resources\GlassDarkThemeColors.xaml" />
+    <Page Remove="Resources\TintedLightThemeColors.xaml" />
+    <Page Remove="Resources\TintedDarkThemeColors.xaml" />
   </ItemGroup>
 
   <!-- Icon resources -->

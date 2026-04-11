@@ -22,6 +22,7 @@ namespace eXeMeL
     private FoldingManager FoldingManager { get; set; }
     private XmlFoldingStrategy XmlFoldingStrategy { get; set; }
     private JsonFoldingStrategy JsonFoldingStrategy { get; set; }
+    private YamlFoldingStrategy YamlFoldingStrategy { get; set; }
     private DocumentContentType _currentContentType = DocumentContentType.Xml;
     public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
@@ -84,6 +85,7 @@ namespace eXeMeL
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
       this.XmlFoldingStrategy = new XmlFoldingStrategy();
       this.JsonFoldingStrategy = new JsonFoldingStrategy();
+      this.YamlFoldingStrategy = new YamlFoldingStrategy();
 
       this.IgnoreNextTextChange = false;
 
@@ -195,10 +197,22 @@ namespace eXeMeL
     {
       if (this.FoldingManager == null) return;
 
-      if (_currentContentType == DocumentContentType.Json)
-        this.JsonFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
-      else
-        this.XmlFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
+      switch (_currentContentType)
+      {
+        case DocumentContentType.Json:
+          this.JsonFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
+          break;
+        case DocumentContentType.Yaml:
+          this.YamlFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
+          break;
+        case DocumentContentType.Text:
+          // No folding for plain text
+          this.FoldingManager.UpdateFoldings(new List<ICSharpCode.AvalonEdit.Folding.NewFolding>(), -1);
+          break;
+        default:
+          this.XmlFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
+          break;
+      }
     }
 
 
@@ -536,13 +550,29 @@ namespace eXeMeL
         this.ViewModel.ToggleEditorModeCommand.Execute(null);
     }
 
+    private void YamlTreeTabHeader_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      if (this.ViewModel.EditorMode != EditorMode.XmlUtility)
+        this.ViewModel.ToggleEditorModeCommand.Execute(null);
+    }
+
     private void ContentTypeLabel_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-      // Toggle content type manually — does NOT re-clean, just swaps highlighting/folding/tabs
-      this.ViewModel.Editor.ContentType =
-        this.ViewModel.Editor.ContentType == DocumentContentType.Xml
-          ? DocumentContentType.Json
-          : DocumentContentType.Xml;
+      var menu = new System.Windows.Controls.ContextMenu();
+      foreach (var type in new[] { DocumentContentType.Xml, DocumentContentType.Json, DocumentContentType.Yaml, DocumentContentType.Text })
+      {
+        var item = new System.Windows.Controls.MenuItem
+        {
+          Header = type.ToString().ToUpper(),
+          IsChecked = (this.ViewModel.Editor.ContentType == type)
+        };
+        var capturedType = type;
+        item.Click += (s, args) => this.ViewModel.Editor.ContentType = capturedType;
+        menu.Items.Add(item);
+      }
+      menu.PlacementTarget = sender as System.Windows.UIElement;
+      menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Top;
+      menu.IsOpen = true;
     }
 
     private void HandleContentTypeChanged(ContentTypeChangedMessage message)
@@ -551,34 +581,64 @@ namespace eXeMeL
 
       // Update status bar label
       if (this.ContentTypeLabel != null)
-        this.ContentTypeLabel.Text = message.ContentType == DocumentContentType.Json ? "JSON" : "XML";
+        this.ContentTypeLabel.Text = message.ContentType.ToString().ToUpper();
 
       // Update app title in title bar
       if (this.AppTitleRun != null)
-        this.AppTitleRun.Text = message.ContentType == DocumentContentType.Json ? "JaSON" : "eXeMeL";
+      {
+        this.AppTitleRun.Text = message.ContentType switch
+        {
+          DocumentContentType.Json => "JaSON",
+          DocumentContentType.Yaml => "YAMeL",
+          DocumentContentType.Text => "TeXT",
+          _ => "eXeMeL"
+        };
+      }
 
       // Update window/taskbar title
       UpdateWindowTitle();
 
-      // Show/hide appropriate tabs
-      if (message.ContentType == DocumentContentType.Json)
+      // Show/hide appropriate utility tabs
+      this.XPathTabHeader.Visibility = Visibility.Collapsed;
+      this.JsonTreeTabHeader.Visibility = Visibility.Collapsed;
+      this.YamlTreeTabHeader.Visibility = Visibility.Collapsed;
+
+      switch (message.ContentType)
       {
-        this.XPathTabHeader.Visibility = Visibility.Collapsed;
-        this.JsonTreeTabHeader.Visibility = Visibility.Visible;
-        if (this.ViewModel.EditorMode == EditorMode.XmlUtility)
-        {
-          this.XPathPanel.Visibility = Visibility.Collapsed;
-          this.JsonTreePanel.Visibility = Visibility.Visible;
-        }
+        case DocumentContentType.Xml:
+          this.XPathTabHeader.Visibility = Visibility.Visible;
+          break;
+        case DocumentContentType.Json:
+          this.JsonTreeTabHeader.Visibility = Visibility.Visible;
+          break;
+        case DocumentContentType.Yaml:
+          this.YamlTreeTabHeader.Visibility = Visibility.Visible;
+          break;
+        // Text: no utility tab
       }
-      else
+
+      // If currently in utility mode, switch the visible panel
+      if (this.ViewModel.EditorMode == EditorMode.XmlUtility)
       {
-        this.XPathTabHeader.Visibility = Visibility.Visible;
-        this.JsonTreeTabHeader.Visibility = Visibility.Collapsed;
-        if (this.ViewModel.EditorMode == EditorMode.XmlUtility)
+        this.XPathPanel.Visibility = Visibility.Collapsed;
+        this.JsonTreePanel.Visibility = Visibility.Collapsed;
+        this.YamlTreePanel.Visibility = Visibility.Collapsed;
+
+        switch (message.ContentType)
         {
-          this.JsonTreePanel.Visibility = Visibility.Collapsed;
-          this.XPathPanel.Visibility = Visibility.Visible;
+          case DocumentContentType.Xml:
+            this.XPathPanel.Visibility = Visibility.Visible;
+            break;
+          case DocumentContentType.Json:
+            this.JsonTreePanel.Visibility = Visibility.Visible;
+            break;
+          case DocumentContentType.Yaml:
+            this.YamlTreePanel.Visibility = Visibility.Visible;
+            break;
+          case DocumentContentType.Text:
+            // No utility — switch back to editor
+            this.ViewModel.ToggleEditorModeCommand.Execute(null);
+            break;
         }
       }
 
@@ -600,42 +660,50 @@ namespace eXeMeL
       var inactiveBg = System.Windows.Media.Brushes.Transparent;
       var inactiveBorder = System.Windows.Media.Brushes.Transparent;
 
+      // Reset all to inactive
+      void SetInactive(System.Windows.Controls.Border header) { header.Background = inactiveBg; header.BorderBrush = inactiveBorder; }
+      void SetActive(System.Windows.Controls.Border header) { header.Background = activeBg; header.BorderBrush = activeBorder; }
+
+      SetInactive(this.EditorTabHeader);
+      SetInactive(this.XPathTabHeader);
+      SetInactive(this.JsonTreeTabHeader);
+      SetInactive(this.YamlTreeTabHeader);
+
+      // Hide all content panels
+      this.EditorPanel.Visibility = Visibility.Collapsed;
+      this.XPathPanel.Visibility = Visibility.Collapsed;
+      this.JsonTreePanel.Visibility = Visibility.Collapsed;
+      this.YamlTreePanel.Visibility = Visibility.Collapsed;
+
       if (mode == EditorMode.Editor)
       {
         this.EditorPanel.Visibility = Visibility.Visible;
-        this.XPathPanel.Visibility = Visibility.Collapsed;
-        this.JsonTreePanel.Visibility = Visibility.Collapsed;
-
-        this.EditorTabHeader.Background = activeBg;
-        this.EditorTabHeader.BorderBrush = activeBorder;
-        this.XPathTabHeader.Background = inactiveBg;
-        this.XPathTabHeader.BorderBrush = inactiveBorder;
-        this.JsonTreeTabHeader.Background = inactiveBg;
-        this.JsonTreeTabHeader.BorderBrush = inactiveBorder;
+        SetActive(this.EditorTabHeader);
       }
       else
       {
-        this.EditorPanel.Visibility = Visibility.Collapsed;
-        this.EditorTabHeader.Background = inactiveBg;
-        this.EditorTabHeader.BorderBrush = inactiveBorder;
+        SetActive(this.EditorTabHeader); // Keep editor tab looking normal (it's always the first)
+        SetInactive(this.EditorTabHeader);
 
-        if (_currentContentType == DocumentContentType.Json)
+        switch (_currentContentType)
         {
-          this.JsonTreePanel.Visibility = Visibility.Visible;
-          this.XPathPanel.Visibility = Visibility.Collapsed;
-          this.JsonTreeTabHeader.Background = activeBg;
-          this.JsonTreeTabHeader.BorderBrush = activeBorder;
-          this.XPathTabHeader.Background = inactiveBg;
-          this.XPathTabHeader.BorderBrush = inactiveBorder;
-        }
-        else
-        {
-          this.XPathPanel.Visibility = Visibility.Visible;
-          this.JsonTreePanel.Visibility = Visibility.Collapsed;
-          this.XPathTabHeader.Background = activeBg;
-          this.XPathTabHeader.BorderBrush = activeBorder;
-          this.JsonTreeTabHeader.Background = inactiveBg;
-          this.JsonTreeTabHeader.BorderBrush = inactiveBorder;
+          case DocumentContentType.Json:
+            this.JsonTreePanel.Visibility = Visibility.Visible;
+            SetActive(this.JsonTreeTabHeader);
+            break;
+          case DocumentContentType.Yaml:
+            this.YamlTreePanel.Visibility = Visibility.Visible;
+            SetActive(this.YamlTreeTabHeader);
+            break;
+          case DocumentContentType.Text:
+            // No utility panel — stay on editor
+            this.EditorPanel.Visibility = Visibility.Visible;
+            SetActive(this.EditorTabHeader);
+            break;
+          default:
+            this.XPathPanel.Visibility = Visibility.Visible;
+            SetActive(this.XPathTabHeader);
+            break;
         }
       }
     }

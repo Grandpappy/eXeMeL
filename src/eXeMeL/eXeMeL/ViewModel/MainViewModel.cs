@@ -2,6 +2,7 @@ using System.Windows.Input;
 using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.JsonUtility;
+using eXeMeL.ViewModel.YamlUtility;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -21,6 +22,7 @@ namespace eXeMeL.ViewModel
     public EditorViewModel Editor { get; private set; }
     public XmlUtilityViewModel XmlUtility { get; private set; }
     public JsonUtilityViewModel JsonUtility { get; private set; }
+    public YamlUtilityViewModel YamlUtility { get; private set; }
     public string Status { get { return this._status; } private set { SetProperty(ref this._status, value); } }
     public string ToolInformation { get { return this._toolInformation; } set { SetProperty(ref this._toolInformation, value); } }
     public SyntaxHighlightingManager HighlightingManager { get { return this._highlightingManager; } private set { SetProperty(ref this._highlightingManager, value); } }
@@ -39,6 +41,7 @@ namespace eXeMeL.ViewModel
       this.Editor = new EditorViewModel(this.Settings);
       this.XmlUtility = new XmlUtilityViewModel(this.Settings);
       this.JsonUtility = new JsonUtilityViewModel(this.Settings);
+      this.YamlUtility = new YamlUtilityViewModel(this.Settings);
       this.ToggleEditorModeCommand = new RelayCommand(ToggleEditorModeCommand_Execute);
       WeakReferenceMessenger.Default.Register<ApplicationClosingMessage>(this, (r, m) => HandleApplicationClosingMessage(m));
       WeakReferenceMessenger.Default.Register<DisplayApplicationStatusMessage>(this, (r, m) => HandleDisplayApplicationStatusMessage(m));
@@ -50,11 +53,19 @@ namespace eXeMeL.ViewModel
 
     private void HandleDocumentRefreshCompletedMessage(DocumentRefreshCompleted message)
     {
-      // Feed the appropriate utility based on content type
-      if (this.Editor.ContentType == DocumentContentType.Json)
-        this.JsonUtility.DocumentText = message.NewDocumentText;
-      else
-        this.XmlUtility.DocumentText = message.NewDocumentText;
+      switch (this.Editor.ContentType)
+      {
+        case DocumentContentType.Json:
+          this.JsonUtility.DocumentText = message.NewDocumentText;
+          break;
+        case DocumentContentType.Yaml:
+          this.YamlUtility.DocumentText = message.NewDocumentText;
+          break;
+        case DocumentContentType.Xml:
+          this.XmlUtility.DocumentText = message.NewDocumentText;
+          break;
+        // Text: no utility to feed
+      }
     }
 
 
@@ -63,10 +74,23 @@ namespace eXeMeL.ViewModel
     {
       if (this.EditorMode == EditorMode.Editor)
       {
-        if (this.Editor.ContentType == DocumentContentType.Json)
-          this.JsonUtility.DocumentText = this.Editor.Document.Text;
-        else
-          this.XmlUtility.DocumentText = this.Editor.Document.Text;
+        // Don't toggle to utility for Text mode — no tree viewer
+        if (this.Editor.ContentType == DocumentContentType.Text)
+          return;
+
+        var text = this.Editor.Document.Text;
+        switch (this.Editor.ContentType)
+        {
+          case DocumentContentType.Json:
+            this.JsonUtility.DocumentText = text;
+            break;
+          case DocumentContentType.Yaml:
+            this.YamlUtility.DocumentText = text;
+            break;
+          default:
+            this.XmlUtility.DocumentText = text;
+            break;
+        }
 
         this.EditorMode = EditorMode.XmlUtility;
       }
