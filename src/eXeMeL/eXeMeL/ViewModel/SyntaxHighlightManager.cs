@@ -142,17 +142,20 @@ namespace eXeMeL.ViewModel
         var tintColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
         var chromeAlpha = (byte)(settings.ChromeOpacity * 255);
         tintColor.A = chromeAlpha;
-        existingDict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(tintColor);
+        var chromeBrush = new System.Windows.Media.SolidColorBrush(tintColor);
+        chromeBrush.Freeze();
+        existingDict["ChromeTintOverlayBrush"] = chromeBrush;
 
         // Editor tint: darker than chrome, controlled by intensity
         var editorAlpha = (byte)(settings.EditorTintIntensity * 255);
         var editorTint = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
-        // Make editor darker by mixing with black
         editorTint.R = (byte)(editorTint.R * 0.4);
         editorTint.G = (byte)(editorTint.G * 0.4);
         editorTint.B = (byte)(editorTint.B * 0.4);
         editorTint.A = editorAlpha;
-        existingDict["EditorTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(editorTint);
+        var editorBrush = new System.Windows.Media.SolidColorBrush(editorTint);
+        editorBrush.Freeze();
+        existingDict["EditorTintOverlayBrush"] = editorBrush;
       }
       catch { /* Invalid color */ }
     }
@@ -181,7 +184,9 @@ namespace eXeMeL.ViewModel
           var chromeAlpha = (byte)(this.Settings.ChromeOpacity * 255);
           var chromeTint = baseColor;
           chromeTint.A = chromeAlpha;
-          dict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(chromeTint);
+          var chromeBrush = new System.Windows.Media.SolidColorBrush(chromeTint);
+          chromeBrush.Freeze();
+          dict["ChromeTintOverlayBrush"] = chromeBrush;
 
           // Editor tint: darker than chrome, controlled by intensity slider
           var editorAlpha = (byte)(this.Settings.EditorTintIntensity * 255);
@@ -190,7 +195,9 @@ namespace eXeMeL.ViewModel
           editorTint.G = (byte)(editorTint.G * 0.4);
           editorTint.B = (byte)(editorTint.B * 0.4);
           editorTint.A = editorAlpha;
-          dict["EditorTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(editorTint);
+          var editorBrush = new System.Windows.Media.SolidColorBrush(editorTint);
+          editorBrush.Freeze();
+          dict["EditorTintOverlayBrush"] = editorBrush;
         }
         catch { /* Invalid color string — skip tint */ }
       }
