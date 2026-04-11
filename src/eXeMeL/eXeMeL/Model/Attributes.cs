@@ -46,6 +46,19 @@ namespace eXeMeL.Model
 
 
 
+  [AttributeUsage(AttributeTargets.Field)]
+  public class AssociatedYamlEmbeddedResourceAttribute : Attribute
+  {
+    public string HighlightResourceName { get; private set; }
+
+    public AssociatedYamlEmbeddedResourceAttribute(string highlightResourceName)
+    {
+      this.HighlightResourceName = highlightResourceName;
+    }
+  }
+
+
+
   public class DoNotDisplayInSettingsAttribute : Attribute
   {
 

@@ -3,6 +3,8 @@ namespace eXeMeL.Model
   public enum DocumentContentType
   {
     Xml,
-    Json
+    Json,
+    Yaml,
+    Text
   }
 }
