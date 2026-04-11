@@ -1,6 +1,7 @@
 using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.XmlCleaners;
+using eXeMeL.ViewModel.JsonCleaners;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -10,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -27,8 +27,10 @@ namespace eXeMeL.ViewModel
     private TextDocument _Document;
     private string _FilePath;
     private string _FileName;
+    private DocumentContentType _contentType = DocumentContentType.Xml;
 
-    private List<XmlCleanerBase> Cleaners;
+    private List<XmlCleanerBase> XmlCleaners;
+    private List<JsonCleanerBase> JsonCleaners;
     public ObservableCollection<DocumentSnapshot> Snapshots { get; set; }
 
 
@@ -42,6 +44,18 @@ namespace eXeMeL.ViewModel
       }
     }
 
+
+    public DocumentContentType ContentType
+    {
+      get => _contentType;
+      set
+      {
+        if (SetProperty(ref _contentType, value))
+        {
+          WeakReferenceMessenger.Default.Send(new ContentTypeChangedMessage(value));
+        }
+      }
+    }
 
 
     public bool IsContentFromFile
@@ -94,18 +108,27 @@ namespace eXeMeL.ViewModel
       this.OpenCommand = new RelayCommand(OpenCommand_Execute);
       this.Snapshots = new ObservableCollection<DocumentSnapshot>();
       this.FindViewModel = new EditorFindViewModel();
-      this.Cleaners = new List<XmlCleanerBase>()
-        {
-          new UrlEncodingCleaner(),
-          new TrimCleaner(),
-          new NewLineCleaner(),
-          new SurroundingGarbageCleaner(),
-          new VisualStudioCleaner(),
-          new VisualStudioVBScriptCleaner(),
-          new AddedRootCleaner(),
-          new FormatCleaner()
-        };
 
+      this.XmlCleaners = new List<XmlCleanerBase>()
+      {
+        new UrlEncodingCleaner(),
+        new TrimCleaner(),
+        new NewLineCleaner(),
+        new SurroundingGarbageCleaner(),
+        new VisualStudioCleaner(),
+        new VisualStudioVBScriptCleaner(),
+        new AddedRootCleaner(),
+        new FormatCleaner()
+      };
+
+      this.JsonCleaners = new List<JsonCleanerBase>()
+      {
+        new JsonUrlEncodingCleaner(),
+        new JsonTrimCleaner(),
+        new JsonEscapeCleaner(),
+        new JsonSurroundingGarbageCleaner(),
+        new JsonFormatCleaner()
+      };
 
       if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
       {
@@ -130,46 +153,74 @@ namespace eXeMeL.ViewModel
 
 
 
-    public async Task<string> CleanXmlIfPossibleAsync(string xml)
+    public async Task<string> CleanContentAsync(string text)
+    {
+      // Detect content type from the raw text
+      ContentType = ContentTypeDetector.Detect(text);
+
+      if (ContentType == DocumentContentType.Json)
+        return await CleanJsonAsync(text);
+      else
+        return await CleanXmlAsync(text);
+    }
+
+
+
+    private async Task<string> CleanXmlAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
         return xml;
 
       var context = new XmlCleanerContext() { XmlToClean = xml };
 
-      await CleanXml(context);
+      await Task.Run(() =>
+      {
+        foreach (var cleaner in this.XmlCleaners)
+        {
+          cleaner.CleanXml(context);
+
+          if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
+          {
+            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
+            return;
+          }
+        }
+
+        if (context.ParsedXml != null)
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("XML parsed correctly"));
+        else
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
+      });
 
       return context.XmlToClean;
     }
 
 
 
-    private async Task CleanXml(XmlCleanerContext context)
+    private async Task<string> CleanJsonAsync(string json)
     {
+      var context = new JsonCleanerContext() { TextToClean = json };
+
       await Task.Run(() =>
+      {
+        foreach (var cleaner in this.JsonCleaners)
         {
-          foreach (var cleaner in this.Cleaners)
-          {
-            cleaner.CleanXml(context);
+          cleaner.Clean(context);
 
-            if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
-            {
-              WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
-              return;
-            }
-          }
-
-          if (context.ParsedXml != null)
+          if (!string.IsNullOrWhiteSpace(context.ErrorMessage))
           {
-            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("XML parsed correctly"));
+            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(context.ErrorMessage));
+            return;
           }
-          else
-          {
-            WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed into XML"));
-          }
-        });
+        }
 
-      return;
+        if (context.IsParsedSuccessfully)
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("JSON parsed correctly"));
+        else
+          WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("Text was not able to be parsed as JSON"));
+      });
+
+      return context.TextToClean;
     }
 
 
@@ -198,10 +249,8 @@ namespace eXeMeL.ViewModel
 
     private async Task SetDocumentTextFromClipboardAsync()
     {
-      // Unselect text, because reloading can cause exceptions if the new text length is shorter than
-      // the range (position and length) of the selected text in the viewer control.
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
-      var text = await CleanXmlIfPossibleAsync(Clipboard.GetText());
+      var text = await CleanContentAsync(Clipboard.GetText());
 
       this.IsContentFromFile = false;
       this.FilePath = null;
@@ -275,7 +324,7 @@ namespace eXeMeL.ViewModel
       var decodedText = await GetDecodedTextAtCaretPositionAsync();
       if (decodedText != null)
       {
-        var cleanedText = await CleanXmlIfPossibleAsync(decodedText);
+        var cleanedText = await CleanContentAsync(decodedText);
         ClearSnapshotsAfterDocument(this.Document);
         AddNewSnapshotWithNewText(cleanedText);
       }
@@ -310,9 +359,13 @@ namespace eXeMeL.ViewModel
 
         var fileContents = await LoadFileContentsAsync(filePath);
 
-        // Unselect text, because reloading can cause exceptions if the new text length is shorter than
-        // the range (position and length) of the selected text in the viewer control.
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+
+        // Detect content type from file extension first, fall back to content detection
+        var ext = Path.GetExtension(filePath)?.ToLowerInvariant();
+        ContentType = ext == ".json"
+          ? DocumentContentType.Json
+          : ContentTypeDetector.Detect(fileContents);
 
         this.IsContentFromFile = true;
         this.FilePath = filePath;
@@ -335,10 +388,7 @@ namespace eXeMeL.ViewModel
     private void RaiseRefreshComplete()
     {
       var handler = RefreshComplete;
-      if (handler != null)
-      {
-        handler(this, EventArgs.Empty);
-      }
+      handler?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -369,10 +419,15 @@ namespace eXeMeL.ViewModel
       }
       else
       {
+        var defaultExt = ContentType == DocumentContentType.Json ? ".json" : ".xml";
+        var filter = ContentType == DocumentContentType.Json
+          ? "JSON files (.json)|*.json|All files (*.*)|*.*"
+          : "XML documents (.xml)|*.xml|All files (*.*)|*.*";
+
         var saveDialog = new SaveFileDialog
         {
-          DefaultExt = ".xml",
-          Filter = "XML documents (.xml)|*.xml"
+          DefaultExt = defaultExt,
+          Filter = filter
         };
 
         if (saveDialog.ShowDialog() == true)
@@ -390,15 +445,13 @@ namespace eXeMeL.ViewModel
 
     private void OpenCommand_Execute()
     {
-      var openDialog = new OpenFileDialog();
-      openDialog.DefaultExt = ".xml"; // Default file extension
-      openDialog.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
+      var openDialog = new OpenFileDialog
+      {
+        DefaultExt = ".xml",
+        Filter = "XML and JSON files|*.xml;*.json|XML documents (.xml)|*.xml|JSON files (.json)|*.json|All files (*.*)|*.*"
+      };
 
-      // Show open file dialog box
-      Nullable<bool> result = openDialog.ShowDialog();
-
-      // Perform file opening
-      if (result == true)
+      if (openDialog.ShowDialog() == true)
       {
         OpenFileAsync(openDialog.FileName);
       }
@@ -422,8 +475,6 @@ namespace eXeMeL.ViewModel
 
     private void AddNewSnapshotWithNewText(string text)
     {
-      // Unselect text, because reloading can cause exceptions if the new text length is shorter than
-      // the range (position and length) of the selected text in the viewer control.
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
       this.Document = new TextDocument() { Text = text };

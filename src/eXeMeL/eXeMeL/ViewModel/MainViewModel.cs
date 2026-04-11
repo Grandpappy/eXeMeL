@@ -1,9 +1,8 @@
 using System.Windows.Input;
 using eXeMeL.Messages;
 using eXeMeL.Model;
+using eXeMeL.ViewModel.JsonUtility;
 using CommunityToolkit.Mvvm.ComponentModel;
-using ICSharpCode.AvalonEdit.Document;
-using System.Xml.Linq;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 
@@ -21,13 +20,13 @@ namespace eXeMeL.ViewModel
     public Settings Settings { get; private set; }
     public EditorViewModel Editor { get; private set; }
     public XmlUtilityViewModel XmlUtility { get; private set; }
+    public JsonUtilityViewModel JsonUtility { get; private set; }
     public string Status { get { return this._status; } private set { SetProperty(ref this._status, value); } }
     public string ToolInformation { get { return this._toolInformation; } set { SetProperty(ref this._toolInformation, value); } }
     public SyntaxHighlightingManager HighlightingManager { get { return this._highlightingManager; } private set { SetProperty(ref this._highlightingManager, value); } }
     public ApplicationThemeManager ApplicationThemeManager { get { return this._applicationThemeManager; } private set { SetProperty(ref this._applicationThemeManager, value); } }
     public ICommand ToggleEditorModeCommand { get; private set; }
     public EditorMode EditorMode { get { return this._editorMode; } private set { SetProperty(ref this._editorMode, value); } }
-    //public XElement ParsedXml { get; set; }
 
 
 
@@ -39,6 +38,7 @@ namespace eXeMeL.ViewModel
       this.ApplicationThemeManager = new ApplicationThemeManager(this.Settings);
       this.Editor = new EditorViewModel(this.Settings);
       this.XmlUtility = new XmlUtilityViewModel(this.Settings);
+      this.JsonUtility = new JsonUtilityViewModel(this.Settings);
       this.ToggleEditorModeCommand = new RelayCommand(ToggleEditorModeCommand_Execute);
       WeakReferenceMessenger.Default.Register<ApplicationClosingMessage>(this, (r, m) => HandleApplicationClosingMessage(m));
       WeakReferenceMessenger.Default.Register<DisplayApplicationStatusMessage>(this, (r, m) => HandleDisplayApplicationStatusMessage(m));
@@ -50,8 +50,11 @@ namespace eXeMeL.ViewModel
 
     private void HandleDocumentRefreshCompletedMessage(DocumentRefreshCompleted message)
     {
-      //this.EditorMode = EditorMode.Editor;
-      this.XmlUtility.DocumentText = message.NewDocumentText;
+      // Feed the appropriate utility based on content type
+      if (this.Editor.ContentType == DocumentContentType.Json)
+        this.JsonUtility.DocumentText = message.NewDocumentText;
+      else
+        this.XmlUtility.DocumentText = message.NewDocumentText;
     }
 
 
@@ -60,7 +63,11 @@ namespace eXeMeL.ViewModel
     {
       if (this.EditorMode == EditorMode.Editor)
       {
-        this.XmlUtility.DocumentText = this.Editor.Document.Text;
+        if (this.Editor.ContentType == DocumentContentType.Json)
+          this.JsonUtility.DocumentText = this.Editor.Document.Text;
+        else
+          this.XmlUtility.DocumentText = this.Editor.Document.Text;
+
         this.EditorMode = EditorMode.XmlUtility;
       }
       else

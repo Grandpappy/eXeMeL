@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -18,8 +17,6 @@ namespace eXeMeL.ViewModel
     protected PropertyObserver<Settings> Observer { get; private set; }
     protected Settings Settings { get; private set; }
 
-
-
     public SettingsWatcherBase(Settings settings)
     {
       this.Settings = settings;
@@ -31,9 +28,8 @@ namespace eXeMeL.ViewModel
 
   public class SyntaxHighlightingManager : SettingsWatcherBase
   {
-
     private IHighlightingDefinition _HighlightingDefinition;
-
+    private DocumentContentType _contentType = DocumentContentType.Xml;
 
 
     public IHighlightingDefinition HighlightingDefinition
@@ -49,6 +45,7 @@ namespace eXeMeL.ViewModel
     {
       this.HighlightingDefinition = GetSyntaxHighlighting();
       this.Observer.RegisterHandler(s => s.SyntaxHighlightingStyle, HandleSettingChange);
+      WeakReferenceMessenger.Default.Register<ContentTypeChangedMessage>(this, (r, m) => HandleContentTypeChanged(m));
     }
 
 
@@ -60,9 +57,19 @@ namespace eXeMeL.ViewModel
 
 
 
+    private void HandleContentTypeChanged(ContentTypeChangedMessage message)
+    {
+      _contentType = message.ContentType;
+      this.HighlightingDefinition = GetSyntaxHighlighting();
+    }
+
+
+
     private IHighlightingDefinition GetSyntaxHighlighting()
     {
-      var resourceName = GetSyntaxHighlightingResource();
+      var resourceName = _contentType == DocumentContentType.Json
+        ? GetJsonSyntaxHighlightingResource()
+        : GetXmlSyntaxHighlightingResource();
 
       using var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
       using var reader = XmlReader.Create(stream);
@@ -71,9 +78,16 @@ namespace eXeMeL.ViewModel
 
 
 
-    private string GetSyntaxHighlightingResource()
+    private string GetXmlSyntaxHighlightingResource()
     {
       return this.Settings.SyntaxHighlightingStyle.GetResourceName();
+    }
+
+
+
+    private string GetJsonSyntaxHighlightingResource()
+    {
+      return this.Settings.SyntaxHighlightingStyle.GetJsonResourceName();
     }
   }
 
@@ -81,7 +95,6 @@ namespace eXeMeL.ViewModel
 
   public class ApplicationThemeManager : SettingsWatcherBase
   {
-
     public ApplicationThemeManager(Settings settings)
       : base(settings)
     {
@@ -101,18 +114,15 @@ namespace eXeMeL.ViewModel
 
     private void SetApplicationThemeBasedOnSettings()
     {
-      // Remove the old theme dictionary (look for one with our marker key)
       var existingTheme = Application.Current.Resources.MergedDictionaries
           .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
       if (existingTheme != null)
         Application.Current.Resources.MergedDictionaries.Remove(existingTheme);
 
-      // Add the new theme dictionary (editor-specific brushes)
-      var dict = new ResourceDictionary() { Source = new Uri(GetApplicationThemeResource(), UriKind.RelativeOrAbsolute) };
-      dict["IsEXeMeLTheme"] = true; // marker
+      var dict = new ResourceDictionary() { Source = new System.Uri(GetApplicationThemeResource(), System.UriKind.RelativeOrAbsolute) };
+      dict["IsEXeMeLTheme"] = true;
       Application.Current.Resources.MergedDictionaries.Add(dict);
 
-      // Sync WPF-UI theme system for Fluent control styling
       var wpfUiTheme = this.Settings.ApplicationTheme switch
       {
         Model.ApplicationTheme.Light => Wpf.Ui.Appearance.ApplicationTheme.Light,

@@ -20,7 +20,9 @@ namespace eXeMeL
   public partial class MainWindow : FluentWindow
   {
     private FoldingManager FoldingManager { get; set; }
-    private XmlFoldingStrategy FoldingStrategy { get; set; }
+    private XmlFoldingStrategy XmlFoldingStrategy { get; set; }
+    private JsonFoldingStrategy JsonFoldingStrategy { get; set; }
+    private DocumentContentType _currentContentType = DocumentContentType.Xml;
     public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
@@ -80,7 +82,8 @@ namespace eXeMeL
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
 
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
-      this.FoldingStrategy = new XmlFoldingStrategy();
+      this.XmlFoldingStrategy = new XmlFoldingStrategy();
+      this.JsonFoldingStrategy = new JsonFoldingStrategy();
 
       this.IgnoreNextTextChange = false;
 
@@ -124,6 +127,7 @@ namespace eXeMeL
       WeakReferenceMessenger.Default.Register<ApplicationThemeUpdatedMessage>(this, (r, m) => HandleApplicationThemeUpdatedMessage(m));
       WeakReferenceMessenger.Default.Register<SetKeyboardFocusToEditor>(this, (r, m) => HandleSetKeyboardFocusToEditorMessage(m));
       WeakReferenceMessenger.Default.Register<EditorModeChangedMessage>(this, (r, m) => HandleEditorModeChangedMessage(m));
+      WeakReferenceMessenger.Default.Register<ContentTypeChangedMessage>(this, (r, m) => HandleContentTypeChanged(m));
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
@@ -188,10 +192,12 @@ namespace eXeMeL
 
     private void UpdateDocumentFoldings()
     {
-      if (this.FoldingManager != null && this.FoldingStrategy != null)
-      {
-        this.FoldingStrategy.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
-      }
+      if (this.FoldingManager == null) return;
+
+      if (_currentContentType == DocumentContentType.Json)
+        this.JsonFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
+      else
+        this.XmlFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
     }
 
 
@@ -421,6 +427,55 @@ namespace eXeMeL
         this.ViewModel.ToggleEditorModeCommand.Execute(null);
     }
 
+    private void JsonTreeTabHeader_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      if (this.ViewModel.EditorMode != EditorMode.XmlUtility)
+        this.ViewModel.ToggleEditorModeCommand.Execute(null);
+    }
+
+    private void ContentTypeLabel_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      // Toggle content type manually — does NOT re-clean, just swaps highlighting/folding/tabs
+      this.ViewModel.Editor.ContentType =
+        this.ViewModel.Editor.ContentType == DocumentContentType.Xml
+          ? DocumentContentType.Json
+          : DocumentContentType.Xml;
+    }
+
+    private void HandleContentTypeChanged(ContentTypeChangedMessage message)
+    {
+      _currentContentType = message.ContentType;
+
+      // Update status bar label
+      if (this.ContentTypeLabel != null)
+        this.ContentTypeLabel.Text = message.ContentType == DocumentContentType.Json ? "JSON" : "XML";
+
+      // Show/hide appropriate tabs
+      if (message.ContentType == DocumentContentType.Json)
+      {
+        this.XPathTabHeader.Visibility = Visibility.Collapsed;
+        this.JsonTreeTabHeader.Visibility = Visibility.Visible;
+        if (this.ViewModel.EditorMode == EditorMode.XmlUtility)
+        {
+          this.XPathPanel.Visibility = Visibility.Collapsed;
+          this.JsonTreePanel.Visibility = Visibility.Visible;
+        }
+      }
+      else
+      {
+        this.XPathTabHeader.Visibility = Visibility.Visible;
+        this.JsonTreeTabHeader.Visibility = Visibility.Collapsed;
+        if (this.ViewModel.EditorMode == EditorMode.XmlUtility)
+        {
+          this.JsonTreePanel.Visibility = Visibility.Collapsed;
+          this.XPathPanel.Visibility = Visibility.Visible;
+        }
+      }
+
+      // Re-fold with the right strategy
+      UpdateDocumentFoldings();
+    }
+
     private void HandleEditorModeChangedMessage(EditorModeChangedMessage message)
     {
       UpdateTabVisuals(message.EditorMode);
@@ -430,27 +485,48 @@ namespace eXeMeL
     {
       if (this.EditorTabHeader == null) return;
 
+      var activeBg = (System.Windows.Media.Brush)FindResource("LayerFillColorDefaultBrush");
+      var activeBorder = (System.Windows.Media.Brush)FindResource("ControlStrokeColorDefaultBrush");
+      var inactiveBg = System.Windows.Media.Brushes.Transparent;
+      var inactiveBorder = System.Windows.Media.Brushes.Transparent;
+
       if (mode == EditorMode.Editor)
       {
         this.EditorPanel.Visibility = Visibility.Visible;
         this.XPathPanel.Visibility = Visibility.Collapsed;
-        // Active tab
-        this.EditorTabHeader.Background = (System.Windows.Media.Brush)FindResource("LayerFillColorDefaultBrush");
-        this.EditorTabHeader.BorderBrush = (System.Windows.Media.Brush)FindResource("ControlStrokeColorDefaultBrush");
-        // Inactive tab
-        this.XPathTabHeader.Background = System.Windows.Media.Brushes.Transparent;
-        this.XPathTabHeader.BorderBrush = System.Windows.Media.Brushes.Transparent;
+        this.JsonTreePanel.Visibility = Visibility.Collapsed;
+
+        this.EditorTabHeader.Background = activeBg;
+        this.EditorTabHeader.BorderBrush = activeBorder;
+        this.XPathTabHeader.Background = inactiveBg;
+        this.XPathTabHeader.BorderBrush = inactiveBorder;
+        this.JsonTreeTabHeader.Background = inactiveBg;
+        this.JsonTreeTabHeader.BorderBrush = inactiveBorder;
       }
       else
       {
         this.EditorPanel.Visibility = Visibility.Collapsed;
-        this.XPathPanel.Visibility = Visibility.Visible;
-        // Active tab
-        this.XPathTabHeader.Background = (System.Windows.Media.Brush)FindResource("LayerFillColorDefaultBrush");
-        this.XPathTabHeader.BorderBrush = (System.Windows.Media.Brush)FindResource("ControlStrokeColorDefaultBrush");
-        // Inactive tab
-        this.EditorTabHeader.Background = System.Windows.Media.Brushes.Transparent;
-        this.EditorTabHeader.BorderBrush = System.Windows.Media.Brushes.Transparent;
+        this.EditorTabHeader.Background = inactiveBg;
+        this.EditorTabHeader.BorderBrush = inactiveBorder;
+
+        if (_currentContentType == DocumentContentType.Json)
+        {
+          this.JsonTreePanel.Visibility = Visibility.Visible;
+          this.XPathPanel.Visibility = Visibility.Collapsed;
+          this.JsonTreeTabHeader.Background = activeBg;
+          this.JsonTreeTabHeader.BorderBrush = activeBorder;
+          this.XPathTabHeader.Background = inactiveBg;
+          this.XPathTabHeader.BorderBrush = inactiveBorder;
+        }
+        else
+        {
+          this.XPathPanel.Visibility = Visibility.Visible;
+          this.JsonTreePanel.Visibility = Visibility.Collapsed;
+          this.XPathTabHeader.Background = activeBg;
+          this.XPathTabHeader.BorderBrush = activeBorder;
+          this.JsonTreeTabHeader.Background = inactiveBg;
+          this.JsonTreeTabHeader.BorderBrush = inactiveBorder;
+        }
       }
     }
 

@@ -1,0 +1,21 @@
+<SyntaxDefinition name="JSON" extensions=".json" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="PropertyKey" foreground="#BA2F2F" />
+  <Color name="StringValue" foreground="Teal" />
+  <Color name="Number" foreground="#DE7800" />
+  <Color name="Keywords" foreground="#BA2F2F" fontWeight="bold" />
+  <Color name="Punctuation" foreground="#555555" />
+
+  <RuleSet>
+    <Rule color="PropertyKey">"[^"\\]*(?:\\.[^"\\]*)*"\s*(?=:)</Rule>
+    <Span color="StringValue">
+      <Begin>"</Begin>
+      <End>"|$</End>
+      <RuleSet>
+        <Rule color="StringValue">\\.</Rule>
+      </RuleSet>
+    </Span>
+    <Rule color="Number">-?\b\d+(\.\d+)?([eE][+-]?\d+)?\b</Rule>
+    <Rule color="Keywords">\b(true|false|null)\b</Rule>
+    <Rule color="Punctuation">[{}\[\]:,]</Rule>
+  </RuleSet>
+</SyntaxDefinition>

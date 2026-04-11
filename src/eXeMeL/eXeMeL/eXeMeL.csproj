@@ -49,6 +49,21 @@
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedDark.xshd">
       <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedDark.xshd</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\JsonBright.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.JsonBright.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\JsonEarthy.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.JsonEarthy.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\JsonDark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.JsonDark.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\JsonVSBlue.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.JsonVSBlue.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\JsonSolarizedDark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.JsonSolarizedDark.xshd</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Assets\ChangeLog.txt">
       <LogicalName>eXeMeL.Assets.ChangeLog.txt</LogicalName>
     </EmbeddedResource>

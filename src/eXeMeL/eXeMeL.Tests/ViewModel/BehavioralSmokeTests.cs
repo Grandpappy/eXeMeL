@@ -93,17 +93,17 @@ namespace eXeMeL.Tests.ViewModel
     }
 
 
-    #region 1. CleanXmlIfPossibleAsync
+    #region 1. CleanContentAsync
 
     [Fact]
-    public void CleanXmlIfPossibleAsync_FormatsRawXml()
+    public void CleanContentAsync_FormatsRawXml()
     {
       var editor = CreateEditorViewModel();
       var rawXml = "<Root><Child Name=\"test\"><Value>42</Value></Child></Root>";
 
       var result = StaHelper.Run(() =>
       {
-        var task = editor.CleanXmlIfPossibleAsync(rawXml);
+        var task = editor.CleanContentAsync(rawXml);
         task.Wait(5000);
         return task.Result;
       });
@@ -119,7 +119,7 @@ namespace eXeMeL.Tests.ViewModel
 
 
     [Fact]
-    public void CleanXmlIfPossibleAsync_HandlesUrlEncodedXml()
+    public void CleanContentAsync_HandlesUrlEncodedXml()
     {
       var editor = CreateEditorViewModel();
       // URL-encoded angle brackets: %3C = <, %3E = >
@@ -127,7 +127,7 @@ namespace eXeMeL.Tests.ViewModel
 
       var result = StaHelper.Run(() =>
       {
-        var task = editor.CleanXmlIfPossibleAsync(urlEncoded);
+        var task = editor.CleanContentAsync(urlEncoded);
         task.Wait(5000);
         return task.Result;
       });
@@ -139,14 +139,14 @@ namespace eXeMeL.Tests.ViewModel
 
 
     [Fact]
-    public void CleanXmlIfPossibleAsync_ReturnsInputWhenNotXml()
+    public void CleanContentAsync_ReturnsInputWhenNotXml()
     {
       var editor = CreateEditorViewModel();
       var plainText = "This is just plain text with no XML at all.";
 
       var result = StaHelper.Run(() =>
       {
-        var task = editor.CleanXmlIfPossibleAsync(plainText);
+        var task = editor.CleanContentAsync(plainText);
         task.Wait(5000);
         return task.Result;
       });

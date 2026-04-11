@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using eXeMeL.Utilities;
-
 
 namespace eXeMeL.Model
 {
@@ -25,6 +19,7 @@ namespace eXeMeL.Model
   {
     [Description("Bright (Light Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Bright.xshd")]
+    [AssociatedJsonEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.JsonBright.xshd")]
     [AssociatedThemeBrush(ApplicationTheme.Light, ThemeBrushTarget.EditorContent, "#FF333333")]
     [AssociatedThemeBrush(ApplicationTheme.Dark, ThemeBrushTarget.EditorContent, "#FFCCCCCC")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Element, "DarkMagenta")]
@@ -37,6 +32,7 @@ namespace eXeMeL.Model
 
     [Description("Earthy (Light Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Earthy.xshd")]
+    [AssociatedJsonEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.JsonEarthy.xshd")]
     [AssociatedThemeBrush(ApplicationTheme.Light, ThemeBrushTarget.EditorContent, "#FF333333")]
     [AssociatedThemeBrush(ApplicationTheme.Dark, ThemeBrushTarget.EditorContent, "#FFCCCCCC")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Element, "#BA2F2F")]
@@ -49,6 +45,7 @@ namespace eXeMeL.Model
 
     [Description("Ethereal (Dark Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.Dark.xshd")]
+    [AssociatedJsonEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.JsonDark.xshd")]
     [AssociatedThemeBrush(ApplicationTheme.Light, ThemeBrushTarget.EditorContent, "#FF333333")]
     [AssociatedThemeBrush(ApplicationTheme.Dark, ThemeBrushTarget.EditorContent, "#FFDDDDDD")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Element, "#73B2C4")]
@@ -61,6 +58,7 @@ namespace eXeMeL.Model
 
     [Description("Blue (Dark Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.VSBlue.xshd")]
+    [AssociatedJsonEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.JsonVSBlue.xshd")]
     [AssociatedThemeBrush(ApplicationTheme.Light, ThemeBrushTarget.EditorContent, "#FF333333")]
     [AssociatedThemeBrush(ApplicationTheme.Dark, ThemeBrushTarget.EditorContent, "#FFD4D4D4")]
     [AssociatedThemeBrush(ApplicationTheme.Any, ThemeBrushTarget.Element, "#FF569CD6")]
@@ -73,6 +71,7 @@ namespace eXeMeL.Model
 
     [Description("Solarized (Dark Theme)")]
     [AssociatedEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedDark.xshd")]
+    [AssociatedJsonEmbeddedResource("eXeMeL.Assets.SyntaxHighlightingSchemes.JsonSolarizedDark.xshd")]
     [AssociatedThemeBrush(ApplicationTheme.Light, ThemeBrushTarget.EditorContent, "#FF333333")]
     [AssociatedThemeBrush(ApplicationTheme.Dark, ThemeBrushTarget.EditorContent, "#FFCCCCCC")]
     [AssociatedThemeBrush(ApplicationTheme.SolarizedDark, ThemeBrushTarget.EditorContent, "#93a1a1")]
@@ -92,6 +91,11 @@ namespace eXeMeL.Model
     public static string GetResourceName(this SyntaxHighlightingStyle style)
     {
       return style.GetAttributeValue<AssociatedEmbeddedResourceAttribute, string>(x => x.HighlightResourceName);
+    }
+
+    public static string GetJsonResourceName(this SyntaxHighlightingStyle style)
+    {
+      return style.GetAttributeValue<AssociatedJsonEmbeddedResourceAttribute, string>(x => x.HighlightResourceName);
     }
   }
 }

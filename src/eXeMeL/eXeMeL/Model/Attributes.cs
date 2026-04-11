@@ -33,6 +33,19 @@ namespace eXeMeL.Model
 
 
 
+  [AttributeUsage(AttributeTargets.Field)]
+  public class AssociatedJsonEmbeddedResourceAttribute : Attribute
+  {
+    public string HighlightResourceName { get; private set; }
+
+    public AssociatedJsonEmbeddedResourceAttribute(string highlightResourceName)
+    {
+      this.HighlightResourceName = highlightResourceName;
+    }
+  }
+
+
+
   public class DoNotDisplayInSettingsAttribute : Attribute
   {
 
