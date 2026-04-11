@@ -104,7 +104,15 @@
       <ui:CardControl.Header>
         <TextBlock Text="Chrome Tint" FontSize="14"/>
       </ui:CardControl.Header>
-      <views:ColorPickerControl SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"/>
+      <StackPanel>
+        <views:ColorPickerControl SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"/>
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+          <TextBlock Text="Editor Tint" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Margin="0,0,8,0"/>
+          <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
+                  Width="140" VerticalAlignment="Center" Focusable="False"
+                  SmallChange="0.05" LargeChange="0.1"/>
+        </StackPanel>
+      </StackPanel>
     </ui:CardControl>
 
     <ui:CardControl Margin="0,0,0,4">

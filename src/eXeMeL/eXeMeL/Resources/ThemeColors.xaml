@@ -18,6 +18,7 @@
 
   <!-- Chrome tint (transparent for non-tinted themes) -->
   <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="Transparent"/>
+  <SolidColorBrush x:Key="EditorTintOverlayBrush" Color="#FFEDEDED"/>
 
   <!-- AvalonEdit editor content foreground -->
   <Color x:Key="Gray1">#FF333333</Color>

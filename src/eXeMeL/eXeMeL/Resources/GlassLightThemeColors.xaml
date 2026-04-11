@@ -15,6 +15,7 @@
 
   <!-- Glass: semi-transparent chrome tint (will be overridden at runtime with user color) -->
   <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="#20000000"/>
+  <SolidColorBrush x:Key="EditorTintOverlayBrush" Color="#10000000"/>
 
   <Color x:Key="Gray1">#FF333333</Color>
   <SolidColorBrush x:Key="EditorTextBrush" Color="{DynamicResource Gray1}"/>

@@ -19,6 +19,7 @@ namespace eXeMeL.Model
     private string _fontFamily;
     private bool _highlightOtherInstancesOfSelection;
     private string _chromeTintColor = "#3366CC";
+    private double _editorTintIntensity = 0.3;
     private string _lastLaunchedVersion;
     private double _windowLeft = double.NaN;
     private double _windowTop = double.NaN;
@@ -95,6 +96,12 @@ namespace eXeMeL.Model
     {
       get => _chromeTintColor;
       set => SetProperty(ref _chromeTintColor, value);
+    }
+
+    public double EditorTintIntensity
+    {
+      get => _editorTintIntensity;
+      set => SetProperty(ref _editorTintIntensity, value);
     }
 
     public double WindowLeft

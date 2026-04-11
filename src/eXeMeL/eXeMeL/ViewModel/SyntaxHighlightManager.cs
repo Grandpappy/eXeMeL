@@ -114,6 +114,7 @@ namespace eXeMeL.ViewModel
     {
       this.Observer.RegisterHandler(x => x.ApplicationTheme, HandleApplicationThemeChange);
       this.Observer.RegisterHandler(x => x.ChromeTintColor, HandleChromeTintColorChange);
+      this.Observer.RegisterHandler(x => x.EditorTintIntensity, HandleChromeTintColorChange);
       SetApplicationThemeBasedOnSettings();
     }
 
@@ -157,6 +158,12 @@ namespace eXeMeL.ViewModel
           var alpha = this.Settings.ApplicationTheme.IsGlassTheme() ? (byte)0x40 : (byte)0xCC;
           tintColor.A = alpha;
           dict["ChromeTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(tintColor);
+
+          // Editor tint: same color but darker, with user-controllable intensity
+          var editorAlpha = (byte)(this.Settings.EditorTintIntensity * 255);
+          var editorTint = tintColor;
+          editorTint.A = editorAlpha;
+          dict["EditorTintOverlayBrush"] = new System.Windows.Media.SolidColorBrush(editorTint);
         }
         catch { /* Invalid color string — skip tint */ }
       }

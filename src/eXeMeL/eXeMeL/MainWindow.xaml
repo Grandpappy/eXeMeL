@@ -134,14 +134,14 @@
     </Style>
   </Window.Resources>
 
-  <Grid>
+  <Grid Background="{DynamicResource ChromeTintOverlayBrush}">
     <Grid.RowDefinitions>
       <RowDefinition Height="46"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
     <!-- Custom Title Bar (full-width Grid for true centering) -->
-    <Grid Grid.Row="0" Background="{DynamicResource ChromeTintOverlayBrush}">
+    <Grid Grid.Row="0">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
@@ -222,7 +222,7 @@
       </Grid.RowDefinitions>
 
       <!-- Tab header row + Snapshots -->
-      <Grid Grid.Row="0" Margin="8,4,8,0" Background="{DynamicResource ChromeTintOverlayBrush}">
+      <Grid Grid.Row="0" Margin="8,4,8,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto"/>
           <ColumnDefinition Width="*"/>
@@ -232,7 +232,7 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal">
           <Border x:Name="EditorTabHeader" MouseLeftButtonDown="EditorTabHeader_Click"
                   Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0"
-                  Background="{DynamicResource LayerFillColorDefaultBrush}"
+                  Background="{DynamicResource EditorTintOverlayBrush}"
                   BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                   BorderThickness="1,1,1,0">
             <StackPanel Orientation="Horizontal">
@@ -318,7 +318,7 @@
 
         <!-- Editor content (visible by default) -->
         <Border x:Name="EditorPanel" Grid.Column="0" Margin="8,0,8,8"
-                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                Background="{DynamicResource EditorTintOverlayBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 BorderThickness="1,0,1,1"
                 CornerRadius="0,6,6,6"
@@ -361,7 +361,7 @@
 
         <!-- XPath content (hidden by default) -->
         <Border x:Name="XPathPanel" Grid.Column="0" Margin="8,0,8,8"
-                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                Background="{DynamicResource EditorTintOverlayBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 BorderThickness="1,0,1,1"
                 CornerRadius="6,0,6,6"
@@ -374,7 +374,7 @@
 
         <!-- JSON Tree content (hidden by default) -->
         <Border x:Name="JsonTreePanel" Grid.Column="0" Margin="8,0,8,8"
-                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                Background="{DynamicResource EditorTintOverlayBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 BorderThickness="1,0,1,1"
                 CornerRadius="6,0,6,6"
@@ -387,7 +387,7 @@
 
         <!-- YAML Tree content (hidden by default) -->
         <Border x:Name="YamlTreePanel" Grid.Column="0" Margin="8,0,8,8"
-                Background="{DynamicResource LayerFillColorDefaultBrush}"
+                Background="{DynamicResource EditorTintOverlayBrush}"
                 BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                 BorderThickness="1,0,1,1"
                 CornerRadius="6,0,6,6"
@@ -434,8 +434,7 @@
 
       <!-- Footer / Status Bar with gold accent -->
       <Border Grid.Row="2" Padding="12,6"
-              BorderThickness="0,1,0,0" BorderBrush="#D4AA00"
-              Background="{DynamicResource ChromeTintOverlayBrush}">
+              BorderThickness="0,1,0,0" BorderBrush="#D4AA00">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>

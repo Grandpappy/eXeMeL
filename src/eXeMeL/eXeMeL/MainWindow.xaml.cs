@@ -655,7 +655,7 @@ namespace eXeMeL
     {
       if (this.EditorTabHeader == null) return;
 
-      var activeBg = (System.Windows.Media.Brush)FindResource("LayerFillColorDefaultBrush");
+      var activeBg = (System.Windows.Media.Brush)FindResource("EditorTintOverlayBrush");
       var activeBorder = (System.Windows.Media.Brush)FindResource("ControlStrokeColorDefaultBrush");
       var inactiveBg = System.Windows.Media.Brushes.Transparent;
       var inactiveBorder = System.Windows.Media.Brushes.Transparent;
@@ -710,7 +710,16 @@ namespace eXeMeL
 
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
-      // Theme updated — WPF-UI and eXeMeL resource dictionaries are both swapped by ApplicationThemeManager
+      // Set backdrop type based on theme
+      var theme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
+      if (theme.IsGlassTheme())
+      {
+        this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Acrylic;
+      }
+      else
+      {
+        this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Mica;
+      }
     }
 
     private void HandleSetKeyboardFocusToEditorMessage(SetKeyboardFocusToEditor obj)
