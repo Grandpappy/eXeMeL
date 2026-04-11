@@ -26,7 +26,7 @@
         </Style>
       </StackPanel.Style>
 
-      <TextBlock Text="Snapshots:" FontSize="11" Opacity="0.6"
+      <TextBlock Text="Snapshots:" FontSize="12" Opacity="0.6"
                  VerticalAlignment="Center" Margin="0,0,6,0"/>
 
       <ItemsControl ItemsSource="{Binding Snapshots}" VerticalAlignment="Center">
@@ -43,7 +43,7 @@
               Content="{Binding Identifier}"
               MinWidth="24" Height="22"
               Padding="6,1" Margin="0,0,3,0"
-              FontSize="11"
+              FontSize="12"
               Focusable="False">
               <Button.ToolTip>
                 <TextBlock Text="Go to this snapshot"/>
@@ -73,7 +73,7 @@
           </ControlTemplate.Triggers>
         </ControlTemplate>
       </Button.Template>
-      <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="16"/>
+      <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="18"/>
     </Button>
   </StackPanel>
 </UserControl>

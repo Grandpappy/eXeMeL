@@ -156,26 +156,26 @@
         <Image Source="Assets\eXeMeL Icon.ico" Width="16" Height="16" Margin="0,0,10,0"
                RenderOptions.BitmapScalingMode="HighQuality"
                WindowChrome.IsHitTestVisibleInChrome="False"/>
-        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="0,0,16,0">
+        <TextBlock VerticalAlignment="Center" FontSize="13" Margin="0,0,16,0">
           <Run Text="eXeMeL" FontWeight="SemiBold"/>
           <Run Text=" 2" FontWeight="SemiBold" Foreground="#D4AA00"/>
         </TextBlock>
 
         <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Refresh from clipboard (F5)"
                 Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="16"/>
+          <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="18"/>
         </Button>
         <Button Command="{Binding Editor.CopyCommand}" ToolTip="Copy all to clipboard"
                 Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="Copy24" FontSize="16"/>
+          <ui:SymbolIcon Symbol="Copy24" FontSize="18"/>
         </Button>
         <Button Command="{Binding Editor.OpenCommand}" ToolTip="Open file (Ctrl+O)"
                 Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="FolderOpen24" FontSize="16"/>
+          <ui:SymbolIcon Symbol="FolderOpen24" FontSize="18"/>
         </Button>
         <Button Command="{Binding Editor.SaveCommand}" ToolTip="Save (Ctrl+S)"
                 Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="Save24" FontSize="16"/>
+          <ui:SymbolIcon Symbol="Save24" FontSize="18"/>
         </Button>
 
       </StackPanel>
@@ -192,22 +192,22 @@
       <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
         <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
                 Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="Settings24" FontSize="16"/>
+          <ui:SymbolIcon Symbol="Settings24" FontSize="18"/>
         </Button>
       </StackPanel>
 
       <!-- Window chrome buttons (min/max/close) — vertically stretched to match row height -->
       <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Stretch">
         <Button Style="{StaticResource ChromeButton}" Click="MinimizeButton_Click">
-          <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+          <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="11"
                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
         </Button>
         <Button Style="{StaticResource ChromeButton}" Click="MaximizeRestoreButton_Click">
-          <TextBlock x:Name="MaximizeRestoreGlyph" Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+          <TextBlock x:Name="MaximizeRestoreGlyph" Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="11"
                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
         </Button>
         <Button Style="{StaticResource ChromeCloseButton}" Click="CloseButton_Click">
-          <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="10"
+          <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="11"
                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
         </Button>
       </StackPanel>
@@ -236,7 +236,7 @@
                   BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
                   BorderThickness="1,1,1,0">
             <StackPanel Orientation="Horizontal">
-              <ui:SymbolIcon Symbol="Document24" FontSize="14" Margin="0,0,6,0">
+              <ui:SymbolIcon Symbol="Document24" FontSize="16" Margin="0,0,6,0">
                 <ui:SymbolIcon.Style>
                   <Style TargetType="ui:SymbolIcon">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -248,7 +248,7 @@
                   </Style>
                 </ui:SymbolIcon.Style>
               </ui:SymbolIcon>
-              <ui:SymbolIcon Symbol="Clipboard24" FontSize="14" Margin="0,0,6,0">
+              <ui:SymbolIcon Symbol="Clipboard24" FontSize="16" Margin="0,0,6,0">
                 <ui:SymbolIcon.Style>
                   <Style TargetType="ui:SymbolIcon">
                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -260,7 +260,7 @@
                   </Style>
                 </ui:SymbolIcon.Style>
               </ui:SymbolIcon>
-              <TextBlock x:Name="EditorTabLabel" Text="Clipboard Content" VerticalAlignment="Center" FontSize="12"/>
+              <TextBlock x:Name="EditorTabLabel" Text="Clipboard Content" VerticalAlignment="Center" FontSize="13"/>
             </StackPanel>
           </Border>
 
@@ -270,8 +270,8 @@
                   BorderBrush="Transparent"
                   BorderThickness="1,1,1,0">
             <StackPanel Orientation="Horizontal">
-              <ui:SymbolIcon Symbol="BranchFork24" FontSize="14" Margin="0,0,6,0" Opacity="0.6"/>
-              <TextBlock Text="XPath Tool" VerticalAlignment="Center" FontSize="12" Opacity="0.6"/>
+              <ui:SymbolIcon Symbol="BranchFork24" FontSize="16" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="XPath Tool" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
             </StackPanel>
           </Border>
         </StackPanel>
@@ -392,9 +392,9 @@
           </Grid.ColumnDefinitions>
           <TextBlock Grid.Column="0" Text="{Binding Status}"
                      TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"
-                     FontSize="12" Opacity="0.7" VerticalAlignment="Center"/>
+                     FontSize="13" Opacity="0.7" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="1" Text="{Binding ToolInformation}"
-                     TextTrimming="CharacterEllipsis" FontSize="12" Opacity="0.7"
+                     TextTrimming="CharacterEllipsis" FontSize="13" Opacity="0.7"
                      HorizontalAlignment="Right" VerticalAlignment="Center"/>
         </Grid>
       </Border>
