@@ -86,7 +86,9 @@ namespace eXeMeL.Model
 
     public AssociatedThemeBrushAttribute(ApplicationTheme associatedTheme, ThemeBrushTarget target, string associatedBrush)
     {
-      this.AssociatedBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(associatedBrush);
+      var brush = (SolidColorBrush)new BrushConverter().ConvertFromString(associatedBrush);
+      brush.Freeze();
+      this.AssociatedBrush = brush;
       this.AssociatedTheme = associatedTheme;
       this.Target = target;
     }

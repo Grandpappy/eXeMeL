@@ -221,7 +221,12 @@ namespace eXeMeL.Model
          .FirstOrDefault(x => (x.AssociatedTheme == ApplicationTheme || x.AssociatedTheme == ApplicationTheme.Any)
                               && x.Target == target);
 
-      return attribute?.AssociatedBrush ?? new SolidColorBrush(Colors.Red);
+      if (attribute?.AssociatedBrush != null)
+        return attribute.AssociatedBrush;
+
+      var fallback = new SolidColorBrush(Colors.Red);
+      fallback.Freeze();
+      return fallback;
     }
   }
 }
