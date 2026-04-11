@@ -134,11 +134,14 @@
     </Style>
   </Window.Resources>
 
-  <Grid Background="{DynamicResource ChromeTintOverlayBrush}">
+  <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="46"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
+
+    <!-- Chrome tint overlay — covers entire window but doesn't intercept hits -->
+    <Border Grid.RowSpan="2" Background="{DynamicResource ChromeTintOverlayBrush}" IsHitTestVisible="False"/>
 
     <!-- Custom Title Bar (full-width Grid for true centering) -->
     <Grid Grid.Row="0">

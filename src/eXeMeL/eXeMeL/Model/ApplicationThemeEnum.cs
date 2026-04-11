@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Windows.Media;
 using eXeMeL.Utilities;
 
 namespace eXeMeL.Model
@@ -17,21 +18,13 @@ namespace eXeMeL.Model
     [AssociatedResourceDictionary(@"pack://application:,,,/Resources/SolarizedDarkThemeColors.xaml")]
     SolarizedDark,
 
-    [Description("Glass Light")]
-    [AssociatedResourceDictionary(@"pack://application:,,,/Resources/GlassLightThemeColors.xaml")]
-    GlassLight,
-
-    [Description("Glass Dark")]
+    [Description("Glass")]
     [AssociatedResourceDictionary(@"pack://application:,,,/Resources/GlassDarkThemeColors.xaml")]
-    GlassDark,
+    Glass,
 
-    [Description("Tinted Light")]
-    [AssociatedResourceDictionary(@"pack://application:,,,/Resources/TintedLightThemeColors.xaml")]
-    TintedLight,
-
-    [Description("Tinted Dark")]
+    [Description("Tinted")]
     [AssociatedResourceDictionary(@"pack://application:,,,/Resources/TintedDarkThemeColors.xaml")]
-    TintedDark,
+    Tinted,
 
     [DoNotDisplayInSettings]
     Any
@@ -48,17 +41,34 @@ namespace eXeMeL.Model
 
     public static bool IsGlassTheme(this ApplicationTheme theme)
     {
-      return theme == ApplicationTheme.GlassLight || theme == ApplicationTheme.GlassDark;
+      return theme == ApplicationTheme.Glass;
     }
 
     public static bool IsTintedTheme(this ApplicationTheme theme)
     {
-      return theme == ApplicationTheme.TintedLight || theme == ApplicationTheme.TintedDark;
+      return theme == ApplicationTheme.Tinted;
     }
 
     public static bool SupportsTint(this ApplicationTheme theme)
     {
-      return theme.IsGlassTheme() || theme.IsTintedTheme();
+      return theme == ApplicationTheme.Glass || theme == ApplicationTheme.Tinted;
+    }
+
+    /// <summary>
+    /// Determines whether to use WPF-UI Light or Dark theme based on the tint color luminance.
+    /// </summary>
+    public static bool IsLightColor(string hexColor)
+    {
+      try
+      {
+        var color = (Color)ColorConverter.ConvertFromString(hexColor);
+        var luminance = (0.299 * color.R + 0.587 * color.G + 0.114 * color.B) / 255;
+        return luminance > 0.5;
+      }
+      catch
+      {
+        return false;
+      }
     }
   }
 }

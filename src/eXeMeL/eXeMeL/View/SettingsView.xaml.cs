@@ -26,6 +26,31 @@ namespace eXeMeL.View
     public SettingsView()
     {
       InitializeComponent();
+      this.AddHandler(System.Windows.UIElement.PreviewMouseWheelEvent, new System.Windows.Input.MouseWheelEventHandler(ComboBox_PreviewMouseWheel), true);
+    }
+
+    private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    {
+      // Prevent scroll wheel from changing ComboBox value unless it's open
+      if (e.OriginalSource is System.Windows.DependencyObject source)
+      {
+        var combo = FindParent<System.Windows.Controls.ComboBox>(source);
+        if (combo != null && !combo.IsDropDownOpen)
+        {
+          e.Handled = true;
+        }
+      }
+    }
+
+    private static T FindParent<T>(System.Windows.DependencyObject child) where T : System.Windows.DependencyObject
+    {
+      var parent = System.Windows.Media.VisualTreeHelper.GetParent(child);
+      while (parent != null)
+      {
+        if (parent is T found) return found;
+        parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+      }
+      return null;
     }
 
 

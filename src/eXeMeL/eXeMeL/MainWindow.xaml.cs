@@ -73,6 +73,9 @@ namespace eXeMeL
             UseAeroCaptionButtons = false
           });
         }
+
+        // Apply glass backdrop on startup if theme requires it
+        ApplyBackdropForCurrentTheme();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -710,7 +713,11 @@ namespace eXeMeL
 
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
-      // Set backdrop type based on theme
+      ApplyBackdropForCurrentTheme();
+    }
+
+    private void ApplyBackdropForCurrentTheme()
+    {
       var theme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
       if (theme.IsGlassTheme())
       {

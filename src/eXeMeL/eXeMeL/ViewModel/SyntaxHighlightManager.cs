@@ -127,7 +127,7 @@ namespace eXeMeL.ViewModel
       WeakReferenceMessenger.Default.Send(new ApplicationThemeUpdatedMessage());
     }
 
-    private void HandleChromeTintColorChange(Settings settings)
+    private static void HandleChromeTintColorChange(Settings settings)
     {
       if (!settings.ApplicationTheme.SupportsTint())
         return;
@@ -195,15 +195,22 @@ namespace eXeMeL.ViewModel
         catch { /* Invalid color string — skip tint */ }
       }
 
-      var wpfUiTheme = this.Settings.ApplicationTheme switch
+      Wpf.Ui.Appearance.ApplicationTheme wpfUiTheme;
+      if (this.Settings.ApplicationTheme.SupportsTint())
       {
-        Model.ApplicationTheme.Light or Model.ApplicationTheme.GlassLight or Model.ApplicationTheme.TintedLight
-          => Wpf.Ui.Appearance.ApplicationTheme.Light,
-        Model.ApplicationTheme.Dark or Model.ApplicationTheme.GlassDark or Model.ApplicationTheme.TintedDark
-          or Model.ApplicationTheme.SolarizedDark
-          => Wpf.Ui.Appearance.ApplicationTheme.Dark,
-        _ => Wpf.Ui.Appearance.ApplicationTheme.Light
-      };
+        // For Glass/Tinted: determine light/dark from the tint color luminance
+        wpfUiTheme = ApplicationThemeExtensions.IsLightColor(this.Settings.ChromeTintColor)
+          ? Wpf.Ui.Appearance.ApplicationTheme.Light
+          : Wpf.Ui.Appearance.ApplicationTheme.Dark;
+      }
+      else
+      {
+        wpfUiTheme = this.Settings.ApplicationTheme switch
+        {
+          Model.ApplicationTheme.Light => Wpf.Ui.Appearance.ApplicationTheme.Light,
+          _ => Wpf.Ui.Appearance.ApplicationTheme.Dark
+        };
+      }
       Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfUiTheme);
     }
 

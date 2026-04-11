@@ -86,16 +86,10 @@
         <Style TargetType="ui:CardControl">
           <Setter Property="Visibility" Value="Collapsed"/>
           <Style.Triggers>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="GlassLight">
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
               <Setter Property="Visibility" Value="Visible"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="GlassDark">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="TintedLight">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="TintedDark">
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Tinted">
               <Setter Property="Visibility" Value="Visible"/>
             </DataTrigger>
           </Style.Triggers>
