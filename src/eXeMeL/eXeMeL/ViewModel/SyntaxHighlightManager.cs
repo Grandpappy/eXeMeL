@@ -132,8 +132,14 @@ namespace eXeMeL.ViewModel
       if (!settings.ApplicationTheme.SupportsTint())
         return;
 
+      if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+      {
+        Application.Current.Dispatcher.Invoke(() => HandleChromeTintColorChange(settings));
+        return;
+      }
+
       // Update tint brushes in-place without reloading the entire theme dictionary
-      var existingDict = Application.Current.Resources.MergedDictionaries
+      var existingDict = Application.Current?.Resources.MergedDictionaries
           .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
       if (existingDict == null) return;
 
@@ -164,6 +170,15 @@ namespace eXeMeL.ViewModel
 
     private void SetApplicationThemeBasedOnSettings()
     {
+      // Ensure we're on the UI thread for ResourceDictionary operations
+      if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+      {
+        Application.Current.Dispatcher.Invoke(SetApplicationThemeBasedOnSettings);
+        return;
+      }
+
+      if (Application.Current == null) return;
+
       var existingTheme = Application.Current.Resources.MergedDictionaries
           .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
       if (existingTheme != null)
