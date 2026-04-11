@@ -244,6 +244,111 @@ namespace eXeMeL
       {
         this.EditorTabLabel.Text = "Clipboard Content";
       }
+
+      UpdateWindowTitle();
+    }
+
+    private void UpdateWindowTitle()
+    {
+      if (this.ViewModel?.Editor == null) return;
+
+      var editor = this.ViewModel.Editor;
+      var typeName = _currentContentType == DocumentContentType.Json ? "JSON" : "XML";
+      var appName = _currentContentType == DocumentContentType.Json ? "JaSON 2" : "eXeMeL 2";
+
+      if (editor.IsContentFromFile && !string.IsNullOrEmpty(editor.FilePath))
+      {
+        this.Title = $"{System.IO.Path.GetFileName(editor.FilePath)} — {appName}";
+      }
+      else
+      {
+        var preview = GetContentPreview(editor.Document?.Text, _currentContentType);
+        if (!string.IsNullOrEmpty(preview))
+          this.Title = $"{typeName} — {preview} — {appName}";
+        else
+          this.Title = appName;
+      }
+    }
+
+    private static string GetContentPreview(string text, DocumentContentType contentType)
+    {
+      if (string.IsNullOrWhiteSpace(text))
+        return null;
+
+      try
+      {
+        if (contentType == DocumentContentType.Xml)
+        {
+          return GetXmlPreview(text);
+        }
+        else
+        {
+          return GetJsonPreview(text);
+        }
+      }
+      catch
+      {
+        return null;
+      }
+    }
+
+    private static string GetXmlPreview(string xml)
+    {
+      try
+      {
+        var doc = System.Xml.Linq.XElement.Parse(xml);
+        // Skip AddedRoot wrapper if present
+        var root = doc.Name.LocalName == "AddedRoot" && doc.Elements().Any()
+          ? doc.Elements().First()
+          : doc;
+        return $"<{root.Name.LocalName}>";
+      }
+      catch
+      {
+        // Try to find the first element name with regex as fallback
+        var match = System.Text.RegularExpressions.Regex.Match(xml, @"<(\w+)[\s>/]");
+        if (match.Success)
+        {
+          var name = match.Groups[1].Value;
+          return name == "AddedRoot" ? null : $"<{name}>";
+        }
+        return null;
+      }
+    }
+
+    private static string GetJsonPreview(string json)
+    {
+      try
+      {
+        using var doc = System.Text.Json.JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        if (root.ValueKind == System.Text.Json.JsonValueKind.Object)
+        {
+          // Find the first string property to use as a preview
+          foreach (var prop in root.EnumerateObject())
+          {
+            if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.String)
+            {
+              var val = prop.Value.GetString();
+              if (val.Length > 40) val = val[..40] + "...";
+              return $"{prop.Name}: {val}";
+            }
+            // If first property is an object/array, show the key name
+            if (prop.Value.ValueKind == System.Text.Json.JsonValueKind.Object ||
+                prop.Value.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+              return $"{{{prop.Name}}}";
+            }
+          }
+        }
+        else if (root.ValueKind == System.Text.Json.JsonValueKind.Array)
+        {
+          return $"[{root.GetArrayLength()} items]";
+        }
+      }
+      catch { }
+      return null;
     }
 
     private void Editor_RefreshComplete(object sender, EventArgs e)
@@ -449,6 +554,13 @@ namespace eXeMeL
       // Update status bar label
       if (this.ContentTypeLabel != null)
         this.ContentTypeLabel.Text = message.ContentType == DocumentContentType.Json ? "JSON" : "XML";
+
+      // Update app title in title bar
+      if (this.AppTitleRun != null)
+        this.AppTitleRun.Text = message.ContentType == DocumentContentType.Json ? "JaSON" : "eXeMeL";
+
+      // Update window/taskbar title
+      UpdateWindowTitle();
 
       // Show/hide appropriate tabs
       if (message.ContentType == DocumentContentType.Json)

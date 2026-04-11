@@ -157,8 +157,8 @@
                RenderOptions.BitmapScalingMode="HighQuality"
                WindowChrome.IsHitTestVisibleInChrome="False"/>
         <TextBlock VerticalAlignment="Center" FontSize="13" Margin="0,0,16,0">
-          <Run Text="eXeMeL" FontWeight="SemiBold"/>
-          <Run Text=" 2" FontWeight="SemiBold" Foreground="#D4AA00"/>
+          <Run x:Name="AppTitleRun" Text="eXeMeL" FontWeight="SemiBold"/>
+          <Run x:Name="AppTitleSuffix" Text=" 2" FontWeight="SemiBold" Foreground="#D4AA00"/>
         </TextBlock>
 
         <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Refresh from clipboard (F5)"
