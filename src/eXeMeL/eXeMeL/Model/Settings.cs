@@ -217,8 +217,15 @@ namespace eXeMeL.Model
 
     private Brush GetBrushForCurrentTheme(ThemeBrushTarget target)
     {
+      // Map Glass/Tinted to Dark for brush lookup (they use dark-based color schemes)
+      var effectiveTheme = ApplicationTheme switch
+      {
+        ApplicationTheme.Glass or ApplicationTheme.Tinted => ApplicationTheme.Dark,
+        _ => ApplicationTheme
+      };
+
       var attribute = SyntaxHighlightingStyle.GetAttributes<AssociatedThemeBrushAttribute>()
-         .FirstOrDefault(x => (x.AssociatedTheme == ApplicationTheme || x.AssociatedTheme == ApplicationTheme.Any)
+         .FirstOrDefault(x => (x.AssociatedTheme == effectiveTheme || x.AssociatedTheme == ApplicationTheme.Any)
                               && x.Target == target);
 
       if (attribute?.AssociatedBrush != null)

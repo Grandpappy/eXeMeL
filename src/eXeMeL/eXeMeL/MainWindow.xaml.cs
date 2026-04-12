@@ -52,30 +52,18 @@ namespace eXeMeL
       this.FoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, true));
       this.UnFoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, false));
 
-      // Set backdrop BEFORE InitializeComponent so FluentWindow configures chrome correctly
-      ApplyBackdropForCurrentTheme();
+      // Set backdrop type BEFORE InitializeComponent — read settings directly
+      // since ViewModel/DataContext isn't bound yet
+      var savedSettings = SettingsIO.LoadSettings<Settings>();
+      if (savedSettings.ApplicationTheme.IsGlassTheme())
+        this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Acrylic;
 
       InitializeComponent();
 
       // Override FluentWindow's WindowChrome so our custom title bar supports drag/double-click
       this.Loaded += (s, e) =>
       {
-        var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(this);
-        if (chrome != null)
-        {
-          chrome.CaptionHeight = 46;
-          chrome.UseAeroCaptionButtons = false;
-        }
-        else
-        {
-          System.Windows.Shell.WindowChrome.SetWindowChrome(this, new System.Windows.Shell.WindowChrome
-          {
-            CaptionHeight = 46,
-            ResizeBorderThickness = new Thickness(5),
-            GlassFrameThickness = new Thickness(0),
-            UseAeroCaptionButtons = false
-          });
-        }
+        ApplyWindowChrome();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -732,10 +720,33 @@ namespace eXeMeL
         {
           this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Mica;
         }
+
+        // Re-apply our chrome after FluentWindow reconfigures it
+        ApplyWindowChrome();
       }
       catch
       {
         // FluentWindow may throw during chrome reconfiguration — safe to ignore
+      }
+    }
+
+    private void ApplyWindowChrome()
+    {
+      var chrome = System.Windows.Shell.WindowChrome.GetWindowChrome(this);
+      if (chrome != null)
+      {
+        chrome.CaptionHeight = 46;
+        chrome.UseAeroCaptionButtons = false;
+      }
+      else
+      {
+        System.Windows.Shell.WindowChrome.SetWindowChrome(this, new System.Windows.Shell.WindowChrome
+        {
+          CaptionHeight = 46,
+          ResizeBorderThickness = new Thickness(5),
+          GlassFrameThickness = new Thickness(0),
+          UseAeroCaptionButtons = false
+        });
       }
     }
 
