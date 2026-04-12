@@ -52,18 +52,12 @@ namespace eXeMeL
       this.FoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, true));
       this.UnFoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, false));
 
-      // Set backdrop type BEFORE InitializeComponent — read settings directly
-      // since ViewModel/DataContext isn't bound yet
-      var savedSettings = SettingsIO.LoadSettings<Settings>();
-      if (savedSettings.ApplicationTheme.IsGlassTheme())
-        this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Acrylic;
-
       InitializeComponent();
 
-      // Override FluentWindow's WindowChrome so our custom title bar supports drag/double-click
+      // Apply backdrop and chrome after window is loaded and has a handle
       this.Loaded += (s, e) =>
       {
-        ApplyWindowChrome();
+        ApplyBackdropForCurrentTheme();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
