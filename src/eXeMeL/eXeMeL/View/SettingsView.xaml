@@ -52,6 +52,26 @@
     <ui:CardControl Margin="0,0,0,4">
       <ui:CardControl.Header>
         <StackPanel>
+          <TextBlock Text="Current Line Highlight" FontSize="14"/>
+          <TextBlock Text="Highlight the line the cursor is on" FontSize="12" Opacity="0.5"/>
+        </StackPanel>
+      </ui:CardControl.Header>
+      <ui:ToggleSwitch IsChecked="{Binding HighlightCurrentLine}"/>
+    </ui:CardControl>
+
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <StackPanel>
+          <TextBlock Text="Built-in Search" FontSize="14"/>
+          <TextBlock Text="Use AvalonEdit's search panel (Ctrl+F)" FontSize="12" Opacity="0.5"/>
+        </StackPanel>
+      </ui:CardControl.Header>
+      <ui:ToggleSwitch IsChecked="{Binding UseBuiltInSearch}"/>
+    </ui:CardControl>
+
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <StackPanel>
           <TextBlock Text="Font Size" FontSize="14"/>
         </StackPanel>
       </ui:CardControl.Header>

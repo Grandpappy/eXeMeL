@@ -23,6 +23,8 @@ namespace eXeMeL.Model
     private string _accentColor = "#D4AA00";
     private double _editorTintIntensity = 0.3;
     private double _chromeOpacity = 0.5;
+    private bool _highlightCurrentLine = true;
+    private bool _useBuiltInSearch;
     private string _lastLaunchedVersion;
     private double _windowLeft = double.NaN;
     private double _windowTop = double.NaN;
@@ -125,6 +127,18 @@ namespace eXeMeL.Model
       set => SetProperty(ref _chromeOpacity, value);
     }
 
+    public bool HighlightCurrentLine
+    {
+      get => _highlightCurrentLine;
+      set => SetProperty(ref _highlightCurrentLine, value);
+    }
+
+    public bool UseBuiltInSearch
+    {
+      get => _useBuiltInSearch;
+      set => SetProperty(ref _useBuiltInSearch, value);
+    }
+
     public double WindowLeft
     {
       get => _windowLeft;
@@ -225,6 +239,8 @@ namespace eXeMeL.Model
       AccentColor = "#D4AA00";
       EditorTintIntensity = 0.3;
       ChromeOpacity = 0.5;
+      HighlightCurrentLine = true;
+      UseBuiltInSearch = false;
     }
 
 

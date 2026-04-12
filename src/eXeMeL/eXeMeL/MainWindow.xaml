@@ -57,7 +57,7 @@
     <Style x:Key="TitleBarIconButton" TargetType="Button">
       <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
       <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+      <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
       <Setter Property="BorderThickness" Value="0"/>
       <Setter Property="Padding" Value="8,0"/>
       <Setter Property="Cursor" Value="Hand"/>
@@ -203,15 +203,15 @@
       <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Stretch">
         <Button Style="{StaticResource ChromeButton}" Click="MinimizeButton_Click">
           <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="11"
-                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                     Foreground="{DynamicResource AppTextBrush}"/>
         </Button>
         <Button Style="{StaticResource ChromeButton}" Click="MaximizeRestoreButton_Click">
           <TextBlock x:Name="MaximizeRestoreGlyph" Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="11"
-                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                     Foreground="{DynamicResource AppTextBrush}"/>
         </Button>
         <Button Style="{StaticResource ChromeCloseButton}" Click="CloseButton_Click">
           <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="11"
-                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                     Foreground="{DynamicResource AppTextBrush}"/>
         </Button>
       </StackPanel>
     </Grid>

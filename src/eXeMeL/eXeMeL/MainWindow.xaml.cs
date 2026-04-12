@@ -14,6 +14,7 @@ using eXeMeL.Model;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Wpf.Ui.Controls;
+using ICSharpCode.AvalonEdit.Search;
 
 namespace eXeMeL
 {
@@ -24,6 +25,7 @@ namespace eXeMeL
     private JsonFoldingStrategy JsonFoldingStrategy { get; set; }
     private YamlFoldingStrategy YamlFoldingStrategy { get; set; }
     private DocumentContentType _currentContentType = DocumentContentType.Xml;
+    private SearchPanel _searchPanel;
     public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
@@ -79,6 +81,16 @@ namespace eXeMeL
       this.XmlFoldingStrategy = new XmlFoldingStrategy();
       this.JsonFoldingStrategy = new JsonFoldingStrategy();
       this.YamlFoldingStrategy = new YamlFoldingStrategy();
+
+      // Bracket highlighting (always on)
+      var bracketRenderer = new BracketHighlightRenderer(this.AvalonEditor);
+      this.AvalonEditor.TextArea.TextView.BackgroundRenderers.Add(bracketRenderer);
+
+      // Current line highlighting
+      UpdateCurrentLineHighlight();
+
+      // AvalonEdit built-in search panel (hidden by default, toggled via settings)
+      _searchPanel = SearchPanel.Install(this.AvalonEditor);
 
       this.IgnoreNextTextChange = false;
 
@@ -731,6 +743,25 @@ namespace eXeMeL
 
       // Re-apply our chrome settings since backdrop changes can reset them
       ApplyWindowChrome();
+    }
+
+    private void UpdateCurrentLineHighlight()
+    {
+      if (this.AvalonEditor == null || this.ViewModel?.Settings == null) return;
+
+      if (this.ViewModel.Settings.HighlightCurrentLine)
+      {
+        var brush = new System.Windows.Media.SolidColorBrush(
+          System.Windows.Media.Color.FromArgb(20, 180, 180, 180));
+        brush.Freeze();
+        this.AvalonEditor.TextArea.TextView.CurrentLineBackground = brush;
+        this.AvalonEditor.TextArea.TextView.CurrentLineBorder = null;
+      }
+      else
+      {
+        this.AvalonEditor.TextArea.TextView.CurrentLineBackground = null;
+        this.AvalonEditor.TextArea.TextView.CurrentLineBorder = null;
+      }
     }
 
     private void ApplyWindowChrome()
