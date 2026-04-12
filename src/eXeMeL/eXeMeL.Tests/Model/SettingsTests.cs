@@ -86,15 +86,15 @@ namespace eXeMeL.Tests.Model
     {
       var settings = StaHelper.Run(() => new Settings());
 
-      Assert.Equal(SyntaxHighlightingStyle.Light_Earthy, settings.SyntaxHighlightingStyle);
+      Assert.Equal(SyntaxHighlightingStyle.Dark_Blue, settings.SyntaxHighlightingStyle);
     }
 
     [Fact]
-    public void Constructor_ApplicationTheme_DefaultsToLight()
+    public void Constructor_ApplicationTheme_DefaultsToDark()
     {
       var settings = StaHelper.Run(() => new Settings());
 
-      Assert.Equal(ApplicationTheme.Light, settings.ApplicationTheme);
+      Assert.Equal(ApplicationTheme.Dark, settings.ApplicationTheme);
     }
 
     [Fact]
@@ -106,11 +106,11 @@ namespace eXeMeL.Tests.Model
     }
 
     [Fact]
-    public void Constructor_HighlightOtherInstancesOfSelection_DefaultsToFalse()
+    public void Constructor_HighlightOtherInstancesOfSelection_DefaultsToTrue()
     {
       var settings = StaHelper.Run(() => new Settings());
 
-      Assert.False(settings.HighlightOtherInstancesOfSelection);
+      Assert.True(settings.HighlightOtherInstancesOfSelection);
     }
   }
 
@@ -361,7 +361,7 @@ namespace eXeMeL.Tests.Model
 
       var fired = StaHelper.Run(() =>
       {
-        return CollectPropertyChangedEvents(settings, s => s.SyntaxHighlightingStyle = SyntaxHighlightingStyle.Dark_Blue);
+        return CollectPropertyChangedEvents(settings, s => s.SyntaxHighlightingStyle = SyntaxHighlightingStyle.Dark_Ethereal);
       });
 
       Assert.Contains("SyntaxHighlightingStyle", fired);
@@ -372,7 +372,7 @@ namespace eXeMeL.Tests.Model
     {
       var settings = StaHelper.Run(() => new Settings());
 
-      var fired = CollectPropertyChangedEvents(settings, s => s.ApplicationTheme = ApplicationTheme.Dark);
+      var fired = CollectPropertyChangedEvents(settings, s => s.ApplicationTheme = ApplicationTheme.Light);
 
       Assert.Contains("ApplicationTheme", fired);
     }
@@ -382,7 +382,7 @@ namespace eXeMeL.Tests.Model
     {
       var settings = StaHelper.Run(() => new Settings());
 
-      var fired = CollectPropertyChangedEvents(settings, s => s.ApplicationTheme = ApplicationTheme.Dark);
+      var fired = CollectPropertyChangedEvents(settings, s => s.ApplicationTheme = ApplicationTheme.Light);
 
       Assert.Contains("ApplicationTheme", fired);
       Assert.Contains("EditorBrush", fired);
@@ -403,7 +403,7 @@ namespace eXeMeL.Tests.Model
     {
       var settings = StaHelper.Run(() => new Settings());
 
-      var fired = CollectPropertyChangedEvents(settings, s => s.HighlightOtherInstancesOfSelection = true);
+      var fired = CollectPropertyChangedEvents(settings, s => s.HighlightOtherInstancesOfSelection = false);
 
       Assert.Contains("HighlightOtherInstancesOfSelection", fired);
     }

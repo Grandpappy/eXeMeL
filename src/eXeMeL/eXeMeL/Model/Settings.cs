@@ -194,12 +194,21 @@ namespace eXeMeL.Model
 
     public Settings()
     {
+      ResetToDefaults();
+    }
+
+    public void ResetToDefaults()
+    {
       ShowEditorLineNumbers = true;
       WrapEditorText = true;
       EditorFontSize = DefaultEditorFontSize;
-      SyntaxHighlightingStyle = SyntaxHighlightingStyle.Light_Earthy;
-      ApplicationTheme = ApplicationTheme.Light;
+      SyntaxHighlightingStyle = SyntaxHighlightingStyle.Dark_Blue;
+      ApplicationTheme = ApplicationTheme.Dark;
       FontFamily = "Consolas";
+      HighlightOtherInstancesOfSelection = true;
+      ChromeTintColor = "#3366CC";
+      EditorTintIntensity = 0.3;
+      ChromeOpacity = 0.5;
     }
 
 

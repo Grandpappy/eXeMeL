@@ -60,6 +60,11 @@ namespace eXeMeL.View
       (this.DataContext as Settings).EditorFontSize = Settings.DefaultEditorFontSize;
     }
 
+    private void ResetToDefaultsButton_Click(object sender, RoutedEventArgs e)
+    {
+      (this.DataContext as Settings)?.ResetToDefaults();
+    }
+
 
 
     public string CurrentVersion

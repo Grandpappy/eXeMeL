@@ -139,6 +139,10 @@
     </ui:CardControl>
 
 
+    <!-- Reset -->
+    <ui:Button Content="Reset All to Defaults" Click="ResetToDefaultsButton_Click"
+               Margin="0,20,0,0" HorizontalAlignment="Left" Appearance="Caution"/>
+
     <!-- About -->
     <TextBlock Text="About" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8" Opacity="0.7"/>
 
