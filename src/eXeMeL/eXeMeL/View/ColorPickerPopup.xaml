@@ -8,19 +8,25 @@
 
   <!-- A compact color swatch button that opens a popup picker -->
   <StackPanel Orientation="Horizontal">
-    <Border x:Name="ColorSwatch" Width="28" Height="28"
-            CornerRadius="4" Cursor="Hand"
-            BorderThickness="1"
-            Background="Gray"
-            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-            MouseLeftButtonDown="ColorSwatch_Click"/>
+    <Button x:Name="ColorSwatchButton" Width="32" Height="28"
+            Padding="0" Click="ColorSwatchButton_Click"
+            BorderThickness="1" Cursor="Hand">
+      <Button.Template>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="ColorSwatch" CornerRadius="4"
+                  Background="{TemplateBinding Background}"
+                  BorderThickness="1"
+                  BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"/>
+        </ControlTemplate>
+      </Button.Template>
+    </Button>
 
     <TextBlock x:Name="HexLabel" VerticalAlignment="Center"
                Margin="8,0,0,0" FontSize="12" Opacity="0.6"/>
 
     <!-- Popup with color picker -->
     <Popup x:Name="PickerPopup" StaysOpen="False"
-           Placement="Bottom" PlacementTarget="{Binding ElementName=ColorSwatch}"
+           Placement="Bottom" PlacementTarget="{Binding ElementName=ColorSwatchButton}"
            AllowsTransparency="True">
       <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
               BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"

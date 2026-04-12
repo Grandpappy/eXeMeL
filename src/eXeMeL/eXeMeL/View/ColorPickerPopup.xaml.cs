@@ -40,7 +40,7 @@ namespace eXeMeL.View
       };
     }
 
-    private void ColorSwatch_Click(object sender, MouseButtonEventArgs e)
+    private void ColorSwatchButton_Click(object sender, RoutedEventArgs e)
     {
       PickerPopup.IsOpen = !PickerPopup.IsOpen;
       if (PickerPopup.IsOpen)
@@ -108,7 +108,7 @@ namespace eXeMeL.View
         var color = (Color)ColorConverter.ConvertFromString(SelectedColor);
         var brush = new SolidColorBrush(color);
         brush.Freeze();
-        if (ColorSwatch != null) ColorSwatch.Background = brush;
+        if (ColorSwatchButton != null) ColorSwatchButton.Background = brush;
         if (PreviewSwatch != null) PreviewSwatch.Background = brush;
         if (HexLabel != null) HexLabel.Text = SelectedColor;
       }
