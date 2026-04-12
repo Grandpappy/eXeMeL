@@ -19,6 +19,8 @@ namespace eXeMeL.Model
     private string _fontFamily;
     private bool _highlightOtherInstancesOfSelection;
     private string _chromeTintColor = "#3366CC";
+    private string _textColor = "#FFFFFF";
+    private string _accentColor = "#D4AA00";
     private double _editorTintIntensity = 0.3;
     private double _chromeOpacity = 0.5;
     private string _lastLaunchedVersion;
@@ -97,6 +99,18 @@ namespace eXeMeL.Model
     {
       get => _chromeTintColor;
       set => SetProperty(ref _chromeTintColor, value);
+    }
+
+    public string TextColor
+    {
+      get => _textColor;
+      set => SetProperty(ref _textColor, value);
+    }
+
+    public string AccentColor
+    {
+      get => _accentColor;
+      set => SetProperty(ref _accentColor, value);
     }
 
     public double EditorTintIntensity
@@ -207,6 +221,8 @@ namespace eXeMeL.Model
       FontFamily = "Consolas";
       HighlightOtherInstancesOfSelection = true;
       ChromeTintColor = "#3366CC";
+      TextColor = "#FFFFFF";
+      AccentColor = "#D4AA00";
       EditorTintIntensity = 0.3;
       ChromeOpacity = 0.5;
     }

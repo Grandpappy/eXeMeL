@@ -116,6 +116,8 @@ namespace eXeMeL.ViewModel
       this.Observer.RegisterHandler(x => x.ChromeTintColor, HandleChromeTintColorChange);
       this.Observer.RegisterHandler(x => x.EditorTintIntensity, HandleChromeTintColorChange);
       this.Observer.RegisterHandler(x => x.ChromeOpacity, HandleChromeTintColorChange);
+      this.Observer.RegisterHandler(x => x.TextColor, HandleTextOrAccentColorChange);
+      this.Observer.RegisterHandler(x => x.AccentColor, HandleTextOrAccentColorChange);
       SetApplicationThemeBasedOnSettings();
     }
 
@@ -125,6 +127,33 @@ namespace eXeMeL.ViewModel
     {
       SetApplicationThemeBasedOnSettings();
       WeakReferenceMessenger.Default.Send(new ApplicationThemeUpdatedMessage());
+    }
+
+    private static void HandleTextOrAccentColorChange(Settings settings)
+    {
+      if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+      {
+        Application.Current.Dispatcher.Invoke(() => HandleTextOrAccentColorChange(settings));
+        return;
+      }
+
+      var existingDict = Application.Current?.Resources.MergedDictionaries
+          .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
+      if (existingDict == null) return;
+
+      try
+      {
+        var textBrush = new System.Windows.Media.SolidColorBrush(
+          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.TextColor));
+        textBrush.Freeze();
+        existingDict["AppTextBrush"] = textBrush;
+
+        var accentBrush = new System.Windows.Media.SolidColorBrush(
+          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.AccentColor));
+        accentBrush.Freeze();
+        existingDict["AppAccentBrush"] = accentBrush;
+      }
+      catch { }
     }
 
     private static void HandleChromeTintColorChange(Settings settings)
@@ -234,6 +263,21 @@ namespace eXeMeL.ViewModel
         };
       }
       Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfUiTheme);
+
+      // Apply user text and accent colors
+      try
+      {
+        var textBrush = new System.Windows.Media.SolidColorBrush(
+          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.TextColor));
+        textBrush.Freeze();
+        dict["AppTextBrush"] = textBrush;
+
+        var accentBrush = new System.Windows.Media.SolidColorBrush(
+          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.AccentColor));
+        accentBrush.Freeze();
+        dict["AppAccentBrush"] = accentBrush;
+      }
+      catch { }
     }
 
 

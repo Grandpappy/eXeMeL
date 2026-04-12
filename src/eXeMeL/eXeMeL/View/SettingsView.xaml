@@ -99,15 +99,19 @@
         <TextBlock Text="Chrome Tint" FontSize="14"/>
       </ui:CardControl.Header>
       <StackPanel>
-        <views:ColorPickerControl SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"/>
-        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-          <TextBlock Text="Window Opacity" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Margin="0,0,8,0" Width="90"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+          <TextBlock Text="Tint Color" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Width="90"/>
+          <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
+                                   SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+          <TextBlock Text="Window Opacity" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Width="90"/>
           <Slider Value="{Binding ChromeOpacity}" Minimum="0" Maximum="1"
                   Width="120" VerticalAlignment="Center" Focusable="False"
                   SmallChange="0.05" LargeChange="0.1"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-          <TextBlock Text="Editor Tint" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Margin="0,0,8,0" Width="90"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+          <TextBlock Text="Editor Tint" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Width="90"/>
           <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
                   Width="120" VerticalAlignment="Center" Focusable="False"
                   SmallChange="0.05" LargeChange="0.1"/>
@@ -138,6 +142,23 @@
         MinWidth="140"/>
     </ui:CardControl>
 
+
+    <!-- Text and Accent Colors -->
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <TextBlock Text="Text Color" FontSize="14"/>
+      </ui:CardControl.Header>
+      <views:ColorPickerPopup SelectedColor="{Binding TextColor, Mode=TwoWay}"
+                               SwatchColors="{x:Static views:ColorSwatches.TextColors}"/>
+    </ui:CardControl>
+
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <TextBlock Text="Accent Color" FontSize="14"/>
+      </ui:CardControl.Header>
+      <views:ColorPickerPopup SelectedColor="{Binding AccentColor, Mode=TwoWay}"
+                               SwatchColors="{x:Static views:ColorSwatches.AccentColors}"/>
+    </ui:CardControl>
 
     <!-- Reset -->
     <ui:Button Content="Reset All to Defaults" Click="ResetToDefaultsButton_Click"
