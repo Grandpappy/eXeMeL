@@ -69,7 +69,16 @@ namespace eXeMeL.View
 
     private void ResetToDefaultsButton_Click(object sender, RoutedEventArgs e)
     {
-      (this.DataContext as Settings)?.ResetToDefaults();
+      var result = System.Windows.MessageBox.Show(
+        "Reset all settings to their default values?",
+        "Reset Settings",
+        System.Windows.MessageBoxButton.YesNo,
+        System.Windows.MessageBoxImage.Question);
+
+      if (result == System.Windows.MessageBoxResult.Yes)
+      {
+        (this.DataContext as Settings)?.ResetToDefaults();
+      }
     }
 
 

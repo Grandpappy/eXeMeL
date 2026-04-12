@@ -48,7 +48,7 @@ namespace eXeMeL.ViewModel
         this.Matches = null;
 
         if (value != null && value.Length == 0)
-          CancelSearch();
+          ClearSearchState();
         else
           _ = PerformFindNextSearchAsync();
       }
@@ -432,6 +432,15 @@ namespace eXeMeL.ViewModel
 
 
 
+    /// <summary>Clears search state without moving focus (used when text is emptied by typing)</summary>
+    private void ClearSearchState()
+    {
+      MatchStatusText = null;
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
+    }
+
+    /// <summary>Cancels search AND returns focus to editor (used by Escape key)</summary>
     private void CancelSearch()
     {
       MatchStatusText = null;
