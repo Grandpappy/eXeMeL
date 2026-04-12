@@ -80,6 +80,78 @@
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\YamlSolarizedDark.xshd">
       <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.YamlSolarizedDark.xshd</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSCodeDarkPlusXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSCodeDarkPlusXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSCodeDarkPlusJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSCodeDarkPlusJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSCodeDarkPlusYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSCodeDarkPlusYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSCodeLightPlusXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSCodeLightPlusXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSCodeLightPlusJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSCodeLightPlusJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\VSCodeLightPlusYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.VSCodeLightPlusYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\MonokaiXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.MonokaiXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\MonokaiJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.MonokaiJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\MonokaiYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.MonokaiYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\DraculaXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.DraculaXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\DraculaJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.DraculaJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\DraculaYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.DraculaYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\OneDarkProXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.OneDarkProXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\OneDarkProJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.OneDarkProJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\OneDarkProYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.OneDarkProYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\GitHubDarkXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.GitHubDarkXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\GitHubDarkJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.GitHubDarkJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\GitHubDarkYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.GitHubDarkYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\GitHubLightXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.GitHubLightXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\GitHubLightJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.GitHubLightJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\GitHubLightYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.GitHubLightYaml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedLightXml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedLightXml.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedLightJson.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedLightJson.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedLightYaml.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedLightYaml.xshd</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Assets\ChangeLog.txt">
       <LogicalName>eXeMeL.Assets.ChangeLog.txt</LogicalName>
     </EmbeddedResource>

@@ -1,0 +1,30 @@
+<SyntaxDefinition name="XML" extensions=".xml" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color foreground="#5c6370" name="Comment" />
+  <Color foreground="#61afef" name="CData" />
+  <Color foreground="#61afef" name="DocType" />
+  <Color foreground="#61afef" name="XmlDeclaration" />
+  <Color foreground="#61afef" name="XmlTag" />
+  <Color foreground="#56b6c2" name="AttributeName" />
+  <Color foreground="#98c379" name="AttributeValue" />
+  <Color foreground="#61afef" name="Entity" />
+  <Color foreground="Red" name="BrokenEntity" />
+  <RuleSet>
+    <Span color="Comment" multiline="true"><Begin>&lt;!--</Begin><End>--&gt;</End></Span>
+    <Span color="CData" multiline="true"><Begin>&lt;!\[CDATA\[</Begin><End>]]&gt;</End></Span>
+    <Span color="DocType" multiline="true"><Begin>&lt;!DOCTYPE</Begin><End>&gt;</End></Span>
+    <Span color="XmlDeclaration" multiline="true"><Begin>&lt;\?</Begin><End>\?&gt;</End></Span>
+    <Span color="XmlTag" multiline="true"><Begin>&lt;</Begin><End>&gt;</End>
+      <RuleSet>
+        <Span color="AttributeValue" multiline="true" ruleSet="EntitySet"><Begin>"</Begin><End>"|(?=&lt;)</End></Span>
+        <Span color="AttributeValue" multiline="true" ruleSet="EntitySet"><Begin>'</Begin><End>'|(?=&lt;)</End></Span>
+        <Rule color="AttributeName">[\d\w_\-\.]+(?=(\s*=))</Rule>
+        <Rule color="AttributeValue">=</Rule>
+      </RuleSet>
+    </Span>
+    <Import ruleSet="EntitySet"/>
+  </RuleSet>
+  <RuleSet name="EntitySet">
+    <Rule color="Entity">&amp;[\w\d\#]+;</Rule>
+    <Rule color="BrokenEntity">&amp;[\w\d\#]*</Rule>
+  </RuleSet>
+</SyntaxDefinition>
