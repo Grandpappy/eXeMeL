@@ -27,6 +27,7 @@ namespace eXeMeL.ViewModel
     private int _matchCount;
     private MatchCollection _matches;
     private int? _currentMatchIndex;
+    private bool _useRegex;
 
 
 
@@ -56,6 +57,20 @@ namespace eXeMeL.ViewModel
 
 
     public bool HasSearchText => !string.IsNullOrEmpty(SearchText);
+
+    public bool UseRegex
+    {
+      get => _useRegex;
+      set
+      {
+        if (SetProperty(ref _useRegex, value))
+        {
+          this.Matches = null; // Force re-search with new mode
+          if (HasSearchText)
+            _ = PerformFindNextSearchAsync();
+        }
+      }
+    }
 
     private string _matchStatusText;
     public string MatchStatusText
@@ -295,13 +310,21 @@ namespace eXeMeL.ViewModel
       if (this.SearchText.Length == 0)
         return;
 
-      //this.AutoFindTimer.Stop();
-
       var text = this.Document.Text;
+      var pattern = UseRegex ? this.SearchText : Regex.Escape(this.SearchText);
 
       await Task.Run(() =>
-        this.Matches = Regex.Matches(text, Regex.Escape(this.SearchText), RegexOptions.IgnoreCase)
-      );
+      {
+        try
+        {
+          this.Matches = Regex.Matches(text, pattern, RegexOptions.IgnoreCase);
+        }
+        catch (System.ArgumentException)
+        {
+          // Invalid regex pattern — clear matches
+          this.Matches = null;
+        }
+      });
     }
 
 

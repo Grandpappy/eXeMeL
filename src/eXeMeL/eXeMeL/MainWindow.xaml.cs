@@ -14,7 +14,6 @@ using eXeMeL.Model;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Wpf.Ui.Controls;
-using ICSharpCode.AvalonEdit.Search;
 
 namespace eXeMeL
 {
@@ -25,7 +24,6 @@ namespace eXeMeL
     private JsonFoldingStrategy JsonFoldingStrategy { get; set; }
     private YamlFoldingStrategy YamlFoldingStrategy { get; set; }
     private DocumentContentType _currentContentType = DocumentContentType.Xml;
-    private SearchPanel _searchPanel;
     public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
@@ -87,9 +85,8 @@ namespace eXeMeL
       var bracketRenderer = new BracketHighlightRenderer(this.AvalonEditor);
       this.AvalonEditor.TextArea.TextView.BackgroundRenderers.Add(bracketRenderer);
 
-      // AvalonEdit built-in search panel
-      _searchPanel = SearchPanel.Install(this.AvalonEditor);
-      _searchPanel.Margin = new Thickness(0, 2, 20, 0);
+      // Note: AvalonEdit's built-in SearchPanel removed — regex support
+      // added to our custom Find bar instead
 
       this.IgnoreNextTextChange = false;
 
@@ -144,8 +141,6 @@ namespace eXeMeL
       {
         if (e.PropertyName == "HighlightCurrentLine")
           UpdateCurrentLineHighlight();
-        if (e.PropertyName == "UseBuiltInSearch")
-          UpdateBuiltInSearch();
       };
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
@@ -753,20 +748,6 @@ namespace eXeMeL
       ApplyWindowChrome();
     }
 
-    private void UpdateBuiltInSearch()
-    {
-      if (_searchPanel == null || this.ViewModel?.Settings == null) return;
-
-      if (this.ViewModel.Settings.UseBuiltInSearch)
-      {
-        // Open the built-in search panel
-        _searchPanel.Open();
-      }
-      else
-      {
-        _searchPanel.Close();
-      }
-    }
 
     private void UpdateCurrentLineHighlight()
     {

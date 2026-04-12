@@ -67,6 +67,15 @@
       </ui:Button.Style>
     </ui:Button>
 
+    <!-- Regex toggle -->
+    <ToggleButton x:Name="RegexToggle"
+                  IsChecked="{Binding FindViewModel.UseRegex}"
+                  ToolTip="Use Regular Expressions"
+                  Padding="4" Margin="4,0,0,0"
+                  WindowChrome.IsHitTestVisibleInChrome="True"
+                  Width="26" Height="24" FontSize="11"
+                  Content=".*" FontFamily="Consolas" FontWeight="Bold"/>
+
     <!-- Match status text — hidden (not collapsed) when no results to show -->
     <TextBlock Text="{Binding FindViewModel.MatchStatusText}"
                VerticalAlignment="Center" FontSize="12" Opacity="0.6"
