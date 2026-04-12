@@ -80,7 +80,7 @@
         MinWidth="140"/>
     </ui:CardControl>
 
-    <!-- Chrome tint color picker (visible only for glass/tinted themes) -->
+    <!-- Glass/Tinted theme controls (visible only for glass/tinted themes) -->
     <ui:CardControl Margin="0,0,0,4">
       <ui:CardControl.Style>
         <Style TargetType="ui:CardControl">
@@ -96,27 +96,54 @@
         </Style>
       </ui:CardControl.Style>
       <ui:CardControl.Header>
-        <TextBlock Text="Chrome Tint" FontSize="14"/>
+        <TextBlock Text="Tint Color" FontSize="14"/>
       </ui:CardControl.Header>
-      <StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-          <TextBlock Text="Tint Color" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Width="90"/>
-          <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
-                                   SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-          <TextBlock Text="Window Opacity" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Width="90"/>
-          <Slider Value="{Binding ChromeOpacity}" Minimum="0" Maximum="1"
-                  Width="120" VerticalAlignment="Center" Focusable="False"
-                  SmallChange="0.05" LargeChange="0.1"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
-          <TextBlock Text="Editor Tint" FontSize="12" Opacity="0.7" VerticalAlignment="Center" Width="90"/>
-          <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
-                  Width="120" VerticalAlignment="Center" Focusable="False"
-                  SmallChange="0.05" LargeChange="0.1"/>
-        </StackPanel>
-      </StackPanel>
+      <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
+                               SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
+    </ui:CardControl>
+
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Style>
+        <Style TargetType="ui:CardControl">
+          <Setter Property="Visibility" Value="Collapsed"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Tinted">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ui:CardControl.Style>
+      <ui:CardControl.Header>
+        <TextBlock Text="Window Opacity" FontSize="14"/>
+      </ui:CardControl.Header>
+      <Slider Value="{Binding ChromeOpacity}" Minimum="0" Maximum="1"
+              Width="140" VerticalAlignment="Center" Focusable="False"
+              SmallChange="0.05" LargeChange="0.1"/>
+    </ui:CardControl>
+
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Style>
+        <Style TargetType="ui:CardControl">
+          <Setter Property="Visibility" Value="Collapsed"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Tinted">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ui:CardControl.Style>
+      <ui:CardControl.Header>
+        <TextBlock Text="Editor Tint" FontSize="14"/>
+      </ui:CardControl.Header>
+      <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
+              Width="140" VerticalAlignment="Center" Focusable="False"
+              SmallChange="0.05" LargeChange="0.1"/>
     </ui:CardControl>
 
     <ui:CardControl Margin="0,0,0,4">

@@ -33,7 +33,11 @@ namespace eXeMeL.View
     public ColorPickerPopup()
     {
       InitializeComponent();
-      UpdateVisuals();
+      this.Loaded += (s, e) =>
+      {
+        BuildSwatches();
+        UpdateVisuals();
+      };
     }
 
     private void ColorSwatch_Click(object sender, MouseButtonEventArgs e)
