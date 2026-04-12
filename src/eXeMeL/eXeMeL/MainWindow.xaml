@@ -14,7 +14,6 @@
   d:DesignWidth="800" d:DesignHeight="600"
   x:Name="ControlRoot"
   ExtendsContentIntoTitleBar="True"
-  WindowBackdropType="Mica"
   >
 
   <Window.DataContext>

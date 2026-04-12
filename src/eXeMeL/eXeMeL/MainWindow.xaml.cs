@@ -54,10 +54,18 @@ namespace eXeMeL
 
       InitializeComponent();
 
-      // Apply backdrop and chrome after window is loaded and has a handle
+      // Set initial backdrop type right after InitializeComponent
+      // (before Loaded, before our chrome override — FluentWindow hasn't
+      // configured chrome yet so this won't conflict)
+      var initialTheme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
+      this.WindowBackdropType = initialTheme.IsGlassTheme()
+        ? Wpf.Ui.Controls.WindowBackdropType.Acrylic
+        : Wpf.Ui.Controls.WindowBackdropType.Mica;
+
+      // Apply chrome override after window is loaded
       this.Loaded += (s, e) =>
       {
-        ApplyBackdropForCurrentTheme();
+        ApplyWindowChrome();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -708,12 +716,20 @@ namespace eXeMeL
         ? Wpf.Ui.Controls.WindowBackdropType.Acrylic
         : Wpf.Ui.Controls.WindowBackdropType.Mica;
 
-      // Use the static ApplyBackdrop method to bypass FluentWindow's
-      // property setter which conflicts with our custom WindowChrome
-      Wpf.Ui.Controls.WindowBackdrop.RemoveBackground(this);
-      Wpf.Ui.Controls.WindowBackdrop.ApplyBackdrop(this, backdropType);
+      try
+      {
+        // Remove existing background so backdrop shows through
+        Wpf.Ui.Controls.WindowBackdrop.RemoveBackground(this);
+        // Apply via static method (bypasses FluentWindow chrome conflicts)
+        Wpf.Ui.Controls.WindowBackdrop.ApplyBackdrop(this, backdropType);
+      }
+      catch
+      {
+        // Fallback: try the property setter
+        try { this.WindowBackdropType = backdropType; } catch { }
+      }
 
-      // Re-apply our chrome settings
+      // Re-apply our chrome settings since backdrop changes can reset them
       ApplyWindowChrome();
     }
 
