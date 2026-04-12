@@ -89,6 +89,7 @@ namespace eXeMeL
 
       // AvalonEdit built-in search panel
       _searchPanel = SearchPanel.Install(this.AvalonEditor);
+      _searchPanel.Margin = new Thickness(0, 2, 20, 0);
 
       this.IgnoreNextTextChange = false;
 
@@ -770,6 +771,9 @@ namespace eXeMeL
     private void UpdateCurrentLineHighlight()
     {
       if (this.AvalonEditor == null || this.ViewModel?.Settings == null) return;
+
+      // Must enable the option AND set the brush
+      this.AvalonEditor.Options.HighlightCurrentLine = this.ViewModel.Settings.HighlightCurrentLine;
 
       if (this.ViewModel.Settings.HighlightCurrentLine)
       {
