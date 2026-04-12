@@ -12,7 +12,7 @@
     <KeyBinding Key="Escape" Command="{Binding FindViewModel.CancelSearchCommand}"/>
   </UserControl.InputBindings>
 
-  <StackPanel Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+  <StackPanel Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True" Width="400">
     <ui:TextBox
       x:Name="FindSearchText"
       PlaceholderText="Find..."
@@ -67,10 +67,10 @@
       </ui:Button.Style>
     </ui:Button>
 
-    <!-- Match status text — hidden (not collapsed) when no text -->
+    <!-- Match status text — hidden (not collapsed) when no results to show -->
     <TextBlock Text="{Binding FindViewModel.MatchStatusText}"
-               VerticalAlignment="Center" FontSize="11" Opacity="0.6"
-               Margin="6,0,0,0">
+               VerticalAlignment="Center" FontSize="12" Opacity="0.6"
+               Margin="6,0,0,0" MinWidth="90">
       <TextBlock.Style>
         <Style TargetType="TextBlock">
           <Setter Property="Visibility" Value="Hidden"/>
