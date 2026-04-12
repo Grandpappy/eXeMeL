@@ -46,6 +46,7 @@
                       Cursor="Hand" Opacity="0.5">
           <ToggleButton.Style>
             <Style TargetType="ToggleButton">
+              <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
               <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
                   <Setter Property="Opacity" Value="1.0"/>
