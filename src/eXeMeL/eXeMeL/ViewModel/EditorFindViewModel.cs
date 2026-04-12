@@ -410,6 +410,7 @@ namespace eXeMeL.ViewModel
     private void CancelSearchCommand_Execute()
     {
       this.SearchText = string.Empty;
+      CancelSearch();
     }
 
 
