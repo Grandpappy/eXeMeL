@@ -703,25 +703,18 @@ namespace eXeMeL
 
     private void ApplyBackdropForCurrentTheme()
     {
-      try
-      {
-        var theme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
-        if (theme.IsGlassTheme())
-        {
-          this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Acrylic;
-        }
-        else
-        {
-          this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Mica;
-        }
+      var theme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
+      var backdropType = theme.IsGlassTheme()
+        ? Wpf.Ui.Controls.WindowBackdropType.Acrylic
+        : Wpf.Ui.Controls.WindowBackdropType.Mica;
 
-        // Re-apply our chrome after FluentWindow reconfigures it
-        ApplyWindowChrome();
-      }
-      catch
-      {
-        // FluentWindow may throw during chrome reconfiguration — safe to ignore
-      }
+      // Use the static ApplyBackdrop method to bypass FluentWindow's
+      // property setter which conflicts with our custom WindowChrome
+      Wpf.Ui.Controls.WindowBackdrop.RemoveBackground(this);
+      Wpf.Ui.Controls.WindowBackdrop.ApplyBackdrop(this, backdropType);
+
+      // Re-apply our chrome settings
+      ApplyWindowChrome();
     }
 
     private void ApplyWindowChrome()
