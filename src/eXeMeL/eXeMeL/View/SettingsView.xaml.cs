@@ -44,11 +44,18 @@ namespace eXeMeL.View
 
     private static T FindParent<T>(System.Windows.DependencyObject child) where T : System.Windows.DependencyObject
     {
-      var parent = System.Windows.Media.VisualTreeHelper.GetParent(child);
-      while (parent != null)
+      var current = child;
+      while (current != null)
       {
+        // Use VisualTreeHelper for Visual elements, LogicalTreeHelper for non-visuals (like Run)
+        System.Windows.DependencyObject parent;
+        if (current is System.Windows.Media.Visual)
+          parent = System.Windows.Media.VisualTreeHelper.GetParent(current);
+        else
+          parent = System.Windows.LogicalTreeHelper.GetParent(current);
+
         if (parent is T found) return found;
-        parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+        current = parent;
       }
       return null;
     }
