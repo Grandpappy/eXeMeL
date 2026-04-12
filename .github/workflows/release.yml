@@ -52,7 +52,7 @@ jobs:
 
       - name: Package with Velopack
         run: |
-          vpk pack --packId eXeMeL --packVersion ${{ steps.version.outputs.VERSION }} --packDir publish --mainExe eXeMeL.exe --icon src/eXeMeL/eXeMeL/Assets/eXeMeL_Icon.ico
+          vpk pack --packId eXeMeL --packVersion ${{ steps.version.outputs.VERSION }} --packDir publish --mainExe eXeMeL.exe --icon "src/eXeMeL/eXeMeL/Assets/eXeMeL Icon.ico"
 
       - name: Upload to GitHub Releases
         run: |
