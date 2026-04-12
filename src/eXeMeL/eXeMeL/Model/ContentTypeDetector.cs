@@ -32,10 +32,11 @@ namespace eXeMeL.Model
       if (trimmed.StartsWith("---"))
         return DocumentContentType.Yaml;
 
-      // YAML: first few lines match key: value pattern (without braces/brackets)
+      // YAML: first few lines match key: value pattern
+      // Only exclude if the content looks like it starts as JSON/XML (already checked above)
+      // YAML can legitimately contain { } [ ] in flow sequences/mappings
       var firstChunk = trimmed.Length > 500 ? trimmed[..500] : trimmed;
-      if (!firstChunk.Contains('{') && !firstChunk.Contains('[') && !firstChunk.Contains('<')
-          && YamlKeyValuePattern.IsMatch(firstChunk))
+      if (YamlKeyValuePattern.IsMatch(firstChunk))
       {
         return DocumentContentType.Yaml;
       }
