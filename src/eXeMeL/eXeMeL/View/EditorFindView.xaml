@@ -19,21 +19,30 @@
       ClearButtonEnabled="True"
       Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}"
       Width="220"
-      Margin="0,0,2,0"
+      Margin="0,0,1,0"
       FontSize="13"
       PreviewKeyDown="FindSearchText_PreviewKeyDown"
       IsTabStop="False"
       GotFocus="FindSearchText_GotFocus"
       />
 
-    <!-- Next/Prev arrows — hidden until there's search text -->
+    <!-- Regex toggle — right next to the textbox -->
+    <ToggleButton x:Name="RegexToggle"
+                  IsChecked="{Binding FindViewModel.UseRegex}"
+                  ToolTip="Use Regular Expressions"
+                  Padding="4" Margin="0,0,0,0"
+                  WindowChrome.IsHitTestVisibleInChrome="True"
+                  Width="26" Height="24" FontSize="11"
+                  Content=".*" FontFamily="Consolas" FontWeight="Bold"/>
+
+    <!-- Next/Prev arrows — hidden until there's search text, spaced from regex button -->
     <ui:Button
       x:Name="FindNextButton"
       Command="{Binding FindViewModel.FindNextCommand}"
       Appearance="Transparent"
       Icon="{ui:SymbolIcon ChevronDown24}"
       ToolTip="Find Next (F3)"
-      Padding="4" Margin="0,0,1,0"
+      Padding="4" Margin="8,0,1,0"
       WindowChrome.IsHitTestVisibleInChrome="True">
       <ui:Button.Style>
         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
@@ -66,15 +75,6 @@
         </Style>
       </ui:Button.Style>
     </ui:Button>
-
-    <!-- Regex toggle -->
-    <ToggleButton x:Name="RegexToggle"
-                  IsChecked="{Binding FindViewModel.UseRegex}"
-                  ToolTip="Use Regular Expressions"
-                  Padding="4" Margin="4,0,0,0"
-                  WindowChrome.IsHitTestVisibleInChrome="True"
-                  Width="26" Height="24" FontSize="11"
-                  Content=".*" FontFamily="Consolas" FontWeight="Bold"/>
 
     <!-- Match status text — hidden (not collapsed) when no results to show -->
     <TextBlock Text="{Binding FindViewModel.MatchStatusText}"
