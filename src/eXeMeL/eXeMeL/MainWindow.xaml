@@ -53,6 +53,15 @@
   </Window.InputBindings>
 
   <Window.Resources>
+    <!-- AvalonEdit SearchPanel styling for dark themes -->
+    <Style TargetType="{x:Type avalonEdit:TextEditor}">
+      <Style.Resources>
+        <!-- Make SearchPanel readable on dark backgrounds -->
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2B2B2B"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#FFFFFFFF"/>
+      </Style.Resources>
+    </Style>
+
     <!-- Muted icon button for the title bar: no background, opacity-based hover -->
     <Style x:Key="TitleBarIconButton" TargetType="Button">
       <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>

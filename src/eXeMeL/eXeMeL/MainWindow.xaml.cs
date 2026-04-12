@@ -68,6 +68,7 @@ namespace eXeMeL
       this.Loaded += (s, e) =>
       {
         ApplyWindowChrome();
+        UpdateCurrentLineHighlight();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -86,10 +87,7 @@ namespace eXeMeL
       var bracketRenderer = new BracketHighlightRenderer(this.AvalonEditor);
       this.AvalonEditor.TextArea.TextView.BackgroundRenderers.Add(bracketRenderer);
 
-      // Current line highlighting
-      UpdateCurrentLineHighlight();
-
-      // AvalonEdit built-in search panel (hidden by default, toggled via settings)
+      // AvalonEdit built-in search panel
       _searchPanel = SearchPanel.Install(this.AvalonEditor);
 
       this.IgnoreNextTextChange = false;
@@ -775,11 +773,16 @@ namespace eXeMeL
 
       if (this.ViewModel.Settings.HighlightCurrentLine)
       {
-        var brush = new System.Windows.Media.SolidColorBrush(
-          System.Windows.Media.Color.FromArgb(20, 180, 180, 180));
-        brush.Freeze();
-        this.AvalonEditor.TextArea.TextView.CurrentLineBackground = brush;
-        this.AvalonEditor.TextArea.TextView.CurrentLineBorder = null;
+        var bgBrush = new System.Windows.Media.SolidColorBrush(
+          System.Windows.Media.Color.FromArgb(40, 180, 180, 180));
+        bgBrush.Freeze();
+        this.AvalonEditor.TextArea.TextView.CurrentLineBackground = bgBrush;
+
+        var borderPen = new System.Windows.Media.Pen(
+          new System.Windows.Media.SolidColorBrush(
+            System.Windows.Media.Color.FromArgb(30, 200, 200, 200)), 1);
+        borderPen.Freeze();
+        this.AvalonEditor.TextArea.TextView.CurrentLineBorder = borderPen;
       }
       else
       {
