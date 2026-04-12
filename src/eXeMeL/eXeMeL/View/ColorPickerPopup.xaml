@@ -11,6 +11,7 @@
     <Border x:Name="ColorSwatch" Width="28" Height="28"
             CornerRadius="4" Cursor="Hand"
             BorderThickness="1"
+            Background="Gray"
             BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
             MouseLeftButtonDown="ColorSwatch_Click"/>
 
