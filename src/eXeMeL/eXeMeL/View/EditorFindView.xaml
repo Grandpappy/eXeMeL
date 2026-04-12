@@ -66,5 +66,21 @@
         </Style>
       </ui:Button.Style>
     </ui:Button>
+
+    <!-- Match status text — hidden (not collapsed) when no text -->
+    <TextBlock Text="{Binding FindViewModel.MatchStatusText}"
+               VerticalAlignment="Center" FontSize="11" Opacity="0.6"
+               Margin="6,0,0,0">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock">
+          <Setter Property="Visibility" Value="Hidden"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding FindViewModel.HasSearchText}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+    </TextBlock>
   </StackPanel>
 </UserControl>

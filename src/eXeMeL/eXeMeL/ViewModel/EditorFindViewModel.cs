@@ -57,6 +57,13 @@ namespace eXeMeL.ViewModel
 
     public bool HasSearchText => !string.IsNullOrEmpty(SearchText);
 
+    private string _matchStatusText;
+    public string MatchStatusText
+    {
+      get => _matchStatusText;
+      private set => SetProperty(ref _matchStatusText, value);
+    }
+
 
 
     public int MatchCount
@@ -387,7 +394,8 @@ namespace eXeMeL.ViewModel
     private void SendNavigationMessageForCurrentMatch()
     {
       WeakReferenceMessenger.Default.Send(new SelectTextInEditorMessage(this.CurrentMatch.Index, this.CurrentMatch.Length));
-      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage($"{this.CurrentMatchPosition} of {this.MatchCount} matches"));
+      MatchStatusText = $"{this.CurrentMatchPosition} of {this.MatchCount} matches";
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(MatchStatusText));
     }
 
 
@@ -395,6 +403,7 @@ namespace eXeMeL.ViewModel
     private void SendNavigationMessageForNoMatch()
     {
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+      MatchStatusText = $"No results";
       WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage($"Unable to find \"{this.SearchText}\""));
     }
 
@@ -402,6 +411,7 @@ namespace eXeMeL.ViewModel
 
     private void CancelSearch()
     {
+      MatchStatusText = null;
       WeakReferenceMessenger.Default.Send(new SetKeyboardFocusToEditor());
       WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
     }
