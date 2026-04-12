@@ -1,6 +1,9 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
+using Velopack;
+using Velopack.Sources;
 using Wpf.Ui.Appearance;
 
 namespace eXeMeL
@@ -17,6 +20,20 @@ namespace eXeMeL
   /// </summary>
   public partial class App : Application
   {
+    private const string GitHubRepoUrl = "https://github.com/Grandpappy/eXeMeL";
+
+    [STAThread]
+    private static void Main(string[] args)
+    {
+      // Velopack MUST be first — handles install/uninstall/update hooks
+      VelopackApp.Build()
+        .Run();
+
+      var app = new App();
+      app.InitializeComponent();
+      app.Run();
+    }
+
     protected override void OnStartup(StartupEventArgs e)
     {
       base.OnStartup(e);
@@ -30,7 +47,66 @@ namespace eXeMeL
       {
         StartupOptions.InitialFilePath = e.Args[0];
       }
+
+      // Auto-check for updates on startup (non-blocking)
+      _ = CheckForUpdatesAsync(silent: true);
     }
+
+    /// <summary>
+    /// Checks for updates from GitHub Releases. If silent, only notifies when update is available.
+    /// If not silent (user-initiated), shows status messages.
+    /// </summary>
+    public static async Task<bool> CheckForUpdatesAsync(bool silent = false)
+    {
+      try
+      {
+        var mgr = new UpdateManager(new GithubSource(GitHubRepoUrl, null, false));
+
+        if (!mgr.IsInstalled)
+        {
+          // Running from dev/unpackaged — skip update check
+          return false;
+        }
+
+        var updateInfo = await mgr.CheckForUpdatesAsync();
+        if (updateInfo == null)
+        {
+          return false; // No update available
+        }
+
+        // Update available — store the info for the UI to pick up
+        LatestUpdate = updateInfo;
+        LatestUpdateManager = mgr;
+        return true;
+      }
+      catch
+      {
+        // Network error, rate limit, etc. — fail silently
+        return false;
+      }
+    }
+
+    /// <summary>Downloads and applies the pending update, then restarts.</summary>
+    public static async Task ApplyUpdateAsync()
+    {
+      if (LatestUpdate == null || LatestUpdateManager == null) return;
+
+      try
+      {
+        await LatestUpdateManager.DownloadUpdatesAsync(LatestUpdate);
+        LatestUpdateManager.ApplyUpdatesAndRestart(LatestUpdate);
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show($"Update failed: {ex.Message}", "Update Error",
+          MessageBoxButton.OK, MessageBoxImage.Error);
+      }
+    }
+
+    /// <summary>Stored update info for the UI to access.</summary>
+    public static UpdateInfo LatestUpdate { get; private set; }
+    public static UpdateManager LatestUpdateManager { get; private set; }
+
 
     private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
@@ -49,12 +125,7 @@ namespace eXeMeL
       }
       catch
       {
-        // If even the error dialog fails, write to file as last resort
-        try
-        {
-          WriteCrashLog(FormatException(e.Exception));
-        }
-        catch { }
+        try { WriteCrashLog(FormatException(e.Exception)); } catch { }
       }
     }
 

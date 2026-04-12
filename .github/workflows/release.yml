@@ -1,0 +1,59 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version calculation
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Calculate version (auto-increment patch)
+        id: version
+        shell: pwsh
+        run: |
+          # Count commits on master as the patch number
+          $commitCount = git rev-list --count HEAD
+          $version = "2.0.$commitCount"
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Calculated version: $version"
+
+      - name: Update version in csproj
+        shell: pwsh
+        run: |
+          $csproj = "src/eXeMeL/eXeMeL/eXeMeL.csproj"
+          $version = "${{ steps.version.outputs.VERSION }}"
+          (Get-Content $csproj) -replace '<Version>.*</Version>', "<Version>$version</Version>" |
+            Set-Content $csproj
+          (Get-Content $csproj) -replace '<AssemblyVersion>.*</AssemblyVersion>', "<AssemblyVersion>$version.0</AssemblyVersion>" |
+            Set-Content $csproj
+          (Get-Content $csproj) -replace '<FileVersion>.*</FileVersion>', "<FileVersion>$version.0</FileVersion>" |
+            Set-Content $csproj
+
+      - name: Publish
+        run: |
+          dotnet publish src/eXeMeL/eXeMeL/eXeMeL.csproj -c Release -r win-x64 --self-contained -o publish
+
+      - name: Package with Velopack
+        run: |
+          vpk pack --packId eXeMeL --packVersion ${{ steps.version.outputs.VERSION }} --packDir publish --mainExe eXeMeL.exe --icon src/eXeMeL/eXeMeL/Assets/eXeMeL_Icon.ico
+
+      - name: Upload to GitHub Releases
+        run: |
+          vpk upload github --repoUrl https://github.com/Grandpappy/eXeMeL --tag v${{ steps.version.outputs.VERSION }} --token ${{ secrets.GITHUB_TOKEN }} --releaseName "eXeMeL v${{ steps.version.outputs.VERSION }}"
