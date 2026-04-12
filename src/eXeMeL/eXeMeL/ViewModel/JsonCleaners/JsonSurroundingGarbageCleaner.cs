@@ -16,7 +16,6 @@ namespace eXeMeL.ViewModel.JsonCleaners
       int firstBracket = text.IndexOf('[');
 
       int start;
-      char openChar;
       char closeChar;
 
       if (firstBrace < 0 && firstBracket < 0)
@@ -25,25 +24,21 @@ namespace eXeMeL.ViewModel.JsonCleaners
       if (firstBrace < 0)
       {
         start = firstBracket;
-        openChar = '[';
         closeChar = ']';
       }
       else if (firstBracket < 0)
       {
         start = firstBrace;
-        openChar = '{';
         closeChar = '}';
       }
       else if (firstBrace < firstBracket)
       {
         start = firstBrace;
-        openChar = '{';
         closeChar = '}';
       }
       else
       {
         start = firstBracket;
-        openChar = '[';
         closeChar = ']';
       }
 
