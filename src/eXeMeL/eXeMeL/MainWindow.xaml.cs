@@ -140,6 +140,15 @@ namespace eXeMeL
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
       this.ViewModel.Editor.PropertyChanged += Editor_PropertyChanged;
 
+      // Observe editor settings changes
+      this.ViewModel.Settings.PropertyChanged += (s, e) =>
+      {
+        if (e.PropertyName == "HighlightCurrentLine")
+          UpdateCurrentLineHighlight();
+        if (e.PropertyName == "UseBuiltInSearch")
+          UpdateBuiltInSearch();
+      };
+
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
     }
 
@@ -743,6 +752,21 @@ namespace eXeMeL
 
       // Re-apply our chrome settings since backdrop changes can reset them
       ApplyWindowChrome();
+    }
+
+    private void UpdateBuiltInSearch()
+    {
+      if (_searchPanel == null || this.ViewModel?.Settings == null) return;
+
+      if (this.ViewModel.Settings.UseBuiltInSearch)
+      {
+        // Open the built-in search panel
+        _searchPanel.Open();
+      }
+      else
+      {
+        _searchPanel.Close();
+      }
     }
 
     private void UpdateCurrentLineHighlight()

@@ -101,9 +101,9 @@
     </ui:CardControl>
 
     <!-- Glass/Tinted theme controls (visible only for glass/tinted themes) -->
-    <ui:CardControl Margin="0,0,0,4">
-      <ui:CardControl.Style>
-        <Style TargetType="ui:CardControl">
+    <StackPanel x:Name="TintSettingsPanel">
+      <StackPanel.Style>
+        <Style TargetType="StackPanel">
           <Setter Property="Visibility" Value="Collapsed"/>
           <Style.Triggers>
             <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
@@ -114,57 +114,34 @@
             </DataTrigger>
           </Style.Triggers>
         </Style>
-      </ui:CardControl.Style>
-      <ui:CardControl.Header>
-        <TextBlock Text="Tint Color" FontSize="14"/>
-      </ui:CardControl.Header>
-      <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
-                               SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
-    </ui:CardControl>
+      </StackPanel.Style>
 
-    <ui:CardControl Margin="0,0,0,4">
-      <ui:CardControl.Style>
-        <Style TargetType="ui:CardControl">
-          <Setter Property="Visibility" Value="Collapsed"/>
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Tinted">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </ui:CardControl.Style>
-      <ui:CardControl.Header>
-        <TextBlock Text="Window Opacity" FontSize="14"/>
-      </ui:CardControl.Header>
-      <Slider Value="{Binding ChromeOpacity}" Minimum="0" Maximum="1"
-              Width="140" VerticalAlignment="Center" Focusable="False"
-              SmallChange="0.05" LargeChange="0.1"/>
-    </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Header>
+          <TextBlock Text="Tint Color" FontSize="14"/>
+        </ui:CardControl.Header>
+        <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
+                                 SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
+      </ui:CardControl>
 
-    <ui:CardControl Margin="0,0,0,4">
-      <ui:CardControl.Style>
-        <Style TargetType="ui:CardControl">
-          <Setter Property="Visibility" Value="Collapsed"/>
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Tinted">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </ui:CardControl.Style>
-      <ui:CardControl.Header>
-        <TextBlock Text="Editor Tint" FontSize="14"/>
-      </ui:CardControl.Header>
-      <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
-              Width="140" VerticalAlignment="Center" Focusable="False"
-              SmallChange="0.05" LargeChange="0.1"/>
-    </ui:CardControl>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Header>
+          <TextBlock Text="Window Opacity" FontSize="14"/>
+        </ui:CardControl.Header>
+        <Slider Value="{Binding ChromeOpacity}" Minimum="0" Maximum="1"
+                Width="140" VerticalAlignment="Center" Focusable="False"
+                SmallChange="0.05" LargeChange="0.1"/>
+      </ui:CardControl>
+
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Header>
+          <TextBlock Text="Editor Tint" FontSize="14"/>
+        </ui:CardControl.Header>
+        <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
+                Width="140" VerticalAlignment="Center" Focusable="False"
+                SmallChange="0.05" LargeChange="0.1"/>
+      </ui:CardControl>
+    </StackPanel>
 
     <ui:CardControl Margin="0,0,0,4">
       <ui:CardControl.Header>
