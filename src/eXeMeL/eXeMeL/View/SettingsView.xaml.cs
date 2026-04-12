@@ -67,6 +67,36 @@ namespace eXeMeL.View
       (this.DataContext as Settings).EditorFontSize = Settings.DefaultEditorFontSize;
     }
 
+    private async void CheckForUpdatesButton_Click(object sender, RoutedEventArgs e)
+    {
+      var button = sender as Wpf.Ui.Controls.Button;
+      if (button != null) button.Content = "Checking...";
+
+      var hasUpdate = await App.CheckForUpdatesAsync(silent: false);
+
+      if (hasUpdate)
+      {
+        var result = System.Windows.MessageBox.Show(
+          $"Version {App.LatestUpdate.TargetFullRelease.Version} is available. Update and restart now?",
+          "Update Available",
+          System.Windows.MessageBoxButton.YesNo,
+          System.Windows.MessageBoxImage.Information);
+
+        if (result == System.Windows.MessageBoxResult.Yes)
+        {
+          if (button != null) button.Content = "Downloading...";
+          await App.ApplyUpdateAsync();
+        }
+      }
+      else
+      {
+        System.Windows.MessageBox.Show("You're running the latest version.",
+          "No Updates", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+      }
+
+      if (button != null) button.Content = "Check for Updates";
+    }
+
     private void ResetToDefaultsButton_Click(object sender, RoutedEventArgs e)
     {
       var result = System.Windows.MessageBox.Show(

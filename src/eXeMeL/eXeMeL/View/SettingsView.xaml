@@ -189,6 +189,8 @@
                      FontSize="12" Opacity="0.5"/>
         </StackPanel>
       </ui:CardControl.Header>
+      <ui:Button Content="Check for Updates" Click="CheckForUpdatesButton_Click"
+                 Appearance="Primary" Padding="12,6"/>
     </ui:CardControl>
 
     <TextBlock Margin="8,8,0,0" FontSize="12" Opacity="0.5" TextWrapping="Wrap">
