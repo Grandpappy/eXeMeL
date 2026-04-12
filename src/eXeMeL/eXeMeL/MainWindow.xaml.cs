@@ -52,6 +52,9 @@ namespace eXeMeL
       this.FoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, true));
       this.UnFoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, false));
 
+      // Set backdrop BEFORE InitializeComponent so FluentWindow configures chrome correctly
+      ApplyBackdropForCurrentTheme();
+
       InitializeComponent();
 
       // Override FluentWindow's WindowChrome so our custom title bar supports drag/double-click
@@ -73,9 +76,6 @@ namespace eXeMeL
             UseAeroCaptionButtons = false
           });
         }
-
-        // Apply glass backdrop on startup if theme requires it
-        ApplyBackdropForCurrentTheme();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -713,19 +713,29 @@ namespace eXeMeL
 
     private void HandleApplicationThemeUpdatedMessage(ApplicationThemeUpdatedMessage message)
     {
-      ApplyBackdropForCurrentTheme();
+      // Schedule backdrop change on next dispatcher pass to avoid
+      // conflicting with FluentWindow's chrome reconfiguration
+      this.Dispatcher.BeginInvoke(new Action(ApplyBackdropForCurrentTheme),
+        System.Windows.Threading.DispatcherPriority.Background);
     }
 
     private void ApplyBackdropForCurrentTheme()
     {
-      var theme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
-      if (theme.IsGlassTheme())
+      try
       {
-        this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Acrylic;
+        var theme = this.ViewModel?.Settings?.ApplicationTheme ?? ApplicationTheme.Dark;
+        if (theme.IsGlassTheme())
+        {
+          this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Acrylic;
+        }
+        else
+        {
+          this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Mica;
+        }
       }
-      else
+      catch
       {
-        this.WindowBackdropType = Wpf.Ui.Controls.WindowBackdropType.Mica;
+        // FluentWindow may throw during chrome reconfiguration — safe to ignore
       }
     }
 

@@ -38,7 +38,7 @@ namespace eXeMeL
       var currentException = e.Exception;
       while (currentException != null)
       {
-        error += currentException.Message + Environment.NewLine + Environment.NewLine;
+        error += currentException.Message + Environment.NewLine + currentException.StackTrace + Environment.NewLine + Environment.NewLine;
         currentException = currentException.InnerException;
       }
 
