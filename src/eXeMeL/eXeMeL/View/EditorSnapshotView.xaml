@@ -1,57 +1,22 @@
-﻿<UserControl x:Class="eXeMeL.View.EditorSnapshotView"
+<UserControl x:Class="eXeMeL.View.EditorSnapshotView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:vm="clr-namespace:eXeMeL.ViewModel"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              Name="ControlRoot"
-             d:DesignHeight="40" d:DesignWidth="300"
+             d:DesignHeight="32" d:DesignWidth="500"
              d:DataContext="{d:DesignInstance Type=vm:EditorViewModel, IsDesignTimeCreatable=True}"
       >
-	<UserControl.Resources>
-		<DataTemplate x:Key="SnapshotDataTemplate">
-			<Border Margin="2,0">
-        <Button 
-          x:Name="SelectSnapshotButton" 
-          Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}" 
-          CommandParameter="{Binding}"
-          Content="{Binding Identifier}" 
-          MinWidth="30" Height="30"
-          Focusable="False"
-          >
-          <Button.ToolTip>
-            <StackPanel Orientation="Vertical">
-              <TextBlock Text="Go to this snapshot"/>
-            </StackPanel>
-          </Button.ToolTip>
-        </Button>
-      </Border>
-		</DataTemplate>
-	</UserControl.Resources>
-  
-  <Grid >
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="Auto"/>
-    </Grid.ColumnDefinitions>
 
-    <ItemsControl 
-      x:Name="SnapshotItemsControl"
-      Grid.Column="0" 
-      HorizontalAlignment="Right" VerticalAlignment="Center"
-      ItemsSource="{Binding Snapshots}" ItemTemplate="{DynamicResource SnapshotDataTemplate}" BorderThickness="0,0,10,0"
-      
-      >
-		  <ItemsControl.ItemsPanel>
-			  <ItemsPanelTemplate>
-				  <StackPanel Orientation="Horizontal"/>
-			  </ItemsPanelTemplate>
-		  </ItemsControl.ItemsPanel>
-      
-      <ItemsControl.Style>
-        <Style TargetType="ItemsControl">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+    <!-- Snapshot list (only visible when >1 snapshot) -->
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+      <StackPanel.Style>
+        <Style TargetType="StackPanel">
           <Setter Property="Visibility" Value="Visible"/>
           <Style.Triggers>
             <DataTrigger Binding="{Binding Snapshots.Count}" Value="1">
@@ -59,19 +24,56 @@
             </DataTrigger>
           </Style.Triggers>
         </Style>
-      </ItemsControl.Style>
-	  </ItemsControl>
+      </StackPanel.Style>
 
-    <Button 
-      Grid.Column="1"
-      Style="{DynamicResource IconButtonStyle}"
-      Background="{DynamicResource BlackBrush}"
-      OpacityMask="{DynamicResource AddSnapshotBrush}"
-      VerticalAlignment="Center" 
-      ToolTip="Add a new snapshot from this version of the document.  The document's contents and the undo stack will be included in the new snapshot."
-      Command="{Binding CreateSnapshotCommand}" 
-      Focusable="False"
-      >
+      <TextBlock Text="Snapshots:" FontSize="12" Opacity="0.6"
+                 VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+      <ItemsControl ItemsSource="{Binding Snapshots}" VerticalAlignment="Center">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Button
+              Command="{Binding DataContext.ChangeToSnapshotCommand, ElementName=ControlRoot}"
+              CommandParameter="{Binding}"
+              Content="{Binding Identifier}"
+              MinWidth="24" Height="22"
+              Padding="6,1" Margin="0,0,3,0"
+              FontSize="12"
+              Focusable="False">
+              <Button.ToolTip>
+                <TextBlock Text="Go to this snapshot"/>
+              </Button.ToolTip>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+
+    <!-- Always-visible add snapshot button -->
+    <Button Command="{Binding CreateSnapshotCommand}"
+            ToolTip="Create snapshot"
+            Focusable="False"
+            Background="Transparent" BorderThickness="0"
+            Padding="6,0" Opacity="0.6" Cursor="Hand"
+            VerticalAlignment="Center">
+      <Button.Template>
+        <ControlTemplate TargetType="Button">
+          <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter Property="Opacity" Value="1.0"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Button.Template>
+      <ui:SymbolIcon Symbol="BookmarkAdd24" FontSize="18"/>
     </Button>
-  </Grid>
+  </StackPanel>
 </UserControl>

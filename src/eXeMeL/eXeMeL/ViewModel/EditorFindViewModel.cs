@@ -1,6 +1,7 @@
-﻿using eXeMeL.Messages;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using eXeMeL.Messages;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using ICSharpCode.AvalonEdit.Document;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ using eXeMeL.Utilities;
 
 namespace eXeMeL.ViewModel
 {
-  public class EditorFindViewModel : ViewModelBase
+  public class EditorFindViewModel : ObservableObject
   {
     #region Properties
 
@@ -26,27 +27,56 @@ namespace eXeMeL.ViewModel
     private int _matchCount;
     private MatchCollection _matches;
     private int? _currentMatchIndex;
+    private bool _useRegex;
 
 
 
     public string SearchText
     {
       get { return this._currentFindValue; }
-      set 
+      set
       {
         if (!string.IsNullOrEmpty(this.SearchText) && string.IsNullOrEmpty(value))
         {
           NavigateToNoMatch();
         }
 
-        Set(() => this.SearchText, ref this._currentFindValue, value);
+        SetProperty(ref this._currentFindValue, value);
+        OnPropertyChanged(nameof(HasSearchText));
+        (FindNextCommand as RelayCommand)?.NotifyCanExecuteChanged();
+        (FindPreviousCommand as RelayCommand)?.NotifyCanExecuteChanged();
         this.Matches = null;
 
         if (value != null && value.Length == 0)
-          CancelSearch();
+          ClearSearchState();
         else
-          PerformFindNextSearchAsync();
+          _ = PerformFindNextSearchAsync();
       }
+    }
+
+
+
+    public bool HasSearchText => !string.IsNullOrEmpty(SearchText);
+
+    public bool UseRegex
+    {
+      get => _useRegex;
+      set
+      {
+        if (SetProperty(ref _useRegex, value))
+        {
+          this.Matches = null; // Force re-search with new mode
+          if (HasSearchText)
+            _ = PerformFindNextSearchAsync();
+        }
+      }
+    }
+
+    private string _matchStatusText;
+    public string MatchStatusText
+    {
+      get => _matchStatusText;
+      private set => SetProperty(ref _matchStatusText, value);
     }
 
 
@@ -54,17 +84,17 @@ namespace eXeMeL.ViewModel
     public int MatchCount
     {
       get { return this._matchCount; }
-      set { Set(() => this.MatchCount, ref this._matchCount, value); }
+      set { SetProperty(ref this._matchCount, value); }
     }
-    
+
 
 
     private MatchCollection Matches
     {
       get { return this._matches; }
-      set 
-      { 
-        Set(() => this.Matches, ref this._matches, value);
+      set
+      {
+        SetProperty(ref this._matches, value, nameof(Matches));
 
         if (this.Matches == null || this.Matches.Count == 0)
         {
@@ -84,25 +114,25 @@ namespace eXeMeL.ViewModel
     public int? CurrentMatchIndex
     {
       get { return this._currentMatchIndex; }
-      set 
-      { 
+      set
+      {
         if (this.Matches == null || this.Matches.Count == 0)
         {
-          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, null);
+          SetProperty(ref this._currentMatchIndex, null);
         }
         else
         if (value >= 0 && value < this.Matches.Count)
         {
-          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, value);
+          SetProperty(ref this._currentMatchIndex, value);
         }
         else
         if (value < 0)
         {
-          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, 0);
+          SetProperty(ref this._currentMatchIndex, 0);
         }
         else
         {
-          Set(() => this.CurrentMatchIndex, ref this._currentMatchIndex, this.Matches.Count - 1);
+          SetProperty(ref this._currentMatchIndex, this.Matches.Count - 1);
         }
       }
     }
@@ -155,7 +185,7 @@ namespace eXeMeL.ViewModel
       this.FindPreviousCommand = new RelayCommand(FindPreviousCommand_Execute, FindPreviousCommand_CanExecute);
       this.CancelSearchCommand = new RelayCommand(CancelSearchCommand_Execute);
 
-      this.MessengerInstance.Register<SetSearchTextMessage>(this, HandleSetFindTextMessage);
+      WeakReferenceMessenger.Default.Register<SetSearchTextMessage>(this, (r, m) => HandleSetFindTextMessage(m));
 
       this.SearchText = string.Empty;
     }
@@ -176,14 +206,14 @@ namespace eXeMeL.ViewModel
 
 
     #region Searching
-    
+
 
     private bool FindNextCommand_CanExecute()
     {
       return IsSearchTextValidForSearching();
     }
 
-    
+
 
     private async void FindNextCommand_Execute()
     {
@@ -280,13 +310,21 @@ namespace eXeMeL.ViewModel
       if (this.SearchText.Length == 0)
         return;
 
-      //this.AutoFindTimer.Stop();
-
       var text = this.Document.Text;
+      var pattern = UseRegex ? this.SearchText : Regex.Escape(this.SearchText);
 
       await Task.Run(() =>
-        this.Matches = Regex.Matches(text, Regex.Escape(this.SearchText), RegexOptions.IgnoreCase)
-      );
+      {
+        try
+        {
+          this.Matches = Regex.Matches(text, pattern, RegexOptions.IgnoreCase);
+        }
+        catch (System.ArgumentException)
+        {
+          // Invalid regex pattern — clear matches
+          this.Matches = null;
+        }
+      });
     }
 
 
@@ -307,7 +345,7 @@ namespace eXeMeL.ViewModel
     #endregion
 
 
-    #region Navigation 
+    #region Navigation
 
 
     private void NavigateToFirstMatch()
@@ -372,30 +410,43 @@ namespace eXeMeL.ViewModel
     private void CancelSearchCommand_Execute()
     {
       this.SearchText = string.Empty;
+      CancelSearch();
     }
 
 
 
     private void SendNavigationMessageForCurrentMatch()
     {
-      this.MessengerInstance.Send(new SelectTextInEditorMessage(this.CurrentMatch.Index, this.CurrentMatch.Length));
-      this.MessengerInstance.Send(new DisplayToolInformationMessage($"{this.CurrentMatchPosition} of {this.MatchCount} matches"));
+      WeakReferenceMessenger.Default.Send(new SelectTextInEditorMessage(this.CurrentMatch.Index, this.CurrentMatch.Length));
+      MatchStatusText = $"{this.CurrentMatchPosition} of {this.MatchCount} matches";
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(MatchStatusText));
     }
 
 
 
     private void SendNavigationMessageForNoMatch()
     {
-      this.MessengerInstance.Send(new UnselectTextInEditorMessage());
-      this.MessengerInstance.Send(new DisplayToolInformationMessage($"Unable to find \"{this.SearchText}\""));
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+      MatchStatusText = $"No results";
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage($"Unable to find \"{this.SearchText}\""));
     }
 
 
 
+    /// <summary>Clears search state without moving focus (used when text is emptied by typing)</summary>
+    private void ClearSearchState()
+    {
+      MatchStatusText = null;
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
+    }
+
+    /// <summary>Cancels search AND returns focus to editor (used by Escape key)</summary>
     private void CancelSearch()
     {
-      this.MessengerInstance.Send(new SetKeyboardFocusToEditor());
-      this.MessengerInstance.Send(new DisplayToolInformationMessage(string.Empty));
+      MatchStatusText = null;
+      WeakReferenceMessenger.Default.Send(new SetKeyboardFocusToEditor());
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
     }
 
 

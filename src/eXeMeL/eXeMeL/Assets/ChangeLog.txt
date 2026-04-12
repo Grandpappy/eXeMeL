@@ -1,4 +1,15 @@
-﻿*4/23/2020 - Opening
+﻿*4/9/2026 - eXeMeL 2
+
+Major platform update
+
+- Modernized to .NET 9
+- Updated UI design from Material to Fluent for a more native Windows experience
+- Settings now stored in %LOCALAPPDATA%\eXeMeL\settings.json (auto-migrated from Registry on first run)
+- Application is now a single self-contained .exe — no installer or .NET runtime required
+- ClickOnce deployment has been removed in favor of direct executable distribution
+- Command-line argument support: pass a file path to open it directly
+
+*4/23/2020 - Opening
 
 Added Open feature.  Clicking the new open icon or pressing CTRL+O will open the dialog to browse for a file. 
 

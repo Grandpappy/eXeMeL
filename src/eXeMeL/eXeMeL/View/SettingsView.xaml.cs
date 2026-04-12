@@ -26,6 +26,38 @@ namespace eXeMeL.View
     public SettingsView()
     {
       InitializeComponent();
+      this.AddHandler(System.Windows.UIElement.PreviewMouseWheelEvent, new System.Windows.Input.MouseWheelEventHandler(ComboBox_PreviewMouseWheel), true);
+    }
+
+    private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    {
+      // Prevent scroll wheel from changing ComboBox value unless it's open
+      if (e.OriginalSource is System.Windows.DependencyObject source)
+      {
+        var combo = FindParent<System.Windows.Controls.ComboBox>(source);
+        if (combo != null && !combo.IsDropDownOpen)
+        {
+          e.Handled = true;
+        }
+      }
+    }
+
+    private static T FindParent<T>(System.Windows.DependencyObject child) where T : System.Windows.DependencyObject
+    {
+      var current = child;
+      while (current != null)
+      {
+        // Use VisualTreeHelper for Visual elements, LogicalTreeHelper for non-visuals (like Run)
+        System.Windows.DependencyObject parent;
+        if (current is System.Windows.Media.Visual)
+          parent = System.Windows.Media.VisualTreeHelper.GetParent(current);
+        else
+          parent = System.Windows.LogicalTreeHelper.GetParent(current);
+
+        if (parent is T found) return found;
+        current = parent;
+      }
+      return null;
     }
 
 
@@ -33,6 +65,50 @@ namespace eXeMeL.View
     private void ResetFontSizeButton_Click(object sender, RoutedEventArgs e)
     {
       (this.DataContext as Settings).EditorFontSize = Settings.DefaultEditorFontSize;
+    }
+
+    private async void CheckForUpdatesButton_Click(object sender, RoutedEventArgs e)
+    {
+      var button = sender as Wpf.Ui.Controls.Button;
+      if (button != null) button.Content = "Checking...";
+
+      var hasUpdate = await App.CheckForUpdatesAsync(silent: false);
+
+      if (hasUpdate)
+      {
+        var result = System.Windows.MessageBox.Show(
+          $"Version {App.LatestUpdate.TargetFullRelease.Version} is available. Update and restart now?",
+          "Update Available",
+          System.Windows.MessageBoxButton.YesNo,
+          System.Windows.MessageBoxImage.Information);
+
+        if (result == System.Windows.MessageBoxResult.Yes)
+        {
+          if (button != null) button.Content = "Downloading...";
+          await App.ApplyUpdateAsync();
+        }
+      }
+      else
+      {
+        System.Windows.MessageBox.Show("You're running the latest version.",
+          "No Updates", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+      }
+
+      if (button != null) button.Content = "Check for Updates";
+    }
+
+    private void ResetToDefaultsButton_Click(object sender, RoutedEventArgs e)
+    {
+      var result = System.Windows.MessageBox.Show(
+        "Reset all settings to their default values?",
+        "Reset Settings",
+        System.Windows.MessageBoxButton.YesNo,
+        System.Windows.MessageBoxImage.Question);
+
+      if (result == System.Windows.MessageBoxResult.Yes)
+      {
+        (this.DataContext as Settings)?.ResetToDefaults();
+      }
     }
 
 

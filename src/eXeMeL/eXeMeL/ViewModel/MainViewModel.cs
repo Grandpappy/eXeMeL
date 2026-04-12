@@ -1,14 +1,15 @@
 using System.Windows.Input;
 using eXeMeL.Messages;
 using eXeMeL.Model;
-using GalaSoft.MvvmLight;
-using ICSharpCode.AvalonEdit.Document;
-using System.Xml.Linq;
-using GalaSoft.MvvmLight.Command;
+using eXeMeL.ViewModel.JsonUtility;
+using eXeMeL.ViewModel.YamlUtility;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace eXeMeL.ViewModel
 {
-  public class MainViewModel : ViewModelBase
+  public class MainViewModel : ObservableObject
   {
     private string _status;
     private SyntaxHighlightingManager _highlightingManager;
@@ -20,36 +21,51 @@ namespace eXeMeL.ViewModel
     public Settings Settings { get; private set; }
     public EditorViewModel Editor { get; private set; }
     public XmlUtilityViewModel XmlUtility { get; private set; }
-    public string Status { get { return this._status; } private set { Set(() => this.Status, ref this._status, value); } }
-    public string ToolInformation { get { return this._toolInformation; } set { Set(() => this.ToolInformation, ref this._toolInformation, value); } }
-    public SyntaxHighlightingManager HighlightingManager { get { return this._highlightingManager; } private set { Set(() => this.HighlightingManager, ref this._highlightingManager, value); } }
-    public ApplicationThemeManager ApplicationThemeManager { get { return this._applicationThemeManager; } private set { Set(() => this.ApplicationThemeManager, ref this._applicationThemeManager, value); } }
+    public JsonUtilityViewModel JsonUtility { get; private set; }
+    public YamlUtilityViewModel YamlUtility { get; private set; }
+    public string Status { get { return this._status; } private set { SetProperty(ref this._status, value); } }
+    public string ToolInformation { get { return this._toolInformation; } set { SetProperty(ref this._toolInformation, value); } }
+    public SyntaxHighlightingManager HighlightingManager { get { return this._highlightingManager; } private set { SetProperty(ref this._highlightingManager, value); } }
+    public ApplicationThemeManager ApplicationThemeManager { get { return this._applicationThemeManager; } private set { SetProperty(ref this._applicationThemeManager, value); } }
     public ICommand ToggleEditorModeCommand { get; private set; }
-    public EditorMode EditorMode { get { return this._editorMode; } private set { Set(() => this.EditorMode, ref this._editorMode, value); } }
-    //public XElement ParsedXml { get; set; }
+    public EditorMode EditorMode { get { return this._editorMode; } private set { SetProperty(ref this._editorMode, value); } }
 
 
 
     public MainViewModel()
     {
+      SettingsMigrator.MigrateIfNeeded();
       this.Settings = SettingsIO.LoadSettings<Settings>();
       this.HighlightingManager = new SyntaxHighlightingManager(this.Settings);
       this.ApplicationThemeManager = new ApplicationThemeManager(this.Settings);
       this.Editor = new EditorViewModel(this.Settings);
       this.XmlUtility = new XmlUtilityViewModel(this.Settings);
+      this.JsonUtility = new JsonUtilityViewModel(this.Settings);
+      this.YamlUtility = new YamlUtilityViewModel(this.Settings);
       this.ToggleEditorModeCommand = new RelayCommand(ToggleEditorModeCommand_Execute);
-      this.MessengerInstance.Register<ApplicationClosingMessage>(this, HandleApplicationClosingMessage);
-      this.MessengerInstance.Register<DisplayApplicationStatusMessage>(this, HandleDisplayApplicationStatusMessage);
-      this.MessengerInstance.Register<DisplayToolInformationMessage>(this, HandleDisplayToolInformationMessage);
-      this.MessengerInstance.Register<DocumentRefreshCompleted>(this, HandleDocumentRefreshCompletedMessage);
+      WeakReferenceMessenger.Default.Register<ApplicationClosingMessage>(this, (r, m) => HandleApplicationClosingMessage(m));
+      WeakReferenceMessenger.Default.Register<DisplayApplicationStatusMessage>(this, (r, m) => HandleDisplayApplicationStatusMessage(m));
+      WeakReferenceMessenger.Default.Register<DisplayToolInformationMessage>(this, (r, m) => HandleDisplayToolInformationMessage(m));
+      WeakReferenceMessenger.Default.Register<DocumentRefreshCompleted>(this, (r, m) => HandleDocumentRefreshCompletedMessage(m));
     }
 
 
 
     private void HandleDocumentRefreshCompletedMessage(DocumentRefreshCompleted message)
     {
-      //this.EditorMode = EditorMode.Editor;
-      this.XmlUtility.DocumentText = message.NewDocumentText;
+      switch (this.Editor.ContentType)
+      {
+        case DocumentContentType.Json:
+          this.JsonUtility.DocumentText = message.NewDocumentText;
+          break;
+        case DocumentContentType.Yaml:
+          this.YamlUtility.DocumentText = message.NewDocumentText;
+          break;
+        case DocumentContentType.Xml:
+          this.XmlUtility.DocumentText = message.NewDocumentText;
+          break;
+        // Text: no utility to feed
+      }
     }
 
 
@@ -58,7 +74,24 @@ namespace eXeMeL.ViewModel
     {
       if (this.EditorMode == EditorMode.Editor)
       {
-        this.XmlUtility.DocumentText = this.Editor.Document.Text;
+        // Don't toggle to utility for Text mode — no tree viewer
+        if (this.Editor.ContentType == DocumentContentType.Text)
+          return;
+
+        var text = this.Editor.Document.Text;
+        switch (this.Editor.ContentType)
+        {
+          case DocumentContentType.Json:
+            this.JsonUtility.DocumentText = text;
+            break;
+          case DocumentContentType.Yaml:
+            this.YamlUtility.DocumentText = text;
+            break;
+          default:
+            this.XmlUtility.DocumentText = text;
+            break;
+        }
+
         this.EditorMode = EditorMode.XmlUtility;
       }
       else
@@ -66,7 +99,7 @@ namespace eXeMeL.ViewModel
         this.EditorMode = EditorMode.Editor;
       }
 
-      this.MessengerInstance.Send(new EditorModeChangedMessage(this.EditorMode));
+      WeakReferenceMessenger.Default.Send(new EditorModeChangedMessage(this.EditorMode));
     }
 
 

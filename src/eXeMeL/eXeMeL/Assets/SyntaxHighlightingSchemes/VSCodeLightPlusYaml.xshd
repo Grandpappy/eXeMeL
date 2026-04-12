@@ -1,0 +1,22 @@
+<SyntaxDefinition name="YAML" extensions=".yaml;.yml" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#008000" />
+  <Color name="Key" foreground="#800000" />
+  <Color name="StringValue" foreground="#0451a5" />
+  <Color name="Number" foreground="#098658" />
+  <Color name="Keywords" foreground="#0000ff" />
+  <Color name="DocumentMarker" foreground="#0000ff" fontWeight="bold" />
+  <Color name="Anchor" foreground="#000000" />
+  <Color name="Punctuation" foreground="#000000" />
+  <RuleSet>
+    <Rule color="Comment">\#.*$</Rule>
+    <Rule color="DocumentMarker">^---\s*$</Rule>
+    <Rule color="DocumentMarker">^\.\.\.\s*$</Rule>
+    <Rule color="Anchor">[&amp;*]\w+</Rule>
+    <Rule color="Key">^[\s]*[\w][\w.\-/]*(?=\s*:)</Rule>
+    <Span color="StringValue"><Begin>"</Begin><End>"|$</End><RuleSet><Rule color="StringValue">\\.</Rule></RuleSet></Span>
+    <Span color="StringValue"><Begin>'</Begin><End>'|$</End></Span>
+    <Rule color="Number">(?&lt;=:\s)-?\b\d+(\.\d+)?([eE][+-]?\d+)?\b</Rule>
+    <Rule color="Keywords">(?&lt;=:\s)\b(true|false|null|yes|no|on|off)\b</Rule>
+    <Rule color="Punctuation">[-:&gt;|]</Rule>
+  </RuleSet>
+</SyntaxDefinition>

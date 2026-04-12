@@ -1,33 +1,35 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Win32;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace eXeMeL.Model
 {
   internal static class SettingsIO
   {
+    private static readonly string SettingsDirectory =
+      Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "eXeMeL");
+
+    private static readonly string SettingsFilePath =
+      Path.Combine(SettingsDirectory, "settings.json");
+
+    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    {
+      WriteIndented = true,
+      NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+      Converters = { new JsonStringEnumConverter() }
+    };
+
+
+    public static string GetSettingsFilePath() => SettingsFilePath;
+
+
     public static void SaveSettings(Settings settings)
     {
-      using (var s = new MemoryStream())
-      {
-        using (var registryKey = RegistryAccess.OpenRegistryKey())
-        {
-          var serializer = new DataContractJsonSerializer(settings.GetType());
-          serializer.WriteObject(s, settings);
+      Directory.CreateDirectory(SettingsDirectory);
 
-          var value = Encoding.UTF8.GetString(s.ToArray());
-
-          registryKey.SetValue("Settings", value);
-        }
-      }
+      var json = JsonSerializer.Serialize(settings, JsonOptions);
+      File.WriteAllText(SettingsFilePath, json);
     }
 
 
@@ -37,15 +39,13 @@ namespace eXeMeL.Model
     {
       try
       {
-        using (var registryKey = RegistryAccess.OpenRegistryKey())
+        if (!File.Exists(SettingsFilePath))
         {
-          var value = registryKey.GetValue("Settings") as string;
-          using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(value)))
-          {
-            var serializer = new DataContractJsonSerializer(typeof(T));
-            return serializer.ReadObject(memoryStream) as T;
-          }
+          return new T();
         }
+
+        var json = File.ReadAllText(SettingsFilePath);
+        return JsonSerializer.Deserialize<T>(json, JsonOptions) ?? new T();
       }
       catch
       {

@@ -9,7 +9,7 @@
   <Color foreground="#DE7800" name="AttributeName" exampleText='&lt;tag attribute="value" /&gt;' />
   <!--#D37200-->
   <!--<Color foreground="Blue" name="AttributeValue" exampleText='&lt;tag attribute="value" /&gt;' />-->
-  <Color foreground="Teal" name="AttributeValue" exampleText='&lt;tag attribute="value" /&gt;' />
+  <Color foreground="#0070A0" name="AttributeValue" exampleText='&lt;tag attribute="value" /&gt;' />
   <Color foreground="Teal" name="Entity" exampleText="index.aspx?a=1&amp;amp;b=2" />
   <Color foreground="Olive" name="BrokenEntity" exampleText="index.aspx?a=1&amp;b=2" />
 

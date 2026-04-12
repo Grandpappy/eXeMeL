@@ -1,0 +1,107 @@
+<UserControl
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:vm="clr-namespace:eXeMeL.ViewModel.YamlUtility"
+  x:Class="eXeMeL.View.YamlUtilityView"
+  mc:Ignorable="d"
+  Name="ControlRoot"
+  d:DesignHeight="300" d:DesignWidth="400"
+  d:DataContext="{d:DesignInstance vm:YamlUtilityViewModel}"
+  >
+
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+    <Style x:Key="YamlText" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{Binding ElementName=ControlRoot, Path=Settings.EditorFontSize}"/>
+      <Setter Property="FontFamily" Value="{Binding ElementName=ControlRoot, Path=Settings.FontFamily}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <Style TargetType="TreeViewItem">
+      <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="TreeViewItem">
+            <StackPanel>
+              <ContentPresenter ContentSource="Header"/>
+              <ItemsPresenter x:Name="ItemsHost"
+                              Margin="20,0,0,0"
+                              Visibility="{Binding IsExpanded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </StackPanel>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <HierarchicalDataTemplate DataType="{x:Type vm:YamlNodeViewModel}" ItemsSource="{Binding Children}">
+      <StackPanel Orientation="Horizontal" Cursor="Hand"
+                  MouseLeftButtonDown="NodeHeader_MouseLeftButtonDown">
+        <StackPanel.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Expand all" Command="{Binding ExpandAllCommand}"/>
+            <MenuItem Header="Collapse all" Command="{Binding CollapseAllCommand}"/>
+          </ContextMenu>
+        </StackPanel.ContextMenu>
+
+        <!-- Key name -->
+        <TextBlock Text="{Binding Name, StringFormat='{}{0}: '}" Style="{StaticResource YamlText}"
+                   Foreground="{Binding ElementName=ControlRoot, Path=Settings.ElementBrush}"
+                   Visibility="{Binding Name, TargetNullValue=Collapsed, FallbackValue=Visible}"/>
+
+        <!-- Value -->
+        <TextBlock x:Name="ValueText" Text="{Binding Value}" Style="{StaticResource YamlText}"
+                   Foreground="{Binding ElementName=ControlRoot, Path=Settings.AttributeValueBrush}"/>
+
+        <!-- Mapping/Sequence summary -->
+        <TextBlock x:Name="SummaryText" Style="{StaticResource YamlText}" Opacity="0.5" Margin="2,0,0,0"/>
+      </StackPanel>
+
+      <HierarchicalDataTemplate.Triggers>
+        <DataTrigger Binding="{Binding NodeType}" Value="Mapping">
+          <Setter TargetName="ValueText" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="SummaryText" Property="Text" Value="{Binding ChildCount, StringFormat='\{ {0} \}'}"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding NodeType}" Value="Sequence">
+          <Setter TargetName="ValueText" Property="Visibility" Value="Collapsed"/>
+          <Setter TargetName="SummaryText" Property="Text" Value="{Binding ChildCount, StringFormat='[ {0} ]'}"/>
+        </DataTrigger>
+      </HierarchicalDataTemplate.Triggers>
+    </HierarchicalDataTemplate>
+  </UserControl.Resources>
+
+  <Grid>
+    <TreeView x:Name="YamlTree"
+              ItemsSource="{Binding RootItems}"
+              Background="Transparent"
+              BorderThickness="0"
+              Padding="4"
+              Focusable="False"
+              VirtualizingStackPanel.IsVirtualizing="True"
+              VirtualizingStackPanel.VirtualizationMode="Recycling"
+              ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+
+    <TextBlock Text="Document is not valid YAML"
+               HorizontalAlignment="Center" VerticalAlignment="Top"
+               Margin="0,30,0,0"
+               Foreground="{DynamicResource LabelTextBrush}"
+               FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock">
+          <Setter Property="Visibility" Value="Collapsed"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding ShowInvalidMessage}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+    </TextBlock>
+  </Grid>
+</UserControl>

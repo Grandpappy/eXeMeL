@@ -33,6 +33,32 @@ namespace eXeMeL.Model
 
 
 
+  [AttributeUsage(AttributeTargets.Field)]
+  public class AssociatedJsonEmbeddedResourceAttribute : Attribute
+  {
+    public string HighlightResourceName { get; private set; }
+
+    public AssociatedJsonEmbeddedResourceAttribute(string highlightResourceName)
+    {
+      this.HighlightResourceName = highlightResourceName;
+    }
+  }
+
+
+
+  [AttributeUsage(AttributeTargets.Field)]
+  public class AssociatedYamlEmbeddedResourceAttribute : Attribute
+  {
+    public string HighlightResourceName { get; private set; }
+
+    public AssociatedYamlEmbeddedResourceAttribute(string highlightResourceName)
+    {
+      this.HighlightResourceName = highlightResourceName;
+    }
+  }
+
+
+
   public class DoNotDisplayInSettingsAttribute : Attribute
   {
 
@@ -60,7 +86,9 @@ namespace eXeMeL.Model
 
     public AssociatedThemeBrushAttribute(ApplicationTheme associatedTheme, ThemeBrushTarget target, string associatedBrush)
     {
-      this.AssociatedBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(associatedBrush);
+      var brush = (SolidColorBrush)new BrushConverter().ConvertFromString(associatedBrush);
+      brush.Freeze();
+      this.AssociatedBrush = brush;
       this.AssociatedTheme = associatedTheme;
       this.Target = target;
     }

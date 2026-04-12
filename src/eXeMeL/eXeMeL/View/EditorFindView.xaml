@@ -1,56 +1,119 @@
-﻿<UserControl x:Class="eXeMeL.View.EditorFindView"
+<UserControl x:Class="eXeMeL.View.EditorFindView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" >
-  
-  
+
   <UserControl.InputBindings>
     <KeyBinding Key="F3" Command="{Binding FindViewModel.FindNextCommand}"/>
     <KeyBinding Modifiers="Shift" Key="F3" Command="{Binding FindViewModel.FindPreviousCommand}"/>
-    <KeyBinding Key="Escape" Command="{Binding FindViewModel.CancelSearchCommand}"></KeyBinding>
+    <KeyBinding Key="Escape" Command="{Binding FindViewModel.CancelSearchCommand}"/>
   </UserControl.InputBindings>
-  
-  
-  <Grid>
-    <StackPanel Orientation="Horizontal">
-      <TextBox 
-        x:Name="FindSearchText" 
-        Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}" 
-        MahApps:TextboxHelper.ClearTextButton="True" 
-        MahApps:TextboxHelper.SelectAllOnFocus="True" 
-        MahApps:TextboxHelper.Watermark="Find..." 
-        Width="200" 
-        Margin="0,0,10,0" 
-        FontSize="14" 
-        PreviewKeyDown="FindSearchText_PreviewKeyDown"
-        IsTabStop="False"
-        />
-      
-      <Button 
-        x:Name="FindNextButton" 
-        Command="{Binding FindViewModel.FindNextCommand}" 
-        Style="{DynamicResource IconButtonStyle}"
-        Background="{DynamicResource BlackBrush}"
-        OpacityMask="{DynamicResource FindNextIconBrush}"
-        HorizontalAlignment="Center" 
-        VerticalAlignment="Center" 
-        ToolTip="Find Next (F3)"
-        Margin="0,0,10,0" 
-        />
 
-      <Button 
-        x:Name="FindPreviousButton" 
-        Command="{Binding FindViewModel.FindPreviousCommand}" 
-        Style="{DynamicResource IconButtonStyle}"
-        Background="{DynamicResource BlackBrush}"
-        OpacityMask="{DynamicResource FindPreviousIconBrush}"
-        HorizontalAlignment="Center" 
-        VerticalAlignment="Center" 
-        ToolTip="Find Previous (Shift F3)"
-        />
-    </StackPanel>
-  </Grid>
+  <StackPanel Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True" Width="420">
+    <!-- Combined find input: textbox + regex toggle in a unified border -->
+    <Border CornerRadius="4" BorderThickness="1"
+            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            Background="{DynamicResource ControlFillColorDefaultBrush}"
+            Padding="0" Margin="0,0,0,0">
+      <StackPanel Orientation="Horizontal">
+        <ui:TextBox
+          x:Name="FindSearchText"
+          PlaceholderText="Find..."
+          ClearButtonEnabled="True"
+          Text="{Binding FindViewModel.SearchText, Delay=0, UpdateSourceTrigger=PropertyChanged}"
+          Width="210"
+          Margin="0"
+          FontSize="13"
+          BorderThickness="0"
+          PreviewKeyDown="FindSearchText_PreviewKeyDown"
+          IsTabStop="False"
+          GotFocus="FindSearchText_GotFocus"
+          />
+
+        <!-- Regex toggle — visually inside the textbox -->
+        <Border Width="1" Height="16" Background="{DynamicResource ControlStrokeColorDefaultBrush}" Margin="0,0,2,0"/>
+        <ToggleButton x:Name="RegexToggle"
+                      IsChecked="{Binding FindViewModel.UseRegex}"
+                      ToolTip="Use Regular Expressions (.*)"
+                      Margin="0" Padding="5,3"
+                      WindowChrome.IsHitTestVisibleInChrome="True"
+                      FontSize="11" FontFamily="Consolas" FontWeight="Bold"
+                      Content=".*"
+                      Background="Transparent" BorderThickness="0"
+                      Cursor="Hand" Opacity="0.5">
+          <ToggleButton.Style>
+            <Style TargetType="ToggleButton">
+              <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+              <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                  <Setter Property="Opacity" Value="1.0"/>
+                  <Setter Property="Foreground" Value="{DynamicResource AppAccentBrush}"/>
+                </Trigger>
+              </Style.Triggers>
+            </Style>
+          </ToggleButton.Style>
+        </ToggleButton>
+      </StackPanel>
+    </Border>
+
+    <!-- Next/Prev arrows — hidden until there's search text -->
+    <ui:Button
+      x:Name="FindNextButton"
+      Command="{Binding FindViewModel.FindNextCommand}"
+      Appearance="Transparent"
+      Icon="{ui:SymbolIcon ChevronDown24}"
+      ToolTip="Find Next (F3)"
+      Padding="4" Margin="8,0,1,0"
+      WindowChrome.IsHitTestVisibleInChrome="True">
+      <ui:Button.Style>
+        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+          <Setter Property="Visibility" Value="Hidden"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding FindViewModel.HasSearchText}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ui:Button.Style>
+    </ui:Button>
+
+    <ui:Button
+      x:Name="FindPreviousButton"
+      Command="{Binding FindViewModel.FindPreviousCommand}"
+      Appearance="Transparent"
+      Icon="{ui:SymbolIcon ChevronUp24}"
+      ToolTip="Find Previous (Shift+F3)"
+      Padding="4"
+      WindowChrome.IsHitTestVisibleInChrome="True">
+      <ui:Button.Style>
+        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+          <Setter Property="Visibility" Value="Hidden"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding FindViewModel.HasSearchText}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ui:Button.Style>
+    </ui:Button>
+
+    <!-- Match status text — hidden (not collapsed) when no results to show -->
+    <TextBlock Text="{Binding FindViewModel.MatchStatusText}"
+               VerticalAlignment="Center" FontSize="12" Opacity="0.6"
+               Margin="6,0,0,0" MinWidth="90">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock">
+          <Setter Property="Visibility" Value="Hidden"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding FindViewModel.HasSearchText}" Value="True">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+    </TextBlock>
+  </StackPanel>
 </UserControl>

@@ -1,125 +1,26 @@
-﻿<MahApps:MetroWindow
-  xmlns:MahApps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+<ui:FluentWindow
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   xmlns:views="clr-namespace:eXeMeL.View"
   xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-  ResizeMode="CanResize"
-  SaveWindowPosition="True"
-  mc:Ignorable="d" 
+  mc:Ignorable="d"
   x:Class="eXeMeL.MainWindow"
-  Title="eXeMeL" 
-  ShowTitleBar="False"
+  Title="eXeMeL 2"
   Icon="Assets\eXeMeL Icon.ico"
-  d:DesignWidth="742" d:DesignHeight="577"
+  d:DesignWidth="800" d:DesignHeight="600"
   x:Name="ControlRoot"
-  GlowBrush="#FFD4AA00"
+  ExtendsContentIntoTitleBar="True"
   >
 
-
-  <MahApps:MetroWindow.Resources>
-    <ResourceDictionary>
-      <Style x:Key="SectionHeaderStyle" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{DynamicResource LabelTextBrush}"/>
-        <Setter Property="FontSize" Value="26.667"/>
-        <Setter Property="FontFamily" Value="Segoe UI"/>
-        <Setter Property="Opacity" Value="0.8"/>
-      </Style>
-
-    </ResourceDictionary>
-  </MahApps:MetroWindow.Resources>
-
-
-
-  <MahApps:MetroWindow.DataContext>
+  <Window.DataContext>
     <Binding Path="Main" Source="{StaticResource Locator}"/>
-  </MahApps:MetroWindow.DataContext>
+  </Window.DataContext>
 
-
-
-  <MahApps:MetroWindow.WindowCommands>
-    <MahApps:WindowCommands>
-
-      <Button 
-        Command="{Binding Editor.RefreshCommand}" 
-        ToolTip="Replace all text with what's in the clipboard (F5)" Focusable="False"
-        >
-        <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource RefreshIconBrush}"/>
-          <TextBlock Text="refresh" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
-        </StackPanel>
-      </Button>
-
-
-      <Button 
-        Command="{Binding Editor.CopyCommand}" 
-        ToolTip="Copy all text to the clipboard"  Focusable="False"
-        >
-        <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource CopyIconBrush}"/>
-          <TextBlock Text="copy all" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
-        </StackPanel>
-      </Button>
-
-      
-      <Button 
-        Command="{Binding Editor.OpenCommand}" 
-        ToolTip="Load an existing XML file to the editor(Ctrl+O)" Focusable="False"
-        >
-        <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource OpenIconBrush}"/>
-          <TextBlock Text="open" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
-        </StackPanel>
-      </Button>
-
-
-      <Button 
-        Command="{Binding Editor.SaveCommand}" 
-        ToolTip="Save the contents of the editor (Ctrl+S)" Focusable="False"
-        >
-        <StackPanel Orientation="Horizontal" Background="Transparent">
-          <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource SaveIconBrush}"/>
-          <TextBlock Text="save" FontFamily="SegoeUI" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="14"/>
-        </StackPanel>
-      </Button>
-
-
-      <Button Click="OpenSettingsButton_Click" ToolTip="Edit settings" Focusable="False">
-        <Rectangle Width="20" Height="20" Fill="{DynamicResource BlackBrush}" OpacityMask="{DynamicResource SettingsIconbrush}"/>
-      </Button>
-
-    </MahApps:WindowCommands>
-  </MahApps:MetroWindow.WindowCommands>
-
-
-
-  <MahApps:MetroWindow.Flyouts>
-    <MahApps:FlyoutsControl>
-      <MahApps:FlyoutsControl.Items>
-        <MahApps:Flyout
-            x:Name="SettingsFlyout"
-            Header="Settings"
-            IsOpen="False"
-            Background="{DynamicResource FlyoutBackgroundBrush}"
-            Foreground="{DynamicResource FlyoutForegroundBrush}"
-            >
-          <StackPanel Orientation="Vertical">
-            <views:SettingsView DataContext="{Binding Settings}"/>
-            <Button x:Name="ChangeLogButton" Content="View Change Log" Click="ChangeLogButton_Click" Margin="10" HorizontalAlignment="Left" Focusable="False"/>
-          </StackPanel>
-        </MahApps:Flyout>
-      </MahApps:FlyoutsControl.Items>
-    </MahApps:FlyoutsControl>
-
-
-  </MahApps:MetroWindow.Flyouts>
-
-
-
-  <MahApps:MetroWindow.InputBindings>
+  <Window.InputBindings>
     <KeyBinding Key="F5" Command="{Binding Editor.RefreshCommand}"/>
     <KeyBinding Key="F2" Command="{Binding ToggleEditorModeCommand}"/>
     <KeyBinding Modifiers="Control" Key="F" Command="{Binding FocusOnFindControlCommand, ElementName=ControlRoot}"/>
@@ -149,294 +50,423 @@
     <KeyBinding Modifiers="Alt+Shift" Key="D9" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="9" />
     <KeyBinding Modifiers="Alt" Key="OemMinus" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
     <KeyBinding Modifiers="Alt+Shift" Key="OemMinus" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
-  </MahApps:MetroWindow.InputBindings>
+  </Window.InputBindings>
 
+  <Window.Resources>
+    <!-- AvalonEdit SearchPanel styling for dark themes -->
+    <Style TargetType="{x:Type avalonEdit:TextEditor}">
+      <Style.Resources>
+        <!-- Make SearchPanel readable on dark backgrounds -->
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF2B2B2B"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#FFFFFFFF"/>
+      </Style.Resources>
+    </Style>
 
-  <Grid Background="#00000000">
-    <i:Interaction.Triggers>
-      <i:DataTrigger Binding="{Binding EditorMode}" Value="Editor">
-        <i:GoToStateAction x:Name="GoToEditorViewAction" StateName="Editor"/>
-      </i:DataTrigger>
-      <i:DataTrigger Binding="{Binding EditorMode}" Value="XmlUtility">
-        <i:GoToStateAction x:Name="GoToXmlUtilityAction" StateName="XmlUtility"/>
-      </i:DataTrigger>
-    </i:Interaction.Triggers>
-    <VisualStateManager.VisualStateGroups>
-      <VisualStateGroup x:Name="EditorView">
-        <VisualState x:Name="Editor">
-          <Storyboard>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityView">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-            </ObjectAnimationUsingKeyFrames>
-          </Storyboard>
-        </VisualState>
-        <VisualState x:Name="XmlUtility">
-          <Storyboard>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="XmlUtilityView">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="AvalonEditor">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="EditorFindControl">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="EditorSnapshotControl">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
-            </ObjectAnimationUsingKeyFrames>
-            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(ContentControl.Content)" Storyboard.TargetName="button">
-              <DiscreteObjectKeyFrame KeyTime="0" Value="XPath Utility"/>
-            </ObjectAnimationUsingKeyFrames>
-          </Storyboard>
-        </VisualState>
-      </VisualStateGroup>
-    </VisualStateManager.VisualStateGroups>
+    <!-- Muted icon button for the title bar: no background, opacity-based hover -->
+    <Style x:Key="TitleBarIconButton" TargetType="Button">
+      <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="1.0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.2"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- Window chrome button (min/max/close) -->
+    <Style x:Key="ChromeButton" TargetType="Button">
+      <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#18FFFFFF"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#28FFFFFF"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="ChromeCloseButton" BasedOn="{StaticResource ChromeButton}" TargetType="Button">
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Bd" Background="{TemplateBinding Background}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#E81123"/>
+                <Setter Property="Foreground" Value="White"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="#F1707A"/>
+                <Setter Property="Foreground" Value="White"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
+  <Grid>
     <Grid.RowDefinitions>
-      <RowDefinition Height="40"/>
-      <RowDefinition/>
-      <RowDefinition Height="28"/>
+      <RowDefinition Height="46"/>
+      <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
-    <Border Grid.Row="2">
-      <Border.Background>
-        <SolidColorBrush Color="{DynamicResource AccentColor}"/>
-      </Border.Background>
-    </Border>
+    <!-- Chrome tint overlay — covers entire window but doesn't intercept hits -->
+    <Border Grid.RowSpan="2" Background="{DynamicResource ChromeTintOverlayBrush}" IsHitTestVisible="False"/>
 
-    <Border Grid.Row="1">
-      <Grid>
+    <!-- Custom Title Bar (full-width Grid for true centering) -->
+    <Grid Grid.Row="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- Left: Icon + Title + Tool buttons -->
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+        <Image Source="Assets\eXeMeL Icon.ico" Width="16" Height="16" Margin="0,0,10,0"
+               RenderOptions.BitmapScalingMode="HighQuality"
+               WindowChrome.IsHitTestVisibleInChrome="False"/>
+        <TextBlock VerticalAlignment="Center" FontSize="13" Margin="0,0,16,0"
+                   Foreground="{DynamicResource AppTextBrush}">
+          <Run x:Name="AppTitleRun" Text="eXeMeL" FontWeight="SemiBold"/>
+          <Run x:Name="AppTitleSuffix" Text=" 2" FontWeight="SemiBold" Foreground="{DynamicResource AppAccentBrush}"/>
+        </TextBlock>
+
+        <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Refresh from clipboard (F5)"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="18"/>
+        </Button>
+        <Button Command="{Binding Editor.CopyCommand}" ToolTip="Copy all to clipboard"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="Copy24" FontSize="18"/>
+        </Button>
+        <Button Command="{Binding Editor.OpenCommand}" ToolTip="Open file (Ctrl+O)"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="FolderOpen24" FontSize="18"/>
+        </Button>
+        <Button Command="{Binding Editor.SaveCommand}" ToolTip="Save (Ctrl+S)"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="Save24" FontSize="18"/>
+        </Button>
+
+      </StackPanel>
+
+      <!-- Center: Find bar (columns 1-*-2-*-3 give true centering) -->
+      <views:EditorFindView
+        x:Name="EditorFindControl"
+        Grid.Column="2"
+        DataContext="{Binding Editor}"
+        VerticalAlignment="Center"
+        WindowChrome.IsHitTestVisibleInChrome="True"/>
+
+      <!-- Right: Settings only (mode toggle moved to tabs) -->
+      <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
+        <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
+                Style="{StaticResource TitleBarIconButton}">
+          <ui:SymbolIcon Symbol="Settings24" FontSize="18"/>
+        </Button>
+      </StackPanel>
+
+      <!-- Window chrome buttons (min/max/close) — vertically stretched to match row height -->
+      <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Stretch">
+        <Button Style="{StaticResource ChromeButton}" Click="MinimizeButton_Click">
+          <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="11"
+                     Foreground="{DynamicResource AppTextBrush}"/>
+        </Button>
+        <Button Style="{StaticResource ChromeButton}" Click="MaximizeRestoreButton_Click">
+          <TextBlock x:Name="MaximizeRestoreGlyph" Text="&#xE739;" FontFamily="Segoe MDL2 Assets" FontSize="11"
+                     Foreground="{DynamicResource AppTextBrush}"/>
+        </Button>
+        <Button Style="{StaticResource ChromeCloseButton}" Click="CloseButton_Click">
+          <TextBlock Text="&#xE106;" FontFamily="Segoe MDL2 Assets" FontSize="11"
+                     Foreground="{DynamicResource AppTextBrush}"/>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- Main content area -->
+    <Grid Grid.Row="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <!-- Tab header row + Snapshots -->
+      <Grid Grid.Row="0" Margin="8,4,8,0">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition/>
-          <ColumnDefinition Width="5"/>
           <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Margin="0" Padding="5,0,5,5" DataContext="{Binding Editor}">
+        <!-- Tab headers -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal">
+          <Border x:Name="EditorTabHeader" MouseLeftButtonDown="EditorTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0"
+                  Background="{DynamicResource EditorTintOverlayBrush}"
+                  BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                  BorderThickness="1,1,1,0">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="Document24" FontSize="16" Margin="0,0,6,0">
+                <ui:SymbolIcon.Style>
+                  <Style TargetType="ui:SymbolIcon">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </ui:SymbolIcon.Style>
+              </ui:SymbolIcon>
+              <ui:SymbolIcon Symbol="Clipboard24" FontSize="16" Margin="0,0,6,0">
+                <ui:SymbolIcon.Style>
+                  <Style TargetType="ui:SymbolIcon">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding Editor.IsContentFromFile}" Value="False">
+                        <Setter Property="Visibility" Value="Visible"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </ui:SymbolIcon.Style>
+              </ui:SymbolIcon>
+              <TextBlock x:Name="EditorTabLabel" Text="Clipboard Content" VerticalAlignment="Center" FontSize="13"/>
+            </StackPanel>
+          </Border>
 
+          <Border x:Name="XPathTabHeader" MouseLeftButtonDown="XPathTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0" Margin="2,0,0,0"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  BorderThickness="1,1,1,0">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="BranchFork24" FontSize="16" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="XPath Tool" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
+            </StackPanel>
+          </Border>
+
+          <Border x:Name="JsonTreeTabHeader" MouseLeftButtonDown="JsonTreeTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0" Margin="2,0,0,0"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  BorderThickness="1,1,1,0"
+                  Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="BranchFork24" FontSize="16" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="JSON Tree" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
+            </StackPanel>
+          </Border>
+
+          <Border x:Name="YamlTreeTabHeader" MouseLeftButtonDown="YamlTreeTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0" Margin="2,0,0,0"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  BorderThickness="1,1,1,0"
+                  Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="BranchFork24" FontSize="16" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="YAML Tree" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- Snapshots inline with tabs (right-aligned) -->
+        <views:EditorSnapshotView
+          x:Name="EditorSnapshotControl"
+          Grid.Column="1"
+          DataContext="{Binding Editor}"
+          VerticalAlignment="Center"
+          HorizontalAlignment="Right"/>
+      </Grid>
+
+      <!-- Tab content -->
+      <Grid Grid.Row="1">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition x:Name="SettingsPanelColumn" Width="0"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Editor content (visible by default) -->
+        <Border x:Name="EditorPanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource EditorTintOverlayBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="0,6,6,6"
+                Padding="2"
+                DataContext="{Binding Editor}">
+          <avalonEdit:TextEditor
+            x:Name="AvalonEditor"
+            FontFamily="{Binding Settings.FontFamily}"
+            FontSize="{Binding Settings.EditorFontSize}"
+            SyntaxHighlighting="{Binding DataContext.HighlightingManager.HighlightingDefinition, Mode=OneWay, ElementName=ControlRoot}"
+            BorderThickness="0"
+            Document="{Binding Document}"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto"
+            ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
+            WordWrap="{Binding Settings.WrapEditorText}"
+            Background="Transparent"
+            Foreground="{Binding Settings.EditorBrush}"
+            MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
+            >
+            <avalonEdit:TextEditor.ContextMenu>
+              <ContextMenu>
+                <MenuItem Header="Copy" Command="Copy"/>
+                <MenuItem Header="Cut" Command="Cut"/>
+                <MenuItem Header="Paste" Command="Paste"/>
+                <Separator/>
+                <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
+                <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
+              </ContextMenu>
+            </avalonEdit:TextEditor.ContextMenu>
+            <avalonEdit:TextEditor.Options>
+              <avalonEdit:TextEditorOptions
+                EnableHyperlinks="False"
+                EnableEmailHyperlinks="False"
+                AllowScrollBelowDocument="True"
+                />
+            </avalonEdit:TextEditor.Options>
+          </avalonEdit:TextEditor>
+        </Border>
+
+        <!-- XPath content (hidden by default) -->
+        <Border x:Name="XPathPanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource EditorTintOverlayBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="6,0,6,6"
+                Padding="2"
+                Visibility="Collapsed">
+          <views:XmlUtilityView
+            x:Name="XmlUtilityView"
+            DataContext="{Binding XmlUtility}"/>
+        </Border>
+
+        <!-- JSON Tree content (hidden by default) -->
+        <Border x:Name="JsonTreePanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource EditorTintOverlayBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="6,0,6,6"
+                Padding="2"
+                Visibility="Collapsed">
+          <views:JsonUtilityView
+            x:Name="JsonUtilityView"
+            DataContext="{Binding JsonUtility}"/>
+        </Border>
+
+        <!-- YAML Tree content (hidden by default) -->
+        <Border x:Name="YamlTreePanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource EditorTintOverlayBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="6,0,6,6"
+                Padding="2"
+                Visibility="Collapsed">
+          <views:YamlUtilityView
+            x:Name="YamlUtilityView"
+            DataContext="{Binding YamlUtility}"/>
+        </Border>
+
+        <!-- Settings Panel (slide-in from right) -->
+        <Border
+          x:Name="SettingsPanel"
+          Grid.Column="1"
+          Background="{DynamicResource ChromeTintOverlayBrush}"
+          BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
+          BorderThickness="1,0,0,0">
           <Grid>
             <Grid.RowDefinitions>
               <RowDefinition Height="Auto"/>
               <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Height="40" >
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-              </Grid.ColumnDefinitions>
-
-              <Rectangle Grid.Column="0" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,10,5,5" Fill="{DynamicResource AccentColorBrush}">
-                <Rectangle.OpacityMask>
-                  <VisualBrush Visual="{StaticResource EditorIconCanvas}" Stretch="Fill" />
-                </Rectangle.OpacityMask>
-              </Rectangle>
-
-              <Button x:Name="button" Grid.Column="1" Margin="5,1,0,0" Command="{Binding ViewModel.ToggleEditorModeCommand, ElementName=ControlRoot}" Content="Editor" ToolTip="Click to change the view (F2)" Focusable="False">
-                <Button.Template>
-                  <ControlTemplate TargetType="Button">
-                    <Border Background="Transparent" BorderThickness="0">
-                      <TextBlock Name="HeaderText" Text="{TemplateBinding Content}" HorizontalAlignment="Left" VerticalAlignment="Center" FontWeight="Normal" Style="{DynamicResource SectionHeaderStyle}"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                      <Trigger Property="IsMouseOver" Value="True">
-                        <Setter TargetName="HeaderText" Property="Opacity" Value="1"/>
-                        <Setter TargetName="HeaderText" Property="Foreground" Value="White"/>
-                      </Trigger>
-                    </ControlTemplate.Triggers>
-                  </ControlTemplate>
-                </Button.Template>
-              </Button>
-
-              <Rectangle Grid.Column="2" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,10,5,5" Fill="{DynamicResource AccentColorBrush}">
-                <Rectangle.ToolTip>
-                  <TextBlock Text="{Binding FilePath}"/>
-                </Rectangle.ToolTip>
-                <Rectangle.OpacityMask>
-                  <VisualBrush Visual="{StaticResource XMLDocumentIcon}" Stretch="Fill" />
-                </Rectangle.OpacityMask>
-                <Rectangle.Style>
-                  <Style TargetType="Rectangle">
-                    <Setter Property="Visibility" Value="Visible"/>
-
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding IsContentFromFile}" Value="False">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                      </DataTrigger>
-                    </Style.Triggers>
-                  </Style>
-                </Rectangle.Style>
-              </Rectangle>
-              <Rectangle Grid.Column="2" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,10,5,5" Fill="{DynamicResource AccentColorBrush}">
-                <Rectangle.ToolTip>
-                  <TextBlock Text="This is a temporary file.  Save the file to persist it."/>
-                </Rectangle.ToolTip>
-                <Rectangle.OpacityMask>
-                  <VisualBrush Visual="{StaticResource XMLIcon}" Stretch="Fill" />
-                </Rectangle.OpacityMask>
-                <Rectangle.Style>
-                  <Style TargetType="Rectangle">
-                    <Setter Property="Visibility" Value="Visible"/>
-
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding IsContentFromFile}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                      </DataTrigger>
-                    </Style.Triggers>
-                  </Style>
-                </Rectangle.Style>
-              </Rectangle>
-
-              <views:EditorSnapshotView 
-                x:Name="EditorSnapshotControl" 
-                Grid.Column="3" 
-                HorizontalAlignment="Right" 
-                VerticalAlignment="Center"
-                />
-              <views:EditorFindView 
-                x:Name="EditorFindControl" 
-                Grid.Column="4" 
-                Margin="20,0,0,0"
-                HorizontalAlignment="Right" 
-                VerticalAlignment="Center"
-                />
+            <Grid Grid.Row="0" Margin="16,16,16,8">
+              <TextBlock Text="Settings" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+              <ui:Button HorizontalAlignment="Right" VerticalAlignment="Center"
+                         Appearance="Transparent"
+                         Icon="{ui:SymbolIcon Dismiss24}"
+                         Click="CloseSettingsButton_Click"
+                         Padding="6"/>
             </Grid>
 
-            <avalonEdit:TextEditor
-              x:Name="AvalonEditor"
-              Grid.Row="1"
-              Margin="0,15,0,0"
-              FontFamily="{Binding Settings.FontFamily}" 
-              FontSize="{Binding Settings.EditorFontSize}" 
-              SyntaxHighlighting="{Binding DataContext.HighlightingManager.HighlightingDefinition, Mode=OneWay, ElementName=ControlRoot}"
-              BorderThickness="1" 
-              Document="{Binding Document}"
-              VerticalScrollBarVisibility="Auto" 
-              HorizontalScrollBarVisibility="Auto"
-              ShowLineNumbers="{Binding Settings.ShowEditorLineNumbers}"
-              WordWrap="{Binding Settings.WrapEditorText}"
-              Background="{x:Null}"
-              Foreground="{Binding Settings.EditorBrush}"
-              MouseRightButtonDown="AvalonEditor_TextAreaMouseRightButtonDown"
-              >
-              <avalonEdit:TextEditor.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="Copy" Command="Copy"/>
-                  <MenuItem Header="Cut" Command="Cut"/>
-                  <MenuItem Header="Paste" Command="Paste"/>
-                  <Separator Margin="3"/>
-                  <MenuItem Header="Delve into Decoded XML" Command="{Binding DelveIntoDecodedXmlFromCursorPositionCommand}"/>
-                  <MenuItem Header="Copy Decoded XML" Command="{Binding CopyDecodedXmlFromCursorPositionCommand}"/>
-                </ContextMenu>
-              </avalonEdit:TextEditor.ContextMenu>
-              <avalonEdit:TextEditor.Options>
-                <avalonEdit:TextEditorOptions
-                  EnableHyperlinks="False"
-                  EnableEmailHyperlinks="False"
-                  AllowScrollBelowDocument="True"
-                  />
-              </avalonEdit:TextEditor.Options>
-            </avalonEdit:TextEditor>
-
-            <views:XmlUtilityView 
-              x:Name="XmlUtilityView"
-              Grid.Row="1"
-              Margin="0,15,0,0" 
-              Visibility="Collapsed"
-              DataContext="{Binding ViewModel.XmlUtility, ElementName=ControlRoot}"
-              />
-          </Grid>
-        </Border>
-
-        <Border Grid.Column="2" Margin="0" Padding="5,0,5,5" Cursor="Hand" Visibility="Collapsed">
-          <Grid>
-            <Button HorizontalAlignment="Stretch" Margin="-5,0,-5,-5" Focusable="False">
-              <Button.Template>
-                <ControlTemplate TargetType="{x:Type Button}">
-                  <Border Background="{DynamicResource Gray4Brush}" Padding="5,0,5,5">
-                    <VisualStateManager.VisualStateGroups>
-                      <VisualStateGroup x:Name="CommonStates">
-                        <VisualStateGroup.Transitions>
-                          <VisualTransition GeneratedDuration="0:0:0.2"/>
-                        </VisualStateGroup.Transitions>
-                        <VisualState x:Name="Normal"/>
-                        <VisualState x:Name="MouseOver">
-                          <Storyboard>
-                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="InactiveIcon">
-                              <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                            </DoubleAnimationUsingKeyFrames>
-                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActiveIcon">
-                              <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
-                            </DoubleAnimationUsingKeyFrames>
-                          </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="Pressed">
-                          <Storyboard>
-                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="InactiveIcon">
-                              <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                            </DoubleAnimationUsingKeyFrames>
-                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActiveIcon">
-                              <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
-                            </DoubleAnimationUsingKeyFrames>
-                          </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="Disabled"/>
-                      </VisualStateGroup>
-                    </VisualStateManager.VisualStateGroups>
-                    <Grid>
-                      <Rectangle x:Name="InactiveIcon" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,5,5" Fill="{DynamicResource Gray2Brush}">
-                        <Rectangle.OpacityMask>
-                          <VisualBrush Visual="{StaticResource NavigateXmlCanvas}" Stretch="Fill" />
-                        </Rectangle.OpacityMask>
-                      </Rectangle>
-                      <Rectangle x:Name="ActiveIcon" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Fill="{DynamicResource AccentColorBrush}" Opacity="0">
-                        <Rectangle.OpacityMask>
-                          <VisualBrush Visual="{StaticResource NavigateXmlCanvas}" Stretch="Fill" />
-                        </Rectangle.OpacityMask>
-                      </Rectangle>
-
-                      <TextBlock Text="Navigator" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,45,0,0" FontSize="26.667" RenderTransformOrigin="-0.22,0.5" Foreground="{DynamicResource Gray2Brush}" Style="{DynamicResource SectionHeaderStyle}" FontWeight="Normal">
-                        <TextBlock.LayoutTransform>
-                          <TransformGroup>
-                            <ScaleTransform CenterX="-0.22" CenterY="0.5"/>
-                            <SkewTransform CenterX="-0.22" CenterY="0.5"/>
-                            <RotateTransform CenterX="-0.22" CenterY="0.5" Angle="90"/>
-                            <TranslateTransform/>
-                          </TransformGroup>
-                        </TextBlock.LayoutTransform>
-                      </TextBlock>
-                    </Grid>
-                  </Border>
-                </ControlTemplate>
-              </Button.Template>
-            </Button>
-
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+              <StackPanel Orientation="Vertical" Margin="0,0,0,16">
+                <views:SettingsView DataContext="{Binding Settings}"/>
+                <ui:Button x:Name="ChangeLogButton" Content="View Change Log"
+                           Click="ChangeLogButton_Click" Margin="16,8"
+                           HorizontalAlignment="Left" Appearance="Transparent"/>
+              </StackPanel>
+            </ScrollViewer>
           </Grid>
         </Border>
       </Grid>
-    </Border>
 
-    <Border Grid.Row="2" Background="{DynamicResource AccentColorBrush}" Padding="5,0">
-      <Grid VerticalAlignment="Center">
-
-        <Grid.Resources>
-          <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="Foreground" Value="{DynamicResource BlackBrush}"/>
-            <Setter Property="FontSize" Value="14"/>
-          </Style>
-        </Grid.Resources>
-
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="4*"/>
-          <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-
-        <TextBlock Grid.Column="0" Text="{Binding Status}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Foreground="{DynamicResource WhiteBrush}"/>
-        <TextBlock Grid.Column="1" Text="{Binding ToolInformation}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}" Foreground="{DynamicResource WhiteBrush}" HorizontalAlignment="Right"/>
-      </Grid>
-    </Border>
+      <!-- Footer / Status Bar with gold accent -->
+      <Border Grid.Row="2" Padding="12,6"
+              BorderThickness="0,1,0,0" BorderBrush="{DynamicResource AppAccentBrush}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="{Binding Status}"
+                     TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"
+                     FontSize="13" Opacity="0.7" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="1" Text="{Binding ToolInformation}"
+                     TextTrimming="CharacterEllipsis" FontSize="13" Opacity="0.7"
+                     HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0"/>
+          <!-- Content type toggle -->
+          <TextBlock x:Name="ContentTypeLabel" Grid.Column="2"
+                     Text="XML" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AppAccentBrush}" Cursor="Hand" VerticalAlignment="Center"
+                     ToolTip="Click to toggle between XML and JSON mode"
+                     MouseLeftButtonDown="ContentTypeLabel_Click"/>
+        </Grid>
+      </Border>
+    </Grid>
   </Grid>
-</MahApps:MetroWindow>
+</ui:FluentWindow>

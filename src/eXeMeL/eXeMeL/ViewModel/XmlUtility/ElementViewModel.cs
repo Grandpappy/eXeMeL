@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using System.Xml.Linq;
 using eXeMeL.ViewModel.UtilityOperationMessages;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace eXeMeL.ViewModel
 {
@@ -28,7 +29,7 @@ namespace eXeMeL.ViewModel
     public bool IsExpanded
     {
       get { return this._IsExpanded; }
-      set { Set(() => this.IsExpanded, ref this._IsExpanded, value); }
+      set { SetProperty(ref this._IsExpanded, value); }
     }
 
 
@@ -60,49 +61,49 @@ namespace eXeMeL.ViewModel
 
     private void CopyXPathFromStartCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new BuildXPathFromStartMessage(element, OutputTarget.Clipboard));
+      WeakReferenceMessenger.Default.Send(new BuildXPathFromStartMessage(element, OutputTarget.Clipboard));
     }
 
 
 
     private void BuildXPathFromStartCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new BuildXPathFromStartMessage(element, OutputTarget.XPathEditor));
+      WeakReferenceMessenger.Default.Send(new BuildXPathFromStartMessage(element, OutputTarget.XPathEditor));
     }
 
 
 
     private void SetStartXPathCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new SetStartElementForXPathMessage(element));
+      WeakReferenceMessenger.Default.Send(new SetStartElementForXPathMessage(element));
     }
 
 
 
     private void BuildXPathFromRootCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new BuildXPathFromRootMessage(element, OutputTarget.XPathEditor));
+      WeakReferenceMessenger.Default.Send(new BuildXPathFromRootMessage(element, OutputTarget.XPathEditor));
     }
 
 
 
     private void CopyXPathFromRootCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new BuildXPathFromRootMessage(element, OutputTarget.Clipboard));
+      WeakReferenceMessenger.Default.Send(new BuildXPathFromRootMessage(element, OutputTarget.Clipboard));
     }
 
 
 
     private void ExpandAllChildElementsCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new ExpandAllChildElementsMessage(element));
+      WeakReferenceMessenger.Default.Send(new ExpandAllChildElementsMessage(element));
     }
 
 
 
     private void CollapseAllOtherElementsCommand_Execute(ElementViewModel element)
     {
-      this.MessengerInstance.Send(new CollapseAllOtherElementsMessage(element));
+      WeakReferenceMessenger.Default.Send(new CollapseAllOtherElementsMessage(element));
     }
 
 

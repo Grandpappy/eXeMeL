@@ -1,0 +1,25 @@
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+  >
+
+  <sys:Boolean x:Key="IsEXeMeLTheme">True</sys:Boolean>
+
+  <Color x:Key="BlackColor">#FFFFFFFF</Color>
+  <Color x:Key="WhiteColor">#FF1E1E1E</Color>
+
+  <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColor}" />
+  <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}" />
+  <SolidColorBrush x:Key="LabelTextBrush" Color="{StaticResource BlackColor}" />
+
+  <!-- Glass: semi-transparent chrome tint (will be overridden at runtime with user color) -->
+  <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="#20FFFFFF"/>
+  <SolidColorBrush x:Key="EditorTintOverlayBrush" Color="#10FFFFFF"/>
+  <SolidColorBrush x:Key="AppTextBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="AppAccentBrush" Color="#D4AA00"/>
+
+  <Color x:Key="Gray7">#FF7E7E7E</Color>
+  <SolidColorBrush x:Key="EditorTextBrush" Color="{DynamicResource Gray7}"/>
+
+</ResourceDictionary>

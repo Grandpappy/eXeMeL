@@ -36,7 +36,21 @@ namespace eXeMeL.View
     {
       if (e.Key == Key.Enter || e.Key == Key.Return)
       {
-        this.FindNextButton.Command.Execute(null);
+        this.FindNextButton.Command?.Execute(null);
+      }
+    }
+
+
+
+    private void FindSearchText_GotFocus(object sender, RoutedEventArgs e)
+    {
+      if (sender is Wpf.Ui.Controls.TextBox wpfUiTextBox)
+      {
+        wpfUiTextBox.SelectAll();
+      }
+      else if (sender is TextBox textBox)
+      {
+        textBox.SelectAll();
       }
     }
   }

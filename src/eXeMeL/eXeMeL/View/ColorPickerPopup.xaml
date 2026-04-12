@@ -1,0 +1,70 @@
+<UserControl x:Class="eXeMeL.View.ColorPickerPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="250" d:DesignHeight="40">
+
+  <!-- A compact color swatch button that opens a popup picker -->
+  <StackPanel Orientation="Horizontal">
+    <Button x:Name="ColorSwatchButton" Width="32" Height="28"
+            Padding="0" Click="ColorSwatchButton_Click"
+            BorderThickness="1" Cursor="Hand">
+      <Button.Template>
+        <ControlTemplate TargetType="Button">
+          <Border CornerRadius="4"
+                  Background="{TemplateBinding Background}"
+                  BorderThickness="1"
+                  BorderBrush="#666666"/>
+        </ControlTemplate>
+      </Button.Template>
+    </Button>
+
+    <TextBlock x:Name="HexLabel" VerticalAlignment="Center"
+               Margin="8,0,0,0" FontSize="12" Opacity="0.7"/>
+
+    <!-- Popup with color picker — always dark background, white text -->
+    <Popup x:Name="PickerPopup" StaysOpen="False"
+           Placement="Bottom" PlacementTarget="{Binding ElementName=ColorSwatchButton}"
+           AllowsTransparency="True">
+      <Border Background="#FF1E1E1E"
+              BorderBrush="#FF555555"
+              BorderThickness="1" CornerRadius="8" Padding="12"
+              Margin="0,4,0,0"
+              TextElement.Foreground="White">
+        <StackPanel Width="280">
+          <!-- Swatches -->
+          <WrapPanel x:Name="SwatchPanel" Margin="0,0,0,8"/>
+
+          <!-- HSV Sliders -->
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="H" FontSize="11" Foreground="#AAAAAA" Width="16" VerticalAlignment="Center"/>
+            <Slider x:Name="HueSlider" Minimum="0" Maximum="360" Width="180"
+                    Value="210" ValueChanged="HsvSlider_ValueChanged" Margin="0,0,8,0"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+            <TextBlock Text="S" FontSize="11" Foreground="#AAAAAA" Width="16" VerticalAlignment="Center"/>
+            <Slider x:Name="SatSlider" Minimum="0" Maximum="100" Width="180"
+                    Value="60" ValueChanged="HsvSlider_ValueChanged" Margin="0,0,8,0"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+            <TextBlock Text="V" FontSize="11" Foreground="#AAAAAA" Width="16" VerticalAlignment="Center"/>
+            <Slider x:Name="ValSlider" Minimum="0" Maximum="100" Width="180"
+                    Value="80" ValueChanged="HsvSlider_ValueChanged" Margin="0,0,8,0"/>
+          </StackPanel>
+
+          <!-- Hex input + preview -->
+          <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <TextBox x:Name="HexInput" Width="80" FontSize="11"
+                     Foreground="White" Background="#FF333333" BorderBrush="#FF555555"
+                     Text="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=LostFocus}"/>
+            <Border x:Name="PreviewSwatch" Width="24" Height="24" Margin="8,0,0,0"
+                    CornerRadius="4" BorderThickness="1"
+                    BorderBrush="#FF555555"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Popup>
+  </StackPanel>
+</UserControl>
