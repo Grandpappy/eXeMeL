@@ -59,4 +59,4 @@ jobs:
 
       - name: Upload to GitHub Releases
         run: |
-          vpk upload github --repoUrl https://github.com/Grandpappy/eXeMeL --tag v${{ steps.version.outputs.VERSION }} --token ${{ secrets.GITHUB_TOKEN }} --releaseName "eXeMeL v${{ steps.version.outputs.VERSION }}" --publish
+          vpk upload github --repoUrl https://github.com/Grandpappy/eXeMeL --tag v${{ steps.version.outputs.VERSION }} --token ${{ secrets.GITHUB_TOKEN }} --releaseName "eXeMeL v${{ steps.version.outputs.VERSION }}" --publish --body "## Download`n`n- **eXeMeL-win-Setup.exe** — One-click installer (recommended)`n- **eXeMeL-win-Portable.zip** — Extract and run anywhere`n`n> **Note:** Windows SmartScreen may show a warning for unsigned software. Click **More info** → **Run anyway** to proceed. This is expected for open-source applications without a code signing certificate."
