@@ -117,7 +117,8 @@ namespace eXeMeL.View
     {
       get
       {
-        return ApplicationVersionControl.GetPublishedVersion().ToString();
+        var v = ApplicationVersionControl.GetPublishedVersion();
+        return $"{v.Major}.{v.Minor}.{v.Build}";
       }
     }
   }
