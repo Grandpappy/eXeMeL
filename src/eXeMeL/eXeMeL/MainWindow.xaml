@@ -231,6 +231,7 @@
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
 
       <!-- Tab header row + Snapshots -->
@@ -444,8 +445,37 @@
         </Border>
       </Grid>
 
+      <!-- Update toast notification -->
+      <Border x:Name="UpdateToast" Grid.Row="2" Visibility="Collapsed"
+              Background="{DynamicResource AppAccentBrush}" Padding="12,8"
+              CornerRadius="0">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock x:Name="UpdateToastMessage" Grid.Column="0"
+                     Text="A new version is available!"
+                     VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold"
+                     Foreground="#FF1E1E1E"/>
+          <Button Grid.Column="1" Content="Update now and restart"
+                  Click="UpdateNowButton_Click" Margin="8,0"
+                  Padding="10,4" FontSize="12" Cursor="Hand"/>
+          <Button Grid.Column="2" Content="Update later"
+                  Click="UpdateLaterButton_Click" Margin="0,0,8,0"
+                  Padding="10,4" FontSize="12" Cursor="Hand"/>
+          <Button Grid.Column="3" Content="&#xE10A;" FontFamily="Segoe MDL2 Assets"
+                  Click="UpdateDismissButton_Click"
+                  Background="Transparent" BorderThickness="0"
+                  Padding="4" FontSize="10" Cursor="Hand"
+                  Foreground="#FF1E1E1E" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+
       <!-- Footer / Status Bar with gold accent -->
-      <Border Grid.Row="2" Padding="12,6"
+      <Border Grid.Row="3" Padding="12,6"
               BorderThickness="0,1,0,0" BorderBrush="{DynamicResource AppAccentBrush}">
         <Grid>
           <Grid.ColumnDefinitions>

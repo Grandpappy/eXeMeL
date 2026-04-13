@@ -48,8 +48,7 @@ namespace eXeMeL
         StartupOptions.InitialFilePath = e.Args[0];
       }
 
-      // Auto-check for updates on startup (non-blocking)
-      _ = CheckForUpdatesAsync(silent: true);
+      // Update check is triggered by MainWindow.Loaded → CheckForUpdatesOnStartup()
     }
 
     /// <summary>
