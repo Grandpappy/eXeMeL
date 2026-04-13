@@ -36,6 +36,8 @@ namespace eXeMeL
     public ICommand UnFoldLevelCommand { get; private set; }
 
     private bool _isSettingsOpen;
+    private bool _isPreviewPinned;
+    private System.Windows.Threading.DispatcherTimer _previewDebounce;
 
 
     public MainWindow()
@@ -567,10 +569,103 @@ namespace eXeMeL
         this.ViewModel.ToggleEditorModeCommand.Execute(null);
     }
 
+    private void MarkdownPreviewTabHeader_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      // If pinned, clicking the tab header unpins
+      if (_isPreviewPinned)
+      {
+        UnpinPreview();
+        return;
+      }
+
+      if (this.ViewModel.EditorMode != EditorMode.XmlUtility)
+        this.ViewModel.ToggleEditorModeCommand.Execute(null);
+    }
+
+    private void PinPreviewButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (_isPreviewPinned)
+        UnpinPreview();
+      else
+        PinPreview();
+    }
+
+    private void PinPreview()
+    {
+      _isPreviewPinned = true;
+
+      // Feed current editor text to the preview
+      this.ViewModel.MarkdownUtility.DocumentText = this.AvalonEditor.Text;
+
+      // If we were in utility mode (preview-only), switch back to editor
+      if (this.ViewModel.EditorMode == EditorMode.XmlUtility)
+        this.ViewModel.ToggleEditorModeCommand.Execute(null);
+
+      // Show the split layout: editor left, preview right
+      this.PreviewSplitterColumn.Width = new GridLength(5);
+      this.PinnedPreviewColumn.Width = new GridLength(1, GridUnitType.Star);
+      this.PreviewSplitter.Visibility = Visibility.Visible;
+
+      // Move preview panel to the pinned column and make it visible
+      System.Windows.Controls.Grid.SetColumn(this.MarkdownPreviewPanel, 2);
+      this.MarkdownPreviewPanel.Visibility = Visibility.Visible;
+      this.MarkdownPreviewPanel.CornerRadius = new CornerRadius(6, 6, 6, 6);
+
+      // Update pin icon to show "pinned" state
+      this.PinPreviewIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.PinOff24;
+      this.PinPreviewIcon.Opacity = 1.0;
+
+      // Start debounced live updates
+      if (_previewDebounce == null)
+      {
+        _previewDebounce = new System.Windows.Threading.DispatcherTimer
+        {
+          Interval = TimeSpan.FromMilliseconds(400)
+        };
+        _previewDebounce.Tick += (s, e) =>
+        {
+          _previewDebounce.Stop();
+          if (_isPreviewPinned && _currentContentType == DocumentContentType.Markdown)
+            this.ViewModel.MarkdownUtility.DocumentText = this.AvalonEditor.Text;
+        };
+      }
+
+      this.AvalonEditor.TextChanged += PinnedPreview_TextChanged;
+    }
+
+    private void UnpinPreview()
+    {
+      _isPreviewPinned = false;
+
+      // Stop live updates
+      this.AvalonEditor.TextChanged -= PinnedPreview_TextChanged;
+      _previewDebounce?.Stop();
+
+      // Collapse the split layout
+      this.PreviewSplitterColumn.Width = new GridLength(0);
+      this.PinnedPreviewColumn.Width = new GridLength(0);
+      this.PreviewSplitter.Visibility = Visibility.Collapsed;
+
+      // Move preview panel back to the overlay column and hide it
+      System.Windows.Controls.Grid.SetColumn(this.MarkdownPreviewPanel, 0);
+      this.MarkdownPreviewPanel.Visibility = Visibility.Collapsed;
+      this.MarkdownPreviewPanel.CornerRadius = new CornerRadius(6, 0, 6, 6);
+
+      // Update pin icon
+      this.PinPreviewIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.Pin24;
+      this.PinPreviewIcon.Opacity = 0.6;
+    }
+
+    private void PinnedPreview_TextChanged(object sender, EventArgs e)
+    {
+      _previewDebounce?.Stop();
+      _previewDebounce?.Start();
+    }
+
     private void ContentTypeLabel_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
       var menu = new System.Windows.Controls.ContextMenu();
-      foreach (var type in new[] { DocumentContentType.Xml, DocumentContentType.Json, DocumentContentType.Yaml, DocumentContentType.Text })
+      foreach (var type in new[] { DocumentContentType.Xml, DocumentContentType.Json, DocumentContentType.Yaml, DocumentContentType.Markdown, DocumentContentType.Text })
       {
         var item = new System.Windows.Controls.MenuItem
         {
@@ -610,10 +705,15 @@ namespace eXeMeL
       // Update window/taskbar title
       UpdateWindowTitle();
 
+      // Auto-unpin if switching away from Markdown
+      if (_isPreviewPinned && message.ContentType != DocumentContentType.Markdown)
+        UnpinPreview();
+
       // Show/hide appropriate utility tabs
       this.XPathTabHeader.Visibility = Visibility.Collapsed;
       this.JsonTreeTabHeader.Visibility = Visibility.Collapsed;
       this.YamlTreeTabHeader.Visibility = Visibility.Collapsed;
+      this.MarkdownPreviewTabHeader.Visibility = Visibility.Collapsed;
 
       switch (message.ContentType)
       {
@@ -626,6 +726,9 @@ namespace eXeMeL
         case DocumentContentType.Yaml:
           this.YamlTreeTabHeader.Visibility = Visibility.Visible;
           break;
+        case DocumentContentType.Markdown:
+          this.MarkdownPreviewTabHeader.Visibility = Visibility.Visible;
+          break;
         // Text: no utility tab
       }
 
@@ -635,6 +738,7 @@ namespace eXeMeL
         this.XPathPanel.Visibility = Visibility.Collapsed;
         this.JsonTreePanel.Visibility = Visibility.Collapsed;
         this.YamlTreePanel.Visibility = Visibility.Collapsed;
+        this.MarkdownPreviewPanel.Visibility = Visibility.Collapsed;
 
         switch (message.ContentType)
         {
@@ -647,8 +751,10 @@ namespace eXeMeL
           case DocumentContentType.Yaml:
             this.YamlTreePanel.Visibility = Visibility.Visible;
             break;
-          case DocumentContentType.Text:
           case DocumentContentType.Markdown:
+            this.MarkdownPreviewPanel.Visibility = Visibility.Visible;
+            break;
+          case DocumentContentType.Text:
             // No utility — switch back to editor
             this.ViewModel.ToggleEditorModeCommand.Execute(null);
             break;
@@ -684,21 +790,27 @@ namespace eXeMeL
       SetInactive(this.XPathTabHeader);
       SetInactive(this.JsonTreeTabHeader);
       SetInactive(this.YamlTreeTabHeader);
+      SetInactive(this.MarkdownPreviewTabHeader);
 
-      // Hide all content panels
+      // Hide all content panels (but leave pinned preview alone — it's managed separately)
       this.EditorPanel.Visibility = Visibility.Collapsed;
       this.XPathPanel.Visibility = Visibility.Collapsed;
       this.JsonTreePanel.Visibility = Visibility.Collapsed;
       this.YamlTreePanel.Visibility = Visibility.Collapsed;
+      if (!_isPreviewPinned)
+        this.MarkdownPreviewPanel.Visibility = Visibility.Collapsed;
 
       if (mode == EditorMode.Editor)
       {
         this.EditorPanel.Visibility = Visibility.Visible;
         SetActive(this.EditorTabHeader);
+
+        // When pinned, keep the preview tab visually active too
+        if (_isPreviewPinned)
+          SetActive(this.MarkdownPreviewTabHeader);
       }
       else
       {
-        SetActive(this.EditorTabHeader); // Keep editor tab looking normal (it's always the first)
         SetInactive(this.EditorTabHeader);
 
         switch (_currentContentType)
@@ -711,8 +823,14 @@ namespace eXeMeL
             this.YamlTreePanel.Visibility = Visibility.Visible;
             SetActive(this.YamlTreeTabHeader);
             break;
-          case DocumentContentType.Text:
           case DocumentContentType.Markdown:
+            if (!_isPreviewPinned)
+            {
+              this.MarkdownPreviewPanel.Visibility = Visibility.Visible;
+              SetActive(this.MarkdownPreviewTabHeader);
+            }
+            break;
+          case DocumentContentType.Text:
             // No utility panel — stay on editor
             this.EditorPanel.Visibility = Visibility.Visible;
             SetActive(this.EditorTabHeader);

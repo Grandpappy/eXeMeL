@@ -15,8 +15,8 @@
 
   <!-- Velopack requires App.xaml as Page, not ApplicationDefinition -->
   <ItemGroup>
-    <ApplicationDefinition Remove="App.xaml"/>
-    <Page Include="App.xaml"/>
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
   </ItemGroup>
 
   <!-- Single-file self-contained publish settings -->
@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="MdXaml" Version="1.27.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
