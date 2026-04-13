@@ -4,6 +4,9 @@ on:
   push:
     branches: [master]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: write
 
@@ -52,8 +55,8 @@ jobs:
 
       - name: Package with Velopack
         run: |
-          vpk pack --packId eXeMeL --packVersion ${{ steps.version.outputs.VERSION }} --packDir publish --mainExe eXeMeL.exe --icon "src/eXeMeL/eXeMeL/Assets/eXeMeL Icon.ico"
+          vpk pack --packId eXeMeL2 --packVersion ${{ steps.version.outputs.VERSION }} --packDir publish --mainExe eXeMeL.exe --packTitle "eXeMeL 2" --icon "src/eXeMeL/eXeMeL/Assets/eXeMeL Icon.ico"
 
       - name: Upload to GitHub Releases
         run: |
-          vpk upload github --repoUrl https://github.com/Grandpappy/eXeMeL --tag v${{ steps.version.outputs.VERSION }} --token ${{ secrets.GITHUB_TOKEN }} --releaseName "eXeMeL v${{ steps.version.outputs.VERSION }}" --publish
+          vpk upload github --repoUrl https://github.com/Grandpappy/eXeMeL --tag v${{ steps.version.outputs.VERSION }} --token ${{ secrets.GITHUB_TOKEN }} --releaseName "eXeMeL 2 v${{ steps.version.outputs.VERSION }}" --body "## Download`n`n- **eXeMeL2-win-Setup.exe** — One-click installer (recommended)`n- **eXeMeL2-win-Portable.zip** — Extract and run anywhere`n`n## Upgrading from eXeMeL 1.x`n`nIf you have the original eXeMeL installed (ClickOnce or standalone .exe), please **uninstall it first** before installing eXeMeL 2. The old version uses a different installation method and won't be updated automatically. Your settings will be preserved (stored in %LOCALAPPDATA%\eXeMeL\settings.json).`n`n## SmartScreen Warning`n`nWindows SmartScreen may show a warning for unsigned software. Click **More info** then **Run anyway** to proceed. This is expected for open-source applications without a code signing certificate."
