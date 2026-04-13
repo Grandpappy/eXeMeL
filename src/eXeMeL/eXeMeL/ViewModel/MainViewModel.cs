@@ -2,6 +2,7 @@ using System.Windows.Input;
 using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.JsonUtility;
+using eXeMeL.ViewModel.MarkdownUtility;
 using eXeMeL.ViewModel.YamlUtility;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,6 +24,7 @@ namespace eXeMeL.ViewModel
     public XmlUtilityViewModel XmlUtility { get; private set; }
     public JsonUtilityViewModel JsonUtility { get; private set; }
     public YamlUtilityViewModel YamlUtility { get; private set; }
+    public MarkdownUtilityViewModel MarkdownUtility { get; private set; }
     public string Status { get { return this._status; } private set { SetProperty(ref this._status, value); } }
     public string ToolInformation { get { return this._toolInformation; } set { SetProperty(ref this._toolInformation, value); } }
     public SyntaxHighlightingManager HighlightingManager { get { return this._highlightingManager; } private set { SetProperty(ref this._highlightingManager, value); } }
@@ -42,6 +44,7 @@ namespace eXeMeL.ViewModel
       this.XmlUtility = new XmlUtilityViewModel(this.Settings);
       this.JsonUtility = new JsonUtilityViewModel(this.Settings);
       this.YamlUtility = new YamlUtilityViewModel(this.Settings);
+      this.MarkdownUtility = new MarkdownUtilityViewModel(this.Settings);
       this.ToggleEditorModeCommand = new RelayCommand(ToggleEditorModeCommand_Execute);
       WeakReferenceMessenger.Default.Register<ApplicationClosingMessage>(this, (r, m) => HandleApplicationClosingMessage(m));
       WeakReferenceMessenger.Default.Register<DisplayApplicationStatusMessage>(this, (r, m) => HandleDisplayApplicationStatusMessage(m));
@@ -64,6 +67,9 @@ namespace eXeMeL.ViewModel
         case DocumentContentType.Xml:
           this.XmlUtility.DocumentText = message.NewDocumentText;
           break;
+        case DocumentContentType.Markdown:
+          this.MarkdownUtility.DocumentText = message.NewDocumentText;
+          break;
         // Text: no utility to feed
       }
     }
@@ -74,9 +80,8 @@ namespace eXeMeL.ViewModel
     {
       if (this.EditorMode == EditorMode.Editor)
       {
-        // Don't toggle to utility for Text/Markdown — no tree viewer
-        if (this.Editor.ContentType == DocumentContentType.Text ||
-            this.Editor.ContentType == DocumentContentType.Markdown)
+        // Don't toggle to utility for Text — no viewer
+        if (this.Editor.ContentType == DocumentContentType.Text)
           return;
 
         var text = this.Editor.Document.Text;
@@ -87,6 +92,9 @@ namespace eXeMeL.ViewModel
             break;
           case DocumentContentType.Yaml:
             this.YamlUtility.DocumentText = text;
+            break;
+          case DocumentContentType.Markdown:
+            this.MarkdownUtility.DocumentText = text;
             break;
           default:
             this.XmlUtility.DocumentText = text;
