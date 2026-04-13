@@ -71,9 +71,9 @@ jobs:
           - **eXeMeL2-win-Setup.exe** — One-click installer (recommended)
           - **eXeMeL2-win-Portable.zip** — Extract and run anywhere
 
-          ## Upgrading from eXeMeL 1.x
+          ## Upgrading from eXeMeL 1
 
-          If you have the original eXeMeL installed (ClickOnce or standalone .exe), please **uninstall it first** before installing eXeMeL 2. The old version uses a different installation method and won't be updated automatically. Your settings will be preserved.
+          This will install alongside your existing installation of eXeMeL 1, if you've got one already. Your settings will be imported into eXeMeL 2.
 
           ## SmartScreen Warning
 
