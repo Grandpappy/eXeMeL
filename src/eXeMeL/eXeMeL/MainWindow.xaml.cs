@@ -601,7 +601,7 @@ namespace eXeMeL
         {
           DocumentContentType.Json => "JaSON",
           DocumentContentType.Yaml => "YAMeL",
-          DocumentContentType.Markdown => "MaRKDoWN",
+          DocumentContentType.Markdown => "MarkDown",
           DocumentContentType.Text => "TeXT",
           _ => "eXeMeL"
         };

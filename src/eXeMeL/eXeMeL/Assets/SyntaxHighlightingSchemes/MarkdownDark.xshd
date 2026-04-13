@@ -1,6 +1,6 @@
 <SyntaxDefinition name="Markdown" extensions=".md;.markdown" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-  <Color name="Heading1" foreground="#569CD6" fontWeight="bold" fontSize="18" />
-  <Color name="Heading2" foreground="#569CD6" fontWeight="bold" fontSize="16" />
+  <Color name="Heading1" foreground="#569CD6" fontWeight="bold" />
+  <Color name="Heading2" foreground="#569CD6" fontWeight="bold" />
   <Color name="Heading3" foreground="#569CD6" fontWeight="bold" />
   <Color name="Heading4" foreground="#4EC9B0" fontWeight="bold" />
   <Color name="Bold" foreground="#D4D4D4" fontWeight="bold" />

@@ -14,48 +14,61 @@ namespace eXeMeL.Utilities
   /// </summary>
   public class MarkdownFormattingTransformer : DocumentColorizingTransformer
   {
-    // Match ***bold+italic***, **bold**, *italic* (in that priority order)
-    private static readonly Regex BoldItalicPattern = new(@"\*{3}([^*]+)\*{3}", RegexOptions.Compiled);
-    private static readonly Regex BoldPattern = new(@"\*{2}([^*]+)\*{2}", RegexOptions.Compiled);
-    private static readonly Regex ItalicPattern = new(@"(?<!\*)\*(?!\*)([^*]+)\*(?!\*)", RegexOptions.Compiled);
-    private static readonly Regex UnderscoreBoldPattern = new(@"__([^_]+)__", RegexOptions.Compiled);
-    private static readonly Regex UnderscoreItalicPattern = new(@"(?<!_)_(?!_)([^_]+)_(?!_)", RegexOptions.Compiled);
+    private static readonly Regex BoldItalicPattern = new(@"\*{3}(.+?)\*{3}", RegexOptions.Compiled);
+    private static readonly Regex BoldStarPattern = new(@"\*{2}(.+?)\*{2}", RegexOptions.Compiled);
+    private static readonly Regex BoldUnderscorePattern = new(@"__(.+?)__", RegexOptions.Compiled);
+    private static readonly Regex ItalicStarPattern = new(@"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", RegexOptions.Compiled);
+    private static readonly Regex ItalicUnderscorePattern = new(@"(?<!_)_(?!_)(.+?)(?<!_)_(?!_)", RegexOptions.Compiled);
 
     protected override void ColorizeLine(DocumentLine line)
     {
-      var lineText = CurrentContext.Document.GetText(line);
-      var lineStart = line.Offset;
+      try
+      {
+        if (line.Length == 0) return;
 
-      // Bold+Italic (*** ***)
-      ApplyPattern(lineText, lineStart, BoldItalicPattern, fw: FontWeights.Bold, fs: FontStyles.Italic);
+        var lineText = CurrentContext.Document.GetText(line.Offset, line.Length);
+        var lineStart = line.Offset;
+        var lineEnd = line.EndOffset;
 
-      // Bold (** **)
-      ApplyPattern(lineText, lineStart, BoldPattern, fw: FontWeights.Bold, fs: null);
-      ApplyPattern(lineText, lineStart, UnderscoreBoldPattern, fw: FontWeights.Bold, fs: null);
-
-      // Italic (* *)
-      ApplyPattern(lineText, lineStart, ItalicPattern, fw: null, fs: FontStyles.Italic);
-      ApplyPattern(lineText, lineStart, UnderscoreItalicPattern, fw: null, fs: FontStyles.Italic);
+        ApplyPattern(lineText, lineStart, lineEnd, BoldItalicPattern, FontWeights.Bold, FontStyles.Italic);
+        ApplyPattern(lineText, lineStart, lineEnd, BoldStarPattern, FontWeights.Bold, FontStyles.Normal);
+        ApplyPattern(lineText, lineStart, lineEnd, BoldUnderscorePattern, FontWeights.Bold, FontStyles.Normal);
+        ApplyPattern(lineText, lineStart, lineEnd, ItalicStarPattern, FontWeights.Normal, FontStyles.Italic);
+        ApplyPattern(lineText, lineStart, lineEnd, ItalicUnderscorePattern, FontWeights.Normal, FontStyles.Italic);
+      }
+      catch
+      {
+        // Regex or offset errors — skip this line silently
+      }
     }
 
-    private void ApplyPattern(string lineText, int lineStart, Regex pattern, FontWeight? fw, FontStyle? fs)
+    private void ApplyPattern(string lineText, int lineStart, int lineEnd, Regex pattern, FontWeight weight, FontStyle style)
     {
       foreach (Match match in pattern.Matches(lineText))
       {
         var start = lineStart + match.Index;
         var end = start + match.Length;
 
-        ChangeLinePart(start, end, element =>
+        // Clamp to line boundaries
+        if (start < lineStart) start = lineStart;
+        if (end > lineEnd) end = lineEnd;
+        if (start >= end) continue;
+
+        try
         {
-          var currentTypeface = element.TextRunProperties.Typeface;
-          var newWeight = fw ?? currentTypeface.Weight;
-          var newStyle = fs ?? currentTypeface.Style;
-          element.TextRunProperties.SetTypeface(new Typeface(
-            currentTypeface.FontFamily,
-            newStyle,
-            newWeight,
-            currentTypeface.Stretch));
-        });
+          ChangeLinePart(start, end, element =>
+          {
+            var tf = element.TextRunProperties.Typeface;
+            var newWeight = weight != FontWeights.Normal ? weight : tf.Weight;
+            var newStyle = style != FontStyles.Normal ? style : tf.Style;
+            element.TextRunProperties.SetTypeface(new Typeface(
+              tf.FontFamily, newStyle, newWeight, tf.Stretch));
+          });
+        }
+        catch
+        {
+          // ChangeLinePart can throw on edge cases — skip
+        }
       }
     }
   }
