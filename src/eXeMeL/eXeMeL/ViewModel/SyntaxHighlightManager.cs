@@ -71,17 +71,26 @@ namespace eXeMeL.ViewModel
       if (_contentType == DocumentContentType.Text)
         return null;
 
-      var resourceName = _contentType switch
+      try
       {
-        DocumentContentType.Json => GetJsonSyntaxHighlightingResource(),
-        DocumentContentType.Yaml => GetYamlSyntaxHighlightingResource(),
-        DocumentContentType.Markdown => GetMarkdownSyntaxHighlightingResource(),
-        _ => GetXmlSyntaxHighlightingResource()
-      };
+        var resourceName = _contentType switch
+        {
+          DocumentContentType.Json => GetJsonSyntaxHighlightingResource(),
+          DocumentContentType.Yaml => GetYamlSyntaxHighlightingResource(),
+          DocumentContentType.Markdown => GetMarkdownSyntaxHighlightingResource(),
+          _ => GetXmlSyntaxHighlightingResource()
+        };
 
-      using var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
-      using var reader = XmlReader.Create(stream);
-      return HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        using var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
+        if (stream == null) return null;
+        using var reader = XmlReader.Create(stream);
+        return HighlightingLoader.Load(reader, HighlightingManager.Instance);
+      }
+      catch
+      {
+        // If highlighting fails to load, fall back to no highlighting
+        return null;
+      }
     }
 
     private string GetMarkdownSyntaxHighlightingResource()

@@ -1,69 +1,44 @@
 <SyntaxDefinition name="Markdown" extensions=".md;.markdown" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-  <Color name="Heading1" foreground="#569CD6" fontWeight="bold" />
-  <Color name="Heading2" foreground="#569CD6" fontWeight="bold" />
-  <Color name="Heading3" foreground="#569CD6" fontWeight="bold" />
-  <Color name="Heading4" foreground="#4EC9B0" fontWeight="bold" />
-  <Color name="Bold" foreground="#D4D4D4" fontWeight="bold" />
-  <Color name="Italic" foreground="#D4D4D4" fontStyle="italic" />
-  <Color name="BoldItalic" foreground="#D4D4D4" fontWeight="bold" fontStyle="italic" />
-  <Color name="InlineCode" foreground="#CE9178" />
-  <Color name="CodeBlock" foreground="#CE9178" />
+  <Color name="Heading" foreground="#569CD6" fontWeight="bold" />
+  <Color name="Bold" foreground="#E0E0E0" fontWeight="bold" />
+  <Color name="Code" foreground="#CE9178" />
   <Color name="Link" foreground="#9CDCFE" />
-  <Color name="LinkUrl" foreground="#6A9955" />
   <Color name="Image" foreground="#C586C0" />
   <Color name="BlockQuote" foreground="#6A9955" fontStyle="italic" />
-  <Color name="ListMarker" foreground="#D4AA00" fontWeight="bold" />
-  <Color name="HorizontalRule" foreground="#555555" />
-  <Color name="Strikethrough" foreground="#808080" />
+  <Color name="ListMarker" foreground="#D4AA00" />
+  <Color name="HRule" foreground="#555555" />
+  <Color name="Strike" foreground="#808080" />
 
   <RuleSet>
-    <!-- Headings -->
-    <Rule color="Heading1">^#\s.*$</Rule>
-    <Rule color="Heading2">^##\s.*$</Rule>
-    <Rule color="Heading3">^###\s.*$</Rule>
-    <Rule color="Heading4">^#{4,6}\s.*$</Rule>
-
-    <!-- Horizontal rule -->
-    <Rule color="HorizontalRule">^(\*{3,}|-{3,}|_{3,})\s*$</Rule>
-
-    <!-- Block quote -->
-    <Rule color="BlockQuote">^&gt;.*$</Rule>
-
-    <!-- List markers -->
-    <Rule color="ListMarker">^\s*[-*+]\s</Rule>
-    <Rule color="ListMarker">^\s*\d+\.\s</Rule>
+    <!-- Headings: match # followed by at least one non-# char -->
+    <Span color="Heading">
+      <Begin>\#</Begin>
+      <End>$</End>
+    </Span>
 
     <!-- Fenced code blocks -->
-    <Span color="CodeBlock" multiline="true">
-      <Begin>^```</Begin>
-      <End>^```</End>
+    <Span color="Code" multiline="true">
+      <Begin>```</Begin>
+      <End>```</End>
     </Span>
-
-    <!-- Images (before links to avoid conflict) -->
-    <Rule color="Image">!\[.*?\]\(.*?\)</Rule>
-
-    <!-- Links -->
-    <Rule color="Link">\[.*?\]</Rule>
-    <Rule color="LinkUrl">\(https?://.*?\)</Rule>
 
     <!-- Inline code -->
-    <Span color="InlineCode">
-      <Begin>`</Begin>
-      <End>`</End>
-    </Span>
+    <Rule color="Code">`[^`]+`</Rule>
 
-    <!-- Bold+italic -->
-    <Rule color="BoldItalic">\*{3}[^*]+\*{3}</Rule>
+    <!-- Images -->
+    <Rule color="Image">!\[[^\]]+\]\([^\)]+\)</Rule>
+
+    <!-- Links -->
+    <Rule color="Link">\[[^\]]+\]\([^\)]+\)</Rule>
 
     <!-- Bold -->
-    <Rule color="Bold">\*{2}[^*]+\*{2}</Rule>
-    <Rule color="Bold">_{2}[^_]+_{2}</Rule>
-
-    <!-- Italic -->
-    <Rule color="Italic">\*[^*]+\*</Rule>
-    <Rule color="Italic">_[^_]+_</Rule>
+    <Rule color="Bold">\*\*[^*]+\*\*</Rule>
+    <Rule color="Bold">__[^_]+__</Rule>
 
     <!-- Strikethrough -->
-    <Rule color="Strikethrough">~~[^~]+~~</Rule>
+    <Rule color="Strike">~~[^~]+~~</Rule>
+
+    <!-- Horizontal rules: three or more dashes -->
+    <Rule color="HRule">---+</Rule>
   </RuleSet>
 </SyntaxDefinition>

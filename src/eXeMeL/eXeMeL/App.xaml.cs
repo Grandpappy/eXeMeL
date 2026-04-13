@@ -158,7 +158,7 @@ namespace eXeMeL
     {
       var crashDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "eXeMeL");
+        "eXeMeL2\\crash-dumps");
       Directory.CreateDirectory(crashDir);
 
       var crashFile = Path.Combine(crashDir, $"crash_{DateTime.Now:yyyyMMdd_HHmmss}.log");
