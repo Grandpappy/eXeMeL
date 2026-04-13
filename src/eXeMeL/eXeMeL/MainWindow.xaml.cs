@@ -67,6 +67,7 @@ namespace eXeMeL
       {
         ApplyWindowChrome();
         UpdateCurrentLineHighlight();
+        CheckForUpdatesOnStartup();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -800,6 +801,38 @@ namespace eXeMeL
     {
       this.ResetFocusCommand.Execute(null);
     }
+
+
+
+    #region Update Toast
+
+    private async void CheckForUpdatesOnStartup()
+    {
+      var hasUpdate = await App.CheckForUpdatesAsync(silent: true);
+      if (hasUpdate && App.LatestUpdate != null)
+      {
+        this.UpdateToastMessage.Text = $"eXeMeL {App.LatestUpdate.TargetFullRelease.Version} is available!";
+        this.UpdateToast.Visibility = Visibility.Visible;
+      }
+    }
+
+    private async void UpdateNowButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.UpdateToastMessage.Text = "Downloading update...";
+      await App.ApplyUpdateAsync();
+    }
+
+    private void UpdateLaterButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.UpdateToast.Visibility = Visibility.Collapsed;
+    }
+
+    private void UpdateDismissButton_Click(object sender, RoutedEventArgs e)
+    {
+      this.UpdateToast.Visibility = Visibility.Collapsed;
+    }
+
+    #endregion
 
 
 
