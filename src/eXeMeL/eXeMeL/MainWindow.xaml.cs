@@ -808,18 +808,37 @@ namespace eXeMeL
 
     private async void CheckForUpdatesOnStartup()
     {
+#if DEBUG
+      // Debug bypass: show fake toast to test UI without a real update
+      await System.Threading.Tasks.Task.Delay(1500); // Simulate network delay
+      this.UpdateToastMessage.Text = "eXeMeL 2.99.0 is available! (DEBUG)";
+      this.UpdateToast.Visibility = Visibility.Visible;
+      return;
+#endif
+
+#pragma warning disable CS0162 // Unreachable code
       var hasUpdate = await App.CheckForUpdatesAsync(silent: true);
       if (hasUpdate && App.LatestUpdate != null)
       {
         this.UpdateToastMessage.Text = $"eXeMeL {App.LatestUpdate.TargetFullRelease.Version} is available!";
         this.UpdateToast.Visibility = Visibility.Visible;
       }
+#pragma warning restore CS0162
     }
 
     private async void UpdateNowButton_Click(object sender, RoutedEventArgs e)
     {
+#if DEBUG
+      this.UpdateToastMessage.Text = "Downloading update... (DEBUG - no actual update)";
+      await System.Threading.Tasks.Task.Delay(2000);
+      this.UpdateToast.Visibility = Visibility.Collapsed;
+      return;
+#endif
+
+#pragma warning disable CS0162
       this.UpdateToastMessage.Text = "Downloading update...";
       await App.ApplyUpdateAsync();
+#pragma warning restore CS0162
     }
 
     private void UpdateLaterButton_Click(object sender, RoutedEventArgs e)
