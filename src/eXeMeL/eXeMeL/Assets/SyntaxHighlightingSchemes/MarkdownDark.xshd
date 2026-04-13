@@ -1,0 +1,44 @@
+<SyntaxDefinition name="Markdown" extensions=".md;.markdown" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Heading" foreground="#569CD6" fontWeight="bold" />
+  <Color name="Bold" foreground="#E0E0E0" fontWeight="bold" />
+  <Color name="Code" foreground="#CE9178" />
+  <Color name="Link" foreground="#9CDCFE" />
+  <Color name="Image" foreground="#C586C0" />
+  <Color name="BlockQuote" foreground="#6A9955" fontStyle="italic" />
+  <Color name="ListMarker" foreground="#D4AA00" />
+  <Color name="HRule" foreground="#555555" />
+  <Color name="Strike" foreground="#808080" />
+
+  <RuleSet>
+    <!-- Headings: match # followed by at least one non-# char -->
+    <Span color="Heading">
+      <Begin>\#</Begin>
+      <End>$</End>
+    </Span>
+
+    <!-- Fenced code blocks -->
+    <Span color="Code" multiline="true">
+      <Begin>```</Begin>
+      <End>```</End>
+    </Span>
+
+    <!-- Inline code -->
+    <Rule color="Code">`[^`]+`</Rule>
+
+    <!-- Images -->
+    <Rule color="Image">!\[[^\]]+\]\([^\)]+\)</Rule>
+
+    <!-- Links -->
+    <Rule color="Link">\[[^\]]+\]\([^\)]+\)</Rule>
+
+    <!-- Bold -->
+    <Rule color="Bold">\*\*[^*]+\*\*</Rule>
+    <Rule color="Bold">__[^_]+__</Rule>
+
+    <!-- Strikethrough -->
+    <Rule color="Strike">~~[^~]+~~</Rule>
+
+    <!-- Horizontal rules: three or more dashes -->
+    <Rule color="HRule">---+</Rule>
+  </RuleSet>
+</SyntaxDefinition>

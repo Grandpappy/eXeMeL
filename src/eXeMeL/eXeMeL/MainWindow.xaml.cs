@@ -24,6 +24,7 @@ namespace eXeMeL
     private JsonFoldingStrategy JsonFoldingStrategy { get; set; }
     private YamlFoldingStrategy YamlFoldingStrategy { get; set; }
     private DocumentContentType _currentContentType = DocumentContentType.Xml;
+    private MarkdownFormattingTransformer _markdownTransformer;
     public MainViewModel ViewModel => this.DataContext as MainViewModel;
     private PropertyObserver<TextDocument> TextDocumentObserver { get; set; }
     private bool IgnoreNextTextChange { get; set; }
@@ -215,7 +216,8 @@ namespace eXeMeL
           this.YamlFoldingStrategy?.UpdateFoldings(this.FoldingManager, this.AvalonEditor.Document);
           break;
         case DocumentContentType.Text:
-          // No folding for plain text
+        case DocumentContentType.Markdown:
+          // No folding for plain text or markdown
           this.FoldingManager.UpdateFoldings(new List<ICSharpCode.AvalonEdit.Folding.NewFolding>(), -1);
           break;
         default:
@@ -599,6 +601,7 @@ namespace eXeMeL
         {
           DocumentContentType.Json => "JaSON",
           DocumentContentType.Yaml => "YAMeL",
+          DocumentContentType.Markdown => "MarkDown",
           DocumentContentType.Text => "TeXT",
           _ => "eXeMeL"
         };
@@ -645,11 +648,15 @@ namespace eXeMeL
             this.YamlTreePanel.Visibility = Visibility.Visible;
             break;
           case DocumentContentType.Text:
+          case DocumentContentType.Markdown:
             // No utility — switch back to editor
             this.ViewModel.ToggleEditorModeCommand.Execute(null);
             break;
         }
       }
+
+      // Manage markdown formatting transformer
+      UpdateMarkdownTransformer();
 
       // Re-fold with the right strategy
       UpdateDocumentFoldings();
@@ -705,6 +712,7 @@ namespace eXeMeL
             SetActive(this.YamlTreeTabHeader);
             break;
           case DocumentContentType.Text:
+          case DocumentContentType.Markdown:
             // No utility panel — stay on editor
             this.EditorPanel.Visibility = Visibility.Visible;
             SetActive(this.EditorTabHeader);
@@ -749,6 +757,26 @@ namespace eXeMeL
       ApplyWindowChrome();
     }
 
+
+    private void UpdateMarkdownTransformer()
+    {
+      if (_currentContentType == DocumentContentType.Markdown)
+      {
+        if (_markdownTransformer == null)
+        {
+          _markdownTransformer = new MarkdownFormattingTransformer();
+          this.AvalonEditor.TextArea.TextView.LineTransformers.Add(_markdownTransformer);
+        }
+      }
+      else
+      {
+        if (_markdownTransformer != null)
+        {
+          this.AvalonEditor.TextArea.TextView.LineTransformers.Remove(_markdownTransformer);
+          _markdownTransformer = null;
+        }
+      }
+    }
 
     private void UpdateCurrentLineHighlight()
     {

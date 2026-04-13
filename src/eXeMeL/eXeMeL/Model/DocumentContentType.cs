@@ -5,6 +5,7 @@ namespace eXeMeL.Model
     Xml,
     Json,
     Yaml,
+    Markdown,
     Text
   }
 }
