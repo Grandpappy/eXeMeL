@@ -75,12 +75,24 @@ namespace eXeMeL.ViewModel
       {
         DocumentContentType.Json => GetJsonSyntaxHighlightingResource(),
         DocumentContentType.Yaml => GetYamlSyntaxHighlightingResource(),
+        DocumentContentType.Markdown => GetMarkdownSyntaxHighlightingResource(),
         _ => GetXmlSyntaxHighlightingResource()
       };
 
       using var stream = this.GetType().Assembly.GetManifestResourceStream(resourceName);
       using var reader = XmlReader.Create(stream);
       return HighlightingLoader.Load(reader, HighlightingManager.Instance);
+    }
+
+    private string GetMarkdownSyntaxHighlightingResource()
+    {
+      // Pick dark or light based on application theme
+      var isLight = this.Settings.ApplicationTheme == Model.ApplicationTheme.Light
+                    || (this.Settings.ApplicationTheme.SupportsTint()
+                        && ApplicationThemeExtensions.IsLightColor(this.Settings.ChromeTintColor));
+      return isLight
+        ? "eXeMeL.Assets.SyntaxHighlightingSchemes.MarkdownLight.xshd"
+        : "eXeMeL.Assets.SyntaxHighlightingSchemes.MarkdownDark.xshd";
     }
 
 

@@ -171,6 +171,7 @@ namespace eXeMeL.ViewModel
         DocumentContentType.Json => await CleanJsonAsync(text),
         DocumentContentType.Yaml => await CleanYamlAsync(text),
         DocumentContentType.Text => await CleanTextAsync(text),
+        DocumentContentType.Markdown => await CleanTextAsync(text), // No cleaning for Markdown
         _ => await CleanXmlAsync(text)
       };
     }
@@ -468,6 +469,7 @@ namespace eXeMeL.ViewModel
         {
           DocumentContentType.Json => (".json", "JSON files (.json)|*.json|All files (*.*)|*.*"),
           DocumentContentType.Yaml => (".yaml", "YAML files (.yaml)|*.yaml;*.yml|All files (*.*)|*.*"),
+          DocumentContentType.Markdown => (".md", "Markdown files (.md)|*.md;*.markdown|All files (*.*)|*.*"),
           DocumentContentType.Text => (".txt", "Text files (.txt)|*.txt|All files (*.*)|*.*"),
           _ => (".xml", "XML documents (.xml)|*.xml|All files (*.*)|*.*")
         };
@@ -496,7 +498,7 @@ namespace eXeMeL.ViewModel
       var openDialog = new OpenFileDialog
       {
         DefaultExt = ".xml",
-        Filter = "All supported|*.xml;*.json;*.yaml;*.yml;*.txt|XML documents|*.xml|JSON files|*.json|YAML files|*.yaml;*.yml|Text files|*.txt|All files|*.*"
+        Filter = "All supported|*.xml;*.json;*.yaml;*.yml;*.md;*.markdown;*.txt|XML documents|*.xml|JSON files|*.json|YAML files|*.yaml;*.yml|Markdown files|*.md;*.markdown|Text files|*.txt|All files|*.*"
       };
 
       if (openDialog.ShowDialog() == true)

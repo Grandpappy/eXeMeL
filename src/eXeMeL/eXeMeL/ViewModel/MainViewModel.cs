@@ -74,8 +74,9 @@ namespace eXeMeL.ViewModel
     {
       if (this.EditorMode == EditorMode.Editor)
       {
-        // Don't toggle to utility for Text mode — no tree viewer
-        if (this.Editor.ContentType == DocumentContentType.Text)
+        // Don't toggle to utility for Text/Markdown — no tree viewer
+        if (this.Editor.ContentType == DocumentContentType.Text ||
+            this.Editor.ContentType == DocumentContentType.Markdown)
           return;
 
         var text = this.Editor.Document.Text;

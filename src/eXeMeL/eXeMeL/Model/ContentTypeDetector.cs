@@ -28,6 +28,10 @@ namespace eXeMeL.Model
           trimmed.StartsWith("%5B", System.StringComparison.OrdinalIgnoreCase))
         return DocumentContentType.Json;
 
+      // Markdown: starts with # heading
+      if (trimmed.StartsWith("# ") || trimmed.StartsWith("## "))
+        return DocumentContentType.Markdown;
+
       // YAML: starts with --- document marker
       if (trimmed.StartsWith("---"))
         return DocumentContentType.Yaml;
@@ -58,6 +62,7 @@ namespace eXeMeL.Model
           or ".vbproj" or ".xaml" or ".xshd" or ".nuspec" or ".targets"
           or ".props" or ".proj" => DocumentContentType.Xml,
         ".yaml" or ".yml" => DocumentContentType.Yaml,
+        ".md" or ".markdown" => DocumentContentType.Markdown,
         ".txt" or ".log" => DocumentContentType.Text,
         _ => null
       };

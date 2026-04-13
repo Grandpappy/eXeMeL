@@ -160,6 +160,12 @@
     <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\SolarizedLightYaml.xshd">
       <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.SolarizedLightYaml.xshd</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\MarkdownDark.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.MarkdownDark.xshd</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\SyntaxHighlightingSchemes\MarkdownLight.xshd">
+      <LogicalName>eXeMeL.Assets.SyntaxHighlightingSchemes.MarkdownLight.xshd</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Assets\ChangeLog.txt">
       <LogicalName>eXeMeL.Assets.ChangeLog.txt</LogicalName>
     </EmbeddedResource>

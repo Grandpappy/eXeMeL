@@ -1,0 +1,46 @@
+<SyntaxDefinition name="Markdown" extensions=".md;.markdown" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Heading1" foreground="#0000FF" fontWeight="bold" />
+  <Color name="Heading2" foreground="#0000FF" fontWeight="bold" />
+  <Color name="Heading3" foreground="#0000CC" fontWeight="bold" />
+  <Color name="Heading4" foreground="#0000AA" fontWeight="bold" />
+  <Color name="Bold" foreground="#000000" fontWeight="bold" />
+  <Color name="Italic" foreground="#000000" fontStyle="italic" />
+  <Color name="BoldItalic" foreground="#000000" fontWeight="bold" fontStyle="italic" />
+  <Color name="InlineCode" foreground="#A31515" />
+  <Color name="CodeBlock" foreground="#A31515" />
+  <Color name="Link" foreground="#0451A5" />
+  <Color name="LinkUrl" foreground="#008000" />
+  <Color name="Image" foreground="#800080" />
+  <Color name="BlockQuote" foreground="#008000" fontStyle="italic" />
+  <Color name="ListMarker" foreground="#B8860B" fontWeight="bold" />
+  <Color name="HorizontalRule" foreground="#AAAAAA" />
+  <Color name="Strikethrough" foreground="#808080" />
+
+  <RuleSet>
+    <Rule color="Heading1">^#\s.*$</Rule>
+    <Rule color="Heading2">^##\s.*$</Rule>
+    <Rule color="Heading3">^###\s.*$</Rule>
+    <Rule color="Heading4">^#{4,6}\s.*$</Rule>
+    <Rule color="HorizontalRule">^(\*{3,}|-{3,}|_{3,})\s*$</Rule>
+    <Rule color="BlockQuote">^&gt;.*$</Rule>
+    <Rule color="ListMarker">^\s*[-*+]\s</Rule>
+    <Rule color="ListMarker">^\s*\d+\.\s</Rule>
+    <Span color="CodeBlock" multiline="true">
+      <Begin>^```</Begin>
+      <End>^```</End>
+    </Span>
+    <Rule color="Image">!\[.*?\]\(.*?\)</Rule>
+    <Rule color="Link">\[.*?\]</Rule>
+    <Rule color="LinkUrl">\(https?://.*?\)</Rule>
+    <Span color="InlineCode">
+      <Begin>`</Begin>
+      <End>`</End>
+    </Span>
+    <Rule color="BoldItalic">\*{3}[^*]+\*{3}</Rule>
+    <Rule color="Bold">\*{2}[^*]+\*{2}</Rule>
+    <Rule color="Bold">_{2}[^_]+_{2}</Rule>
+    <Rule color="Italic">\*[^*]+\*</Rule>
+    <Rule color="Italic">_[^_]+_</Rule>
+    <Rule color="Strikethrough">~~[^~]+~~</Rule>
+  </RuleSet>
+</SyntaxDefinition>
