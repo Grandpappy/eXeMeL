@@ -63,8 +63,11 @@ local.properties
 .builds
 *.dotCover
 
-## TODO: If you have NuGet Package Restore enabled, uncomment this
-#packages/
+## NuGet packages (restored via PackageReference, not stored locally)
+packages/
+
+# VS Code workspace files
+*.code-workspace
 
 # Visual C++ cache files
 ipch/
