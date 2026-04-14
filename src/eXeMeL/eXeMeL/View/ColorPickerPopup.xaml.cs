@@ -12,11 +12,15 @@ namespace eXeMeL.View
 
     public static readonly DependencyProperty SelectedColorProperty =
       DependencyProperty.Register(nameof(SelectedColor), typeof(string), typeof(ColorPickerPopup),
-        new FrameworkPropertyMetadata("#D4AA00", FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedColorChanged));
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedColorChanged));
 
     public static readonly DependencyProperty SwatchColorsProperty =
       DependencyProperty.Register(nameof(SwatchColors), typeof(string[]), typeof(ColorPickerPopup),
         new PropertyMetadata(null, OnSwatchColorsChanged));
+
+    public static readonly DependencyProperty ThemeResourceKeyProperty =
+      DependencyProperty.Register(nameof(ThemeResourceKey), typeof(string), typeof(ColorPickerPopup),
+        new PropertyMetadata(null));
 
     public string SelectedColor
     {
@@ -28,6 +32,16 @@ namespace eXeMeL.View
     {
       get => (string[])GetValue(SwatchColorsProperty);
       set => SetValue(SwatchColorsProperty, value);
+    }
+
+    /// <summary>
+    /// When SelectedColor is null, the picker displays the color from this application resource key
+    /// (e.g. "AppTextBrush") so the user sees the effective theme default.
+    /// </summary>
+    public string ThemeResourceKey
+    {
+      get => (string)GetValue(ThemeResourceKeyProperty);
+      set => SetValue(ThemeResourceKeyProperty, value);
     }
 
     public ColorPickerPopup()
@@ -101,16 +115,34 @@ namespace eXeMeL.View
       _updatingFromSlider = false;
     }
 
+    private string GetEffectiveColor()
+    {
+      if (!string.IsNullOrEmpty(SelectedColor))
+        return SelectedColor;
+
+      // Resolve the current theme's default from the resource dictionary
+      if (!string.IsNullOrEmpty(ThemeResourceKey)
+          && Application.Current?.Resources[ThemeResourceKey] is SolidColorBrush themeBrush)
+      {
+        var c = themeBrush.Color;
+        return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
+      }
+
+      return null;
+    }
+
     private void UpdateVisuals()
     {
+      var effectiveColor = GetEffectiveColor();
       try
       {
-        var color = (Color)ColorConverter.ConvertFromString(SelectedColor);
+        if (effectiveColor == null) return;
+        var color = (Color)ColorConverter.ConvertFromString(effectiveColor);
         var brush = new SolidColorBrush(color);
         brush.Freeze();
         if (ColorSwatchButton != null) ColorSwatchButton.Background = brush;
         if (PreviewSwatch != null) PreviewSwatch.Background = brush;
-        if (HexLabel != null) HexLabel.Text = SelectedColor;
+        if (HexLabel != null) HexLabel.Text = effectiveColor;
       }
       catch { }
 
@@ -132,7 +164,9 @@ namespace eXeMeL.View
       if (HueSlider == null) return;
       try
       {
-        var color = (Color)ColorConverter.ConvertFromString(SelectedColor);
+        var effectiveColor = GetEffectiveColor();
+        if (effectiveColor == null) return;
+        var color = (Color)ColorConverter.ConvertFromString(effectiveColor);
         var (h, s, v) = ColorToHsv(color);
         HueSlider.Value = h;
         SatSlider.Value = s * 100;

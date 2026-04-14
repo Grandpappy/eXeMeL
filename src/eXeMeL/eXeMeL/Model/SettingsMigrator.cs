@@ -16,6 +16,24 @@ namespace eXeMeL.Model
     {
       var settingsFilePath = SettingsIO.GetSettingsFilePath();
 
+      // Move settings from the old %LOCALAPPDATA%\eXeMeL directory if present
+      if (!File.Exists(settingsFilePath))
+      {
+        var legacyFilePath = SettingsIO.GetLegacySettingsFilePath();
+        if (File.Exists(legacyFilePath))
+        {
+          try
+          {
+            Directory.CreateDirectory(Path.GetDirectoryName(settingsFilePath));
+            File.Move(legacyFilePath, settingsFilePath);
+          }
+          catch (Exception)
+          {
+            // If the move fails, fall through to the registry migration or defaults
+          }
+        }
+      }
+
       if (File.Exists(settingsFilePath))
       {
         return;

@@ -56,7 +56,7 @@ The app follows MVVM using **CommunityToolkit.Mvvm** (migrated from MvvmLight). 
 | Editor logic | `ViewModel/EditorViewModel.cs` | Clipboard ops, XML cleaning pipeline, snapshots, file I/O |
 | XPath utility | `ViewModel/XmlUtility/XmlUtilityViewModel.cs` | XPath evaluation and tree navigation |
 | XML cleaners | `ViewModel/XmlCleaners/` | Chain of cleaners (URL encoding, trim, newlines, VS artifacts, formatting) |
-| Settings | `Model/Settings.cs`, `Model/SettingsIO.cs` | User preferences persisted as JSON to `%LOCALAPPDATA%\eXeMeL\settings.json` |
+| Settings | `Model/Settings.cs`, `Model/SettingsIO.cs` | User preferences persisted as JSON to `%LOCALAPPDATA%\eXeMeL2\settings.json` |
 | Settings migration | `Model/SettingsMigrator.cs` | Auto-migrates old Registry settings to file on first run |
 | Syntax themes | `Assets/SyntaxHighlightingSchemes/` | AvalonEdit `.xshd` files (VSBlue, Dark, Bright, Earthy, SolarizedDark) |
 | Theme manager | `ViewModel/SyntaxHighlightManager.cs` | Swaps theme ResourceDictionaries using marker-key approach |
@@ -74,7 +74,7 @@ The app follows MVVM using **CommunityToolkit.Mvvm** (migrated from MvvmLight). 
 
 ### Settings Storage
 
-Settings persist as JSON to `%LOCALAPPDATA%\eXeMeL\settings.json` using `System.Text.Json`. On first run, `SettingsMigrator` checks for old Registry settings at `HKCU\Software\eXeMeL` and migrates them automatically.
+Settings persist as JSON to `%LOCALAPPDATA%\eXeMeL2\settings.json` using `System.Text.Json`. On first run, `SettingsMigrator` checks for old Registry settings at `HKCU\Software\eXeMeL` and migrates them automatically.
 
 ### Theme System
 
