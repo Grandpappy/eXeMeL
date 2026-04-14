@@ -311,6 +311,25 @@
               <TextBlock Text="YAML Tree" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
             </StackPanel>
           </Border>
+
+          <Border x:Name="MarkdownPreviewTabHeader" MouseLeftButtonDown="MarkdownPreviewTabHeader_Click"
+                  Cursor="Hand" Padding="10,6" CornerRadius="6,6,0,0" Margin="2,0,0,0"
+                  Background="Transparent"
+                  BorderBrush="Transparent"
+                  BorderThickness="1,1,1,0"
+                  Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="Eye24" FontSize="16" Margin="0,0,6,0" Opacity="0.6"/>
+              <TextBlock Text="Preview" VerticalAlignment="Center" FontSize="13" Opacity="0.6"/>
+              <Button x:Name="PinPreviewButton" Click="PinPreviewButton_Click"
+                      ToolTip="Pin preview side-by-side"
+                      Background="Transparent" BorderThickness="0"
+                      Padding="4,0" Margin="6,0,0,0" Cursor="Hand"
+                      VerticalAlignment="Center" Focusable="False">
+                <ui:SymbolIcon x:Name="PinPreviewIcon" Symbol="Pin24" FontSize="14" Opacity="0.6"/>
+              </Button>
+            </StackPanel>
+          </Border>
         </StackPanel>
 
         <!-- Snapshots inline with tabs (right-aligned) -->
@@ -326,6 +345,8 @@
       <Grid Grid.Row="1">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
+          <ColumnDefinition x:Name="PreviewSplitterColumn" Width="0"/>
+          <ColumnDefinition x:Name="PinnedPreviewColumn" Width="0"/>
           <ColumnDefinition x:Name="SettingsPanelColumn" Width="0"/>
         </Grid.ColumnDefinitions>
 
@@ -411,10 +432,30 @@
             DataContext="{Binding YamlUtility}"/>
         </Border>
 
+        <!-- Markdown Preview content (hidden by default) -->
+        <Border x:Name="MarkdownPreviewPanel" Grid.Column="0" Margin="8,0,8,8"
+                Background="{DynamicResource EditorTintOverlayBrush}"
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1,0,1,1"
+                CornerRadius="6,0,6,6"
+                Padding="2"
+                Visibility="Collapsed">
+          <views:MarkdownUtilityView
+            x:Name="MarkdownUtilityView"
+            DataContext="{Binding MarkdownUtility}"/>
+        </Border>
+
+        <!-- GridSplitter for pinned preview (hidden by default) -->
+        <GridSplitter x:Name="PreviewSplitter" Grid.Column="1"
+                      Width="5" HorizontalAlignment="Stretch"
+                      Background="{DynamicResource DividerStrokeColorDefaultBrush}"
+                      Visibility="Collapsed"
+                      Margin="0,0,0,8"/>
+
         <!-- Settings Panel (slide-in from right) -->
         <Border
           x:Name="SettingsPanel"
-          Grid.Column="1"
+          Grid.Column="3"
           Background="{DynamicResource ChromeTintOverlayBrush}"
           BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
           BorderThickness="1,0,0,0">
