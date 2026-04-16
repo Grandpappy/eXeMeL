@@ -954,9 +954,10 @@ namespace eXeMeL
 
     private async void CheckForUpdatesOnStartup()
     {
+      // Delay update check so it doesn't compete with initial content load
+      await System.Threading.Tasks.Task.Delay(5000);
+
 #if DEBUG
-      // Debug bypass: show fake toast to test UI without a real update
-      await System.Threading.Tasks.Task.Delay(1500); // Simulate network delay
       this.UpdateToastMessage.Text = "eXeMeL 2.99.0 is available! (DEBUG)";
       this.UpdateToast.Visibility = Visibility.Visible;
       return;

@@ -25,7 +25,9 @@ namespace eXeMeL
     [STAThread]
     private static void Main(string[] args)
     {
-      // Velopack MUST be first — handles install/uninstall/update hooks
+      // Velopack lifecycle hooks — MUST run first.
+      // Only does work when invoked by the installer (special args);
+      // returns immediately during normal user launches.
       VelopackApp.Build()
         .Run();
 
