@@ -25,6 +25,8 @@ namespace eXeMeL.Model
     private double _chromeOpacity = 0.5;
     private bool _highlightCurrentLine = true;
     private bool _useBuiltInSearch;
+    private bool _opaqueEditorBackground;
+    private string _editorBackgroundColor;
     private string _lastLaunchedVersion;
     private double _windowLeft = double.NaN;
     private double _windowTop = double.NaN;
@@ -139,6 +141,18 @@ namespace eXeMeL.Model
       set => SetProperty(ref _useBuiltInSearch, value);
     }
 
+    public bool OpaqueEditorBackground
+    {
+      get => _opaqueEditorBackground;
+      set => SetProperty(ref _opaqueEditorBackground, value);
+    }
+
+    public string EditorBackgroundColor
+    {
+      get => _editorBackgroundColor;
+      set => SetProperty(ref _editorBackgroundColor, value);
+    }
+
     public double WindowLeft
     {
       get => _windowLeft;
@@ -241,6 +255,8 @@ namespace eXeMeL.Model
       ChromeOpacity = 0.5;
       HighlightCurrentLine = true;
       UseBuiltInSearch = false;
+      OpaqueEditorBackground = false;
+      EditorBackgroundColor = null;
     }
 
 

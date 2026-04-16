@@ -183,6 +183,7 @@ namespace eXeMeL.Tests.ViewModel
 
       Assert.NotNull(capturedXPath);
       Assert.Equal("/Child1/GrandChild", capturedXPath);
+      GC.KeepAlive(operations);
     }
 
 
@@ -200,6 +201,7 @@ namespace eXeMeL.Tests.ViewModel
 
       Assert.NotNull(capturedXPath);
       Assert.Equal("/Child2", capturedXPath);
+      GC.KeepAlive(operations);
     }
 
     #endregion

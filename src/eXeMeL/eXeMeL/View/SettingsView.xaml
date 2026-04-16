@@ -16,7 +16,7 @@
 
   <StackPanel Margin="16,8,16,0">
 
-    <!-- Editor Settings -->
+    <!-- ═══════════════ EDITOR ═══════════════ -->
     <TextBlock Text="Editor" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8" Opacity="0.7"/>
 
     <ui:CardControl Margin="0,0,0,4">
@@ -59,24 +59,10 @@
       <ui:ToggleSwitch IsChecked="{Binding HighlightCurrentLine}"/>
     </ui:CardControl>
 
-    <ui:CardControl Margin="0,0,0,4">
-      <ui:CardControl.Header>
-        <StackPanel>
-          <TextBlock Text="Font Size" FontSize="14"/>
-        </StackPanel>
-      </ui:CardControl.Header>
-      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-        <Slider Value="{Binding EditorFontSize}" Minimum="12" Maximum="30"
-                Width="120" VerticalAlignment="Center" Focusable="False"/>
-        <ui:Button Content="Reset" Click="ResetFontSizeButton_Click"
-                   Appearance="Transparent" Padding="6,2" Margin="8,0,0,0"
-                   VerticalAlignment="Center" FontSize="12"/>
-      </StackPanel>
-    </ui:CardControl>
 
 
-    <!-- Appearance -->
-    <TextBlock Text="Appearance" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8" Opacity="0.7"/>
+    <!-- ═══════════════ THEME &amp; FONTS ═══════════════ -->
+    <TextBlock Text="Theme &amp; Fonts" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8" Opacity="0.7"/>
 
     <ui:CardControl Margin="0,0,0,4">
       <ui:CardControl.Header>
@@ -90,7 +76,7 @@
         MinWidth="140"/>
     </ui:CardControl>
 
-    <!-- Glass/Tinted theme controls (visible only for glass/tinted themes) -->
+    <!-- Glass/Tinted: tint color + window opacity -->
     <StackPanel x:Name="TintSettingsPanel">
       <StackPanel.Style>
         <Style TargetType="StackPanel">
@@ -108,26 +94,9 @@
 
       <ui:CardControl Margin="0,0,0,4">
         <ui:CardControl.Header>
-          <TextBlock Text="Tint Color" FontSize="14"/>
-        </ui:CardControl.Header>
-        <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
-                                 SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
-      </ui:CardControl>
-
-      <ui:CardControl Margin="0,0,0,4">
-        <ui:CardControl.Header>
           <TextBlock Text="Window Opacity" FontSize="14"/>
         </ui:CardControl.Header>
         <Slider Value="{Binding ChromeOpacity}" Minimum="0" Maximum="1"
-                Width="140" VerticalAlignment="Center" Focusable="False"
-                SmallChange="0.05" LargeChange="0.1"/>
-      </ui:CardControl>
-
-      <ui:CardControl Margin="0,0,0,4">
-        <ui:CardControl.Header>
-          <TextBlock Text="Editor Tint" FontSize="14"/>
-        </ui:CardControl.Header>
-        <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
                 Width="140" VerticalAlignment="Center" Focusable="False"
                 SmallChange="0.05" LargeChange="0.1"/>
       </ui:CardControl>
@@ -156,8 +125,23 @@
         MinWidth="140"/>
     </ui:CardControl>
 
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <TextBlock Text="Font Size" FontSize="14"/>
+      </ui:CardControl.Header>
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <Slider Value="{Binding EditorFontSize}" Minimum="12" Maximum="30"
+                Width="120" VerticalAlignment="Center" Focusable="False"/>
+        <ui:Button Content="Reset" Click="ResetFontSizeButton_Click"
+                   Appearance="Transparent" Padding="6,2" Margin="8,0,0,0"
+                   VerticalAlignment="Center" FontSize="12"/>
+      </StackPanel>
+    </ui:CardControl>
 
-    <!-- Text and Accent Colors -->
+
+    <!-- ═══════════════ COLORS ═══════════════ -->
+    <TextBlock Text="Colors" FontSize="14" FontWeight="SemiBold" Margin="0,20,0,8" Opacity="0.7"/>
+
     <ui:CardControl Margin="0,0,0,4">
       <ui:CardControl.Header>
         <TextBlock Text="Text Color" FontSize="14"/>
@@ -175,6 +159,62 @@
                                SwatchColors="{x:Static views:ColorSwatches.AccentColors}"
                                ThemeResourceKey="AppAccentBrush"/>
     </ui:CardControl>
+
+    <!-- Application Color (tint) — visible only for Glass/Tinted themes -->
+    <StackPanel>
+      <StackPanel.Style>
+        <Style TargetType="StackPanel">
+          <Setter Property="Visibility" Value="Collapsed"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Glass">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ApplicationTheme}" Value="Tinted">
+              <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </StackPanel.Style>
+      <ui:CardControl Margin="0,0,0,4">
+        <ui:CardControl.Header>
+          <TextBlock Text="Application Color" FontSize="14"/>
+        </ui:CardControl.Header>
+        <views:ColorPickerPopup SelectedColor="{Binding ChromeTintColor, Mode=TwoWay}"
+                                 SwatchColors="{x:Static views:ColorSwatches.TintColors}"/>
+      </ui:CardControl>
+    </StackPanel>
+
+    <!-- Editor Background: link/unlink + color picker -->
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <StackPanel>
+          <TextBlock Text="Editor Background" FontSize="14"/>
+          <TextBlock x:Name="EditorBackgroundSubtext" Text="Follows theme" FontSize="12" Opacity="0.5"/>
+        </StackPanel>
+      </ui:CardControl.Header>
+      <StackPanel Orientation="Horizontal">
+        <ui:Button x:Name="EditorBackgroundLinkButton"
+                   Click="EditorBackgroundLinkButton_Click"
+                   Appearance="Transparent" Padding="4" Margin="0,0,4,0"
+                   ToolTip="Link/unlink from theme" Focusable="False">
+          <ui:SymbolIcon x:Name="EditorBackgroundLinkIcon" Symbol="Link24" FontSize="16"/>
+        </ui:Button>
+        <views:ColorPickerPopup x:Name="EditorBackgroundColorPicker"
+                                 SwatchColors="{x:Static views:ColorSwatches.EditorBackgroundColors}"
+                                 IsEnabled="False"/>
+      </StackPanel>
+    </ui:CardControl>
+
+    <!-- Editor Opacity — always visible -->
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <TextBlock Text="Editor Opacity" FontSize="14"/>
+      </ui:CardControl.Header>
+      <Slider Value="{Binding EditorTintIntensity}" Minimum="0" Maximum="1"
+              Width="140" VerticalAlignment="Center" Focusable="False"
+              SmallChange="0.05" LargeChange="0.1"/>
+    </ui:CardControl>
+
 
     <!-- Reset -->
     <ui:Button Content="Reset All to Defaults" Click="ResetToDefaultsButton_Click"
