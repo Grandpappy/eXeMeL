@@ -135,10 +135,11 @@ namespace eXeMeL.ViewModel
     {
       this.Observer.RegisterHandler(x => x.ApplicationTheme, HandleApplicationThemeChange);
       this.Observer.RegisterHandler(x => x.ChromeTintColor, HandleChromeTintColorChange);
-      this.Observer.RegisterHandler(x => x.EditorTintIntensity, HandleChromeTintColorChange);
+      this.Observer.RegisterHandler(x => x.EditorTintIntensity, HandleEditorTintIntensityChange);
       this.Observer.RegisterHandler(x => x.ChromeOpacity, HandleChromeTintColorChange);
       this.Observer.RegisterHandler(x => x.TextColor, HandleTextOrAccentColorChange);
       this.Observer.RegisterHandler(x => x.AccentColor, HandleTextOrAccentColorChange);
+      this.Observer.RegisterHandler(x => x.EditorBackgroundColor, HandleEditorBackgroundColorChange);
       SetApplicationThemeBasedOnSettings();
     }
 
@@ -202,18 +203,101 @@ namespace eXeMeL.ViewModel
         chromeBrush.Freeze();
         existingDict["ChromeTintOverlayBrush"] = chromeBrush;
 
-        // Editor tint: darker than chrome, controlled by intensity
-        var editorAlpha = (byte)(settings.EditorTintIntensity * 255);
-        var editorTint = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
-        editorTint.R = (byte)(editorTint.R * 0.4);
-        editorTint.G = (byte)(editorTint.G * 0.4);
-        editorTint.B = (byte)(editorTint.B * 0.4);
-        editorTint.A = editorAlpha;
-        var editorBrush = new System.Windows.Media.SolidColorBrush(editorTint);
-        editorBrush.Freeze();
-        existingDict["EditorTintOverlayBrush"] = editorBrush;
+        // Editor tint: skip if user has a custom editor background color
+        if (string.IsNullOrEmpty(settings.EditorBackgroundColor))
+        {
+          var editorAlpha = (byte)(settings.EditorTintIntensity * 255);
+          var editorTint = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
+          editorTint.R = (byte)(editorTint.R * 0.4);
+          editorTint.G = (byte)(editorTint.G * 0.4);
+          editorTint.B = (byte)(editorTint.B * 0.4);
+          editorTint.A = editorAlpha;
+          var editorBrush = new System.Windows.Media.SolidColorBrush(editorTint);
+          editorBrush.Freeze();
+          existingDict["EditorTintOverlayBrush"] = editorBrush;
+        }
       }
       catch { /* Invalid color */ }
+    }
+
+
+
+    private static void HandleEditorTintIntensityChange(Settings settings)
+    {
+      // Intensity affects both linked (tint-derived) and unlinked (custom color) editor backgrounds
+      if (!string.IsNullOrEmpty(settings.EditorBackgroundColor))
+        HandleEditorBackgroundColorChange(settings);
+      else
+        HandleChromeTintColorChange(settings);
+    }
+
+    private static void HandleEditorBackgroundColorChange(Settings settings)
+    {
+      if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.CheckAccess())
+      {
+        Application.Current.Dispatcher.Invoke(() => HandleEditorBackgroundColorChange(settings));
+        return;
+      }
+
+      var existingDict = Application.Current?.Resources.MergedDictionaries
+          .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
+      if (existingDict == null) return;
+
+      if (!string.IsNullOrEmpty(settings.EditorBackgroundColor))
+      {
+        // Custom color with editor opacity applied
+        try
+        {
+          var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.EditorBackgroundColor);
+          color.A = (byte)(settings.EditorTintIntensity * 255);
+          var brush = new System.Windows.Media.SolidColorBrush(color);
+          brush.Freeze();
+          existingDict["EditorTintOverlayBrush"] = brush;
+        }
+        catch { }
+      }
+      else
+      {
+        // Re-linked: revert to theme-derived brush
+        if (settings.ApplicationTheme.SupportsTint())
+          HandleChromeTintColorChange(settings);
+        else
+        {
+          var defaultColor = GetDefaultEditorBrushColorForTheme(settings.ApplicationTheme);
+          var brush = new System.Windows.Media.SolidColorBrush(defaultColor);
+          brush.Freeze();
+          existingDict["EditorTintOverlayBrush"] = brush;
+        }
+      }
+    }
+
+    public static string GetCurrentDerivedEditorColor(Settings settings)
+    {
+      if (settings.ApplicationTheme.SupportsTint())
+      {
+        try
+        {
+          var baseColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.ChromeTintColor);
+          var r = (byte)(baseColor.R * 0.4);
+          var g = (byte)(baseColor.G * 0.4);
+          var b = (byte)(baseColor.B * 0.4);
+          return $"#{r:X2}{g:X2}{b:X2}";
+        }
+        catch { return "#252525"; }
+      }
+
+      var c = GetDefaultEditorBrushColorForTheme(settings.ApplicationTheme);
+      return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
+    }
+
+    private static System.Windows.Media.Color GetDefaultEditorBrushColorForTheme(Model.ApplicationTheme theme)
+    {
+      return theme switch
+      {
+        Model.ApplicationTheme.Light => (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#EDEDED"),
+        Model.ApplicationTheme.SolarizedDark => (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#002B36"),
+        _ => (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#252525")
+      };
     }
 
 
@@ -253,18 +337,35 @@ namespace eXeMeL.ViewModel
           chromeBrush.Freeze();
           dict["ChromeTintOverlayBrush"] = chromeBrush;
 
-          // Editor tint: darker than chrome, controlled by intensity slider
-          var editorAlpha = (byte)(this.Settings.EditorTintIntensity * 255);
-          var editorTint = baseColor;
-          editorTint.R = (byte)(editorTint.R * 0.4);
-          editorTint.G = (byte)(editorTint.G * 0.4);
-          editorTint.B = (byte)(editorTint.B * 0.4);
-          editorTint.A = editorAlpha;
-          var editorBrush = new System.Windows.Media.SolidColorBrush(editorTint);
-          editorBrush.Freeze();
-          dict["EditorTintOverlayBrush"] = editorBrush;
+          // Editor tint: skip if user has a custom editor background color
+          if (string.IsNullOrEmpty(this.Settings.EditorBackgroundColor))
+          {
+            var editorAlpha = (byte)(this.Settings.EditorTintIntensity * 255);
+            var editorTint = baseColor;
+            editorTint.R = (byte)(editorTint.R * 0.4);
+            editorTint.G = (byte)(editorTint.G * 0.4);
+            editorTint.B = (byte)(editorTint.B * 0.4);
+            editorTint.A = editorAlpha;
+            var editorBrush = new System.Windows.Media.SolidColorBrush(editorTint);
+            editorBrush.Freeze();
+            dict["EditorTintOverlayBrush"] = editorBrush;
+          }
         }
         catch { /* Invalid color string — skip tint */ }
+      }
+
+      // Custom editor background overrides both tinted and non-tinted themes
+      if (!string.IsNullOrEmpty(this.Settings.EditorBackgroundColor))
+      {
+        try
+        {
+          var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.EditorBackgroundColor);
+          color.A = (byte)(this.Settings.EditorTintIntensity * 255);
+          var brush = new System.Windows.Media.SolidColorBrush(color);
+          brush.Freeze();
+          dict["EditorTintOverlayBrush"] = brush;
+        }
+        catch { }
       }
 
       Wpf.Ui.Appearance.ApplicationTheme wpfUiTheme;

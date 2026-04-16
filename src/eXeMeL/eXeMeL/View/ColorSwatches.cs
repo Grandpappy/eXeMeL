@@ -20,6 +20,16 @@ namespace eXeMeL.View
       "#F5F5DC", "#FAFAFA", "#E8E8E8", "#D0D0D0"
     };
 
+    // Editor background colors (dark and light options)
+    public static string[] EditorBackgroundColors { get; } = new[]
+    {
+      "#1E1E1E", "#252525", "#2D2D2D", "#1A1A2E",
+      "#0D1117", "#002B36", "#1B1B1B", "#171717",
+      "#0A0A0A", "#2B2B2B", "#1C1C1C", "#242424",
+      "#EDEDED", "#F5F5F5", "#FAFAFA", "#FFFFFF",
+      "#FDF6E3", "#EEE8D5", "#E8E8E8", "#D0D0D0"
+    };
+
     // Accent colors (vibrant, distinctive)
     public static string[] AccentColors { get; } = new[]
     {

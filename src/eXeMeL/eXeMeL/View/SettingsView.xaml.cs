@@ -1,4 +1,5 @@
 ﻿using eXeMeL.Model;
+using eXeMeL.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,99 @@ namespace eXeMeL.View
     {
       InitializeComponent();
       this.AddHandler(System.Windows.UIElement.PreviewMouseWheelEvent, new System.Windows.Input.MouseWheelEventHandler(ComboBox_PreviewMouseWheel), true);
+      this.Loaded += SettingsView_Loaded;
+    }
+
+    private void SettingsView_Loaded(object sender, RoutedEventArgs e)
+    {
+      var settings = DataContext as Settings;
+      if (settings == null) return;
+
+      InitializeEditorBackgroundUI(settings);
+
+      // Watch for property changes that affect editor background UI
+      settings.PropertyChanged += Settings_PropertyChanged;
+
+      // Push picker color changes to the setting when unlinked
+      var dpd = DependencyPropertyDescriptor.FromProperty(
+        ColorPickerPopup.SelectedColorProperty, typeof(ColorPickerPopup));
+      dpd?.AddValueChanged(EditorBackgroundColorPicker, OnEditorBackgroundPickerColorChanged);
+    }
+
+    private void InitializeEditorBackgroundUI(Settings settings)
+    {
+      var isLinked = string.IsNullOrEmpty(settings.EditorBackgroundColor);
+      EditorBackgroundColorPicker.IsEnabled = !isLinked;
+      EditorBackgroundLinkIcon.Symbol = isLinked
+        ? Wpf.Ui.Controls.SymbolRegular.Link24
+        : Wpf.Ui.Controls.SymbolRegular.LinkDismiss24;
+      EditorBackgroundSubtext.Text = isLinked ? "Follows theme" : "Custom color";
+
+      EditorBackgroundColorPicker.SelectedColor = isLinked
+        ? ApplicationThemeManager.GetCurrentDerivedEditorColor(settings)
+        : settings.EditorBackgroundColor;
+
+      UpdateEditorTintControlsVisibility();
+    }
+
+    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      var settings = DataContext as Settings;
+      if (settings == null) return;
+
+      if (e.PropertyName is nameof(Settings.ApplicationTheme)
+          or nameof(Settings.ChromeTintColor)
+          or nameof(Settings.EditorTintIntensity))
+      {
+        UpdateEditorTintControlsVisibility();
+
+        // If linked, update the picker preview to reflect the new derived color
+        if (string.IsNullOrEmpty(settings.EditorBackgroundColor))
+          EditorBackgroundColorPicker.SelectedColor = ApplicationThemeManager.GetCurrentDerivedEditorColor(settings);
+      }
+    }
+
+    private void EditorBackgroundLinkButton_Click(object sender, RoutedEventArgs e)
+    {
+      var settings = DataContext as Settings;
+      if (settings == null) return;
+
+      if (string.IsNullOrEmpty(settings.EditorBackgroundColor))
+      {
+        // Unlink: populate with current derived color
+        var derivedColor = ApplicationThemeManager.GetCurrentDerivedEditorColor(settings);
+        settings.EditorBackgroundColor = derivedColor;
+        EditorBackgroundColorPicker.SelectedColor = derivedColor;
+        EditorBackgroundColorPicker.IsEnabled = true;
+        EditorBackgroundLinkIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.LinkDismiss24;
+        EditorBackgroundSubtext.Text = "Custom color";
+      }
+      else
+      {
+        // Relink: clear custom color
+        settings.EditorBackgroundColor = null;
+        EditorBackgroundColorPicker.SelectedColor = ApplicationThemeManager.GetCurrentDerivedEditorColor(settings);
+        EditorBackgroundColorPicker.IsEnabled = false;
+        EditorBackgroundLinkIcon.Symbol = Wpf.Ui.Controls.SymbolRegular.Link24;
+        EditorBackgroundSubtext.Text = "Follows theme";
+      }
+
+      UpdateEditorTintControlsVisibility();
+    }
+
+    private void OnEditorBackgroundPickerColorChanged(object sender, EventArgs e)
+    {
+      var settings = DataContext as Settings;
+      if (settings == null) return;
+
+      // Only push to settings when unlinked (picker is enabled)
+      if (!string.IsNullOrEmpty(settings.EditorBackgroundColor))
+        settings.EditorBackgroundColor = EditorBackgroundColorPicker.SelectedColor;
+    }
+
+    private void UpdateEditorTintControlsVisibility()
+    {
+      // No conditional controls to manage — Editor Opacity is always visible
     }
 
     private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -107,7 +201,10 @@ namespace eXeMeL.View
 
       if (result == System.Windows.MessageBoxResult.Yes)
       {
-        (this.DataContext as Settings)?.ResetToDefaults();
+        var settings = this.DataContext as Settings;
+        settings?.ResetToDefaults();
+        if (settings != null)
+          InitializeEditorBackgroundUI(settings);
       }
     }
 

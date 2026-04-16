@@ -1,4 +1,9 @@
-﻿*4/13/2026 - eXeMeL 2
+﻿*4/16/2026 - Improved readability
+
+- Added ability to control color of the editor's background to enhance readability.
+- Added default text colors for application themes to prevent too similar of a color being defaulted for light on light or dark on dark.
+
+*4/13/2026 - eXeMeL 2
 
 Major platform update
 
