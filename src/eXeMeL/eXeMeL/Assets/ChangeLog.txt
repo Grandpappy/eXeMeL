@@ -1,5 +1,6 @@
-﻿*4/16/2026 - Improved readability
+﻿*4/16/2026 - Improved startup time and readability
 
+- Improved startup time by delaying update checks
 - Added ability to control color of the editor's background to enhance readability.
 - Added default text colors for application themes to prevent too similar of a color being defaulted for light on light or dark on dark.
 
