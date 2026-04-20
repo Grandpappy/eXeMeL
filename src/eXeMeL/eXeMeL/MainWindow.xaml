@@ -14,6 +14,7 @@
   d:DesignWidth="800" d:DesignHeight="600"
   x:Name="ControlRoot"
   ExtendsContentIntoTitleBar="True"
+  MinWidth="884" MinHeight="200"
   >
 
   <Window.DataContext>
@@ -151,19 +152,16 @@
     <!-- Chrome tint overlay — covers entire window but doesn't intercept hits -->
     <Border Grid.RowSpan="2" Background="{DynamicResource ChromeTintOverlayBrush}" IsHitTestVisible="False"/>
 
-    <!-- Custom Title Bar (full-width Grid for true centering) -->
+    <!-- Custom Title Bar: *, Auto, * columns — Auto center is always at window midpoint -->
     <Grid Grid.Row="0">
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MinWidth="280"/>
         <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*" MinWidth="184"/>
       </Grid.ColumnDefinitions>
 
       <!-- Left: Icon + Title + Tool buttons -->
-      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="12,0,0,0">
         <!-- Vector "XML" icon — accent-colored square with letters cut out -->
         <Path Width="20" Height="20" Margin="0,0,10,0" Stretch="Uniform"
               Fill="{DynamicResource AppAccentBrush}"
@@ -196,27 +194,22 @@
                 Style="{StaticResource TitleBarIconButton}">
           <ui:SymbolIcon Symbol="Save24" FontSize="18"/>
         </Button>
-
       </StackPanel>
 
-      <!-- Center: Find bar (columns 1-*-2-*-3 give true centering) -->
+      <!-- Center: Find bar — Auto column, flanked by equal * columns = true window center -->
       <views:EditorFindView
         x:Name="EditorFindControl"
-        Grid.Column="2"
+        Grid.Column="1"
         DataContext="{Binding Editor}"
         VerticalAlignment="Center"
         WindowChrome.IsHitTestVisibleInChrome="True"/>
 
-      <!-- Right: Settings only (mode toggle moved to tabs) -->
-      <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
+      <!-- Right: Settings + chrome buttons -->
+      <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Right">
         <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
-                Style="{StaticResource TitleBarIconButton}">
+                Style="{StaticResource TitleBarIconButton}" Margin="0,0,4,0" VerticalAlignment="Center">
           <ui:SymbolIcon Symbol="Settings24" FontSize="18"/>
         </Button>
-      </StackPanel>
-
-      <!-- Window chrome buttons (min/max/close) — vertically stretched to match row height -->
-      <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Stretch">
         <Button Style="{StaticResource ChromeButton}" Click="MinimizeButton_Click">
           <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="11"
                      Foreground="{DynamicResource AppTextBrush}"/>
