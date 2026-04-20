@@ -508,7 +508,7 @@
                      Text="A new version is available!"
                      VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold"
                      Foreground="#FF1E1E1E"/>
-          <Button Grid.Column="1" Content="Update now and restart"
+          <Button Grid.Column="1" Content="Update now and restart eXeMeL"
                   Click="UpdateNowButton_Click" Margin="8,0"
                   Padding="10,4" FontSize="12" Cursor="Hand"/>
           <Button Grid.Column="2" Content="Update later"
