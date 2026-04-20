@@ -163,19 +163,33 @@ namespace eXeMeL.ViewModel
           .FirstOrDefault(d => d.Contains("IsEXeMeLTheme"));
       if (existingDict == null) return;
 
+      ApplyUserColors(existingDict, settings);
+    }
+
+    private static void ApplyUserColors(ResourceDictionary dict, Settings settings)
+    {
+      // Only override theme defaults when the user has explicitly chosen a color.
+      // Null means "not set" (e.g. migrated from an older version without this setting),
+      // so we let the theme's built-in AppTextBrush provide a readable default.
       try
       {
-        var textBrush = new System.Windows.Media.SolidColorBrush(
-          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.TextColor));
-        textBrush.Freeze();
-        existingDict["AppTextBrush"] = textBrush;
+        if (!string.IsNullOrEmpty(settings.TextColor))
+        {
+          var textBrush = new System.Windows.Media.SolidColorBrush(
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.TextColor));
+          textBrush.Freeze();
+          dict["AppTextBrush"] = textBrush;
+        }
 
-        var accentBrush = new System.Windows.Media.SolidColorBrush(
-          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.AccentColor));
-        accentBrush.Freeze();
-        existingDict["AppAccentBrush"] = accentBrush;
+        if (!string.IsNullOrEmpty(settings.AccentColor))
+        {
+          var accentBrush = new System.Windows.Media.SolidColorBrush(
+            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(settings.AccentColor));
+          accentBrush.Freeze();
+          dict["AppAccentBrush"] = accentBrush;
+        }
       }
-      catch { }
+      catch { /* Invalid color string — leave theme defaults */ }
     }
 
     private static void HandleChromeTintColorChange(Settings settings)
@@ -386,20 +400,7 @@ namespace eXeMeL.ViewModel
       }
       Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfUiTheme);
 
-      // Apply user text and accent colors
-      try
-      {
-        var textBrush = new System.Windows.Media.SolidColorBrush(
-          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.TextColor));
-        textBrush.Freeze();
-        dict["AppTextBrush"] = textBrush;
-
-        var accentBrush = new System.Windows.Media.SolidColorBrush(
-          (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(this.Settings.AccentColor));
-        accentBrush.Freeze();
-        dict["AppAccentBrush"] = accentBrush;
-      }
-      catch { }
+      ApplyUserColors(dict, this.Settings);
     }
 
 

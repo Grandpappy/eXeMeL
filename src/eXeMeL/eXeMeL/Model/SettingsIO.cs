@@ -8,6 +8,9 @@ namespace eXeMeL.Model
   internal static class SettingsIO
   {
     private static readonly string SettingsDirectory =
+      Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "eXeMeL2");
+
+    private static readonly string LegacySettingsDirectory =
       Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "eXeMeL");
 
     private static readonly string SettingsFilePath =
@@ -22,6 +25,9 @@ namespace eXeMeL.Model
 
 
     public static string GetSettingsFilePath() => SettingsFilePath;
+
+    public static string GetLegacySettingsFilePath() =>
+      Path.Combine(LegacySettingsDirectory, "settings.json");
 
 
     public static void SaveSettings(Settings settings)

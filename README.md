@@ -18,7 +18,7 @@ A desktop XML editor for Windows, built for developers who work with XML daily. 
 
 ### Download
 
-Download `eXeMeL.exe` from the latest release. No installation or .NET runtime required — it's a self-contained executable.
+Download either the intallable or stand-alone version of eXeMeL from the latest release.
 
 ### Build from source
 
@@ -63,7 +63,7 @@ dotnet test eXeMeL.Tests\eXeMeL.Tests.csproj
 
 ## Settings
 
-User settings are stored at `%LOCALAPPDATA%\eXeMeL\settings.json`. If upgrading from an older version that stored settings in the Windows Registry (`HKCU\Software\eXeMeL`), they are migrated automatically on first launch.
+User settings are stored at `%LOCALAPPDATA%\eXeMeL2\settings.json`. If upgrading from an older version that stored settings in the Windows Registry (`HKCU\Software\eXeMeL`), they are migrated automatically on first launch.
 
 ## Technology Stack
 
@@ -98,7 +98,7 @@ This application was originally built circa 2013 on .NET Framework 4.5. In April
 - Command-line file argument replaces ClickOnce activation
 
 ### Settings storage
-- Windows Registry (`HKCU\Software\eXeMeL`) replaced with local JSON file (`%LOCALAPPDATA%\eXeMeL\settings.json`)
+- Windows Registry (`HKCU\Software\eXeMeL`) replaced with local JSON file (`%LOCALAPPDATA%\eXeMeL2\settings.json`)
 - Automatic one-time migration from Registry on first run
 - `System.Text.Json` replaces `DataContractJsonSerializer`
 

@@ -147,7 +147,8 @@
         <TextBlock Text="Text Color" FontSize="14"/>
       </ui:CardControl.Header>
       <views:ColorPickerPopup SelectedColor="{Binding TextColor, Mode=TwoWay}"
-                               SwatchColors="{x:Static views:ColorSwatches.TextColors}"/>
+                               SwatchColors="{x:Static views:ColorSwatches.TextColors}"
+                               ThemeResourceKey="AppTextBrush"/>
     </ui:CardControl>
 
     <ui:CardControl Margin="0,0,0,4">
@@ -155,7 +156,8 @@
         <TextBlock Text="Accent Color" FontSize="14"/>
       </ui:CardControl.Header>
       <views:ColorPickerPopup SelectedColor="{Binding AccentColor, Mode=TwoWay}"
-                               SwatchColors="{x:Static views:ColorSwatches.AccentColors}"/>
+                               SwatchColors="{x:Static views:ColorSwatches.AccentColors}"
+                               ThemeResourceKey="AppAccentBrush"/>
     </ui:CardControl>
 
     <!-- Application Color (tint) — visible only for Glass/Tinted themes -->
