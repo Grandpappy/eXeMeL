@@ -154,69 +154,76 @@
     <!-- Custom Title Bar (full-width Grid for true centering) -->
     <Grid Grid.Row="0">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
+      
+      <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-      <!-- Left: Icon + Title + Tool buttons -->
-      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
-        <!-- Vector "XML" icon — accent-colored square with letters cut out -->
-        <Path Width="20" Height="20" Margin="0,0,10,0" Stretch="Uniform"
-              Fill="{DynamicResource AppAccentBrush}"
-              WindowChrome.IsHitTestVisibleInChrome="False"
-              Data="F0 M 0,0 L 156,0 156,152 0,152 Z
-                    M 22.75,31.22 L 35.76,31.22 46,63.72 57,30.97 68.75,30.97
-                    85,96.47 102,30.97 115.25,30.97 116,106.22 137.25,106.72
-                    137.25,121.97 104,121.47 104.5,65.72 89.75,121.97 79,121.72
-                    62.25,53.97 53,77.47 70.25,121.72 57.25,121.72 45.75,89.22
-                    35,121.97 22,121.72 37.75,78.97 Z"/>
-        <TextBlock VerticalAlignment="Center" FontSize="13" Margin="0,0,16,0"
-                   Foreground="{DynamicResource AppTextBrush}">
-          <Run x:Name="AppTitleRun" Text="eXeMeL" FontWeight="SemiBold"/>
-          <Run x:Name="AppTitleSuffix" Text=" 2" FontWeight="SemiBold" Foreground="{DynamicResource AppAccentBrush}"/>
-        </TextBlock>
+        <!-- Left: Icon + Title + Tool buttons -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+          <!-- Vector "XML" icon — accent-colored square with letters cut out -->
+          <Path Width="20" Height="20" Margin="0,0,10,0" Stretch="Uniform"
+                Fill="{DynamicResource AppAccentBrush}"
+                WindowChrome.IsHitTestVisibleInChrome="False"
+                Data="F0 M 0,0 L 156,0 156,152 0,152 Z
+                      M 22.75,31.22 L 35.76,31.22 46,63.72 57,30.97 68.75,30.97
+                      85,96.47 102,30.97 115.25,30.97 116,106.22 137.25,106.72
+                      137.25,121.97 104,121.47 104.5,65.72 89.75,121.97 79,121.72
+                      62.25,53.97 53,77.47 70.25,121.72 57.25,121.72 45.75,89.22
+                      35,121.97 22,121.72 37.75,78.97 Z"/>
+          <TextBlock VerticalAlignment="Center" FontSize="13" Margin="0,0,16,0"
+                     Foreground="{DynamicResource AppTextBrush}">
+            <Run x:Name="AppTitleRun" Text="eXeMeL" FontWeight="SemiBold"/>
+            <Run x:Name="AppTitleSuffix" Text=" 2" FontWeight="SemiBold" Foreground="{DynamicResource AppAccentBrush}"/>
+          </TextBlock>
 
-        <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Refresh from clipboard (F5)"
-                Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="18"/>
-        </Button>
-        <Button Command="{Binding Editor.CopyCommand}" ToolTip="Copy all to clipboard"
-                Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="Copy24" FontSize="18"/>
-        </Button>
-        <Button Command="{Binding Editor.OpenCommand}" ToolTip="Open file (Ctrl+O)"
-                Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="FolderOpen24" FontSize="18"/>
-        </Button>
-        <Button Command="{Binding Editor.SaveCommand}" ToolTip="Save (Ctrl+S)"
-                Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="Save24" FontSize="18"/>
-        </Button>
+          <Button Command="{Binding Editor.RefreshCommand}" ToolTip="Refresh from clipboard (F5)"
+                  Style="{StaticResource TitleBarIconButton}">
+            <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="18"/>
+          </Button>
+          <Button Command="{Binding Editor.CopyCommand}" ToolTip="Copy all to clipboard"
+                  Style="{StaticResource TitleBarIconButton}">
+            <ui:SymbolIcon Symbol="Copy24" FontSize="18"/>
+          </Button>
+          <Button Command="{Binding Editor.OpenCommand}" ToolTip="Open file (Ctrl+O)"
+                  Style="{StaticResource TitleBarIconButton}">
+            <ui:SymbolIcon Symbol="FolderOpen24" FontSize="18"/>
+          </Button>
+          <Button Command="{Binding Editor.SaveCommand}" ToolTip="Save (Ctrl+S)"
+                  Style="{StaticResource TitleBarIconButton}">
+            <ui:SymbolIcon Symbol="Save24" FontSize="18"/>
+          </Button>
 
-      </StackPanel>
+        </StackPanel>
 
-      <!-- Center: Find bar (columns 1-*-2-*-3 give true centering) -->
-      <views:EditorFindView
-        x:Name="EditorFindControl"
-        Grid.Column="2"
-        DataContext="{Binding Editor}"
-        VerticalAlignment="Center"
-        WindowChrome.IsHitTestVisibleInChrome="True"/>
+        <!-- Center: Find bar (columns 1-*-2-*-3 give true centering) -->
+        <views:EditorFindView
+          x:Name="EditorFindControl"
+          Grid.Column="2"
+          DataContext="{Binding Editor}"
+          VerticalAlignment="Center"
+          WindowChrome.IsHitTestVisibleInChrome="True"/>
 
-      <!-- Right: Settings only (mode toggle moved to tabs) -->
-      <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
-        <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
-                Style="{StaticResource TitleBarIconButton}">
-          <ui:SymbolIcon Symbol="Settings24" FontSize="18"/>
-        </Button>
-      </StackPanel>
+        <!-- Right: Settings only (mode toggle moved to tabs) -->
+        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
+          <Button Click="OpenSettingsButton_Click" ToolTip="Settings"
+                  Style="{StaticResource TitleBarIconButton}">
+            <ui:SymbolIcon Symbol="Settings24" FontSize="18"/>
+          </Button>
+        </StackPanel>
+      </Grid>
 
       <!-- Window chrome buttons (min/max/close) — vertically stretched to match row height -->
-      <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Stretch">
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
         <Button Style="{StaticResource ChromeButton}" Click="MinimizeButton_Click">
           <TextBlock Text="&#xE949;" FontFamily="Segoe MDL2 Assets" FontSize="11"
                      Foreground="{DynamicResource AppTextBrush}"/>
