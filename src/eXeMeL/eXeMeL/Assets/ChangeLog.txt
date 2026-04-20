@@ -1,4 +1,9 @@
-﻿*4/16/2026 - Improved startup time and readability
+﻿*4/20/2026 - Minor UI improvements
+
+- Title bar no longer gets clipped at narrow application widths (thanks StefanZuefeldt!)
+- App restart button is more clear
+
+*4/16/2026 - Improved startup time and readability
 
 - Improved startup time by delaying update checks
 - Added ability to control color of the editor's background to enhance readability.
