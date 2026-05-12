@@ -32,17 +32,18 @@ namespace eXeMeL.Utilities
       var textBrush = Application.Current.TryFindResource("AppTextBrush") as Brush;
 
       // ── Title area: accent stripe + title text ──────────────────────────
+      // ContentDialogTopOverlay has Padding="24,10" and the title ContentPresenter has
+      // Margin="0,12,0,0", so the title element's top is 22px below the dialog's top edge.
+      // Negative margins on titleRoot bleed the stripe through those 22px and to the side
+      // edges. The overlay's own CornerRadius="8,8,0,0" clips the stripe's top corners
+      // to the dialog's rounded shape automatically.
       var titleRoot = new Grid();
-      titleRoot.RowDefinitions.Add(new RowDefinition { Height = new GridLength(4) });
-      titleRoot.RowDefinitions.Add(new RowDefinition { Height = new GridLength(12) });
-      titleRoot.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+      titleRoot.RowDefinitions.Add(new RowDefinition { Height = new GridLength(4) });   // stripe
+      titleRoot.RowDefinitions.Add(new RowDefinition { Height = new GridLength(18) });  // gap to title text
+      titleRoot.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });     // title text
+      titleRoot.Margin = new Thickness(-24, -22, -24, 0);
 
-      var stripe = new Border
-      {
-        Background = accentBrush,
-        HorizontalAlignment = HorizontalAlignment.Stretch,
-        CornerRadius = new CornerRadius(2)
-      };
+      var stripe = new Border { Background = accentBrush };
       Grid.SetRow(stripe, 0);
       titleRoot.Children.Add(stripe);
 
@@ -51,6 +52,7 @@ namespace eXeMeL.Utilities
         Text = title,
         FontSize = 20,
         FontWeight = FontWeights.SemiBold,
+        Margin = new Thickness(24, 0, 24, 0)  // restore horizontal indent for text only
       };
       if (textBrush != null) titleText.Foreground = textBrush;
       Grid.SetRow(titleText, 2);
@@ -78,7 +80,7 @@ namespace eXeMeL.Utilities
         TextWrapping = TextWrapping.Wrap,
         VerticalAlignment = VerticalAlignment.Center,
         FontSize = 14,
-        MaxWidth = 360
+        MaxWidth = 480
       };
       if (textBrush != null) messageText.Foreground = textBrush;
       Grid.SetColumn(messageText, 1);
