@@ -91,11 +91,14 @@ namespace eXeMeL.View
     {
       if (block is Paragraph p)
       {
-        // Headings: MdXaml sets larger FontSize on heading paragraphs
+        // Headings: MdXaml sets larger FontSize on heading paragraphs.
+        // Compress the size range toward the 14px baseline so H1 is less
+        // extreme while the H1 > H2 > H3 hierarchy is still visible.
         if (p.FontSize > 15)
         {
           p.Foreground = ctx.HeadingBrush;
           p.FontWeight = FontWeights.Bold;
+          p.FontSize = Math.Round(14 + (p.FontSize - 14) * 0.70);
         }
 
         // Code blocks: paragraphs with monospace font
