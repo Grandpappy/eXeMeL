@@ -764,16 +764,13 @@ namespace eXeMeL
 
       if (ViewModel.Editor.HasDocumentBeenEditedSinceLoad)
       {
-        var dialog = new ContentDialog(RootContentDialogPresenter)
-        {
-          Title = "Reprocess document",
-          Content = $"The editor has been modified since it was loaded. Which text should be reprocessed as {contentType.ToString().ToUpper()}?",
-          PrimaryButtonText = "Original input",
-          SecondaryButtonText = "Current editor content",
-          CloseButtonText = "Cancel"
-        };
-
-        var result = await dialog.ShowAsync();
+        var result = await AppDialog.ShowAsync(
+          host: RootContentDialogPresenter,
+          title: "Reprocess document",
+          message: $"The editor has been modified since it was loaded. Which text should be reprocessed as {contentType.ToString().ToUpper()}?",
+          primaryText: "Original input",
+          secondaryText: "Current editor content",
+          closeText: "Cancel");
 
         if (result == ContentDialogResult.None)
           return;
