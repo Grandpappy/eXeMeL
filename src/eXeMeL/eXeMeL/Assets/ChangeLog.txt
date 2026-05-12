@@ -1,4 +1,10 @@
-﻿*4/20/2026 - Minor UI improvements
+﻿*5/12/2026 - Confirm on exit, app zooming, improve content type changes
+
+- App will now ask for confirmation when closed and there is an open file with unsaved changes
+- When changing content type, the original (unedited) version of the content will now be used, so it can be cleaned correctly based on the new content type.  User is asked what to use if they edited the content.
+- Added application zooming.  Ctrl+ and Ctrl- will zoom in and out, and Ctrl+0 will reset the zoom level.
+
+*4/20/2026 - Minor UI improvements
 
 - Title bar no longer gets clipped at narrow application widths (thanks StefanZuefeldt!)
 - App restart button is more clear

@@ -4,6 +4,7 @@
   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   xmlns:views="clr-namespace:eXeMeL.View"
   xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+  xmlns:utilities="clr-namespace:eXeMeL.Utilities"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -51,9 +52,18 @@
     <KeyBinding Modifiers="Alt+Shift" Key="D9" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="9" />
     <KeyBinding Modifiers="Alt" Key="OemMinus" Command="{Binding FoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
     <KeyBinding Modifiers="Alt+Shift" Key="OemMinus" Command="{Binding UnFoldLevelCommand, ElementName=ControlRoot}" CommandParameter="-" />
+
+    <KeyBinding Modifiers="Control" Key="OemPlus" Command="{Binding ZoomInCommand}"/>
+    <KeyBinding Modifiers="Control" Key="Add" Command="{Binding ZoomInCommand}"/>
+    <KeyBinding Modifiers="Control" Key="OemMinus" Command="{Binding ZoomOutCommand}"/>
+    <KeyBinding Modifiers="Control" Key="Subtract" Command="{Binding ZoomOutCommand}"/>
+    <KeyBinding Modifiers="Control" Key="D0" Command="{Binding ResetZoomCommand}"/>
+    <KeyBinding Modifiers="Control" Key="NumPad0" Command="{Binding ResetZoomCommand}"/>
   </Window.InputBindings>
 
   <Window.Resources>
+    <utilities:AppScaleConverter x:Key="AppScaleConverter"/>
+
     <!-- AvalonEdit SearchPanel styling for dark themes -->
     <Style TargetType="{x:Type avalonEdit:TextEditor}">
       <Style.Resources>
@@ -141,9 +151,42 @@
         </Setter.Value>
       </Setter>
     </Style>
+
+    <!-- Compact flat button for footer zoom controls -->
+    <Style x:Key="FooterIconButton" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="5,0"/>
+      <Setter Property="FontSize" Value="15"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="Focusable" Value="False"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="1.0"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.25"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
   </Window.Resources>
 
   <Grid>
+    <Grid.LayoutTransform>
+      <ScaleTransform ScaleX="{Binding Settings.AppScale}" ScaleY="{Binding Settings.AppScale}"/>
+    </Grid.LayoutTransform>
     <Grid.RowDefinitions>
       <RowDefinition Height="46"/>
       <RowDefinition Height="*"/>
@@ -152,7 +195,7 @@
     <!-- Chrome tint overlay — covers entire window but doesn't intercept hits -->
     <Border Grid.RowSpan="2" Background="{DynamicResource ChromeTintOverlayBrush}" IsHitTestVisible="False"/>
 
-    <!-- Custom Title Bar: *, Auto, * columns — Auto center is always at window midpoint -->
+    <!-- Custom Title Bar: *, Auto, * — toolbar | find bar | chrome (equal flanking keeps find bar centered) -->
     <Grid Grid.Row="0">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" MinWidth="280"/>
@@ -194,11 +237,17 @@
                 Style="{StaticResource TitleBarIconButton}">
           <ui:SymbolIcon Symbol="Save24" FontSize="18"/>
         </Button>
+        <!-- Compact-mode search button — shown only when find bar can't fit in header -->
+        <Button x:Name="FindHeaderSearchButton" Click="FindButton_Click" ToolTip="Find (Ctrl+F)"
+                Style="{StaticResource TitleBarIconButton}"
+                Visibility="Collapsed">
+          <ui:SymbolIcon Symbol="Search24" FontSize="18"/>
+        </Button>
       </StackPanel>
 
-      <!-- Center: Find bar — Auto column, flanked by equal * columns = true window center -->
+      <!-- Center: Find bar — collapses to icon when window is too narrow at current zoom -->
       <views:EditorFindView
-        x:Name="EditorFindControl"
+        x:Name="FindBarInHeader"
         Grid.Column="1"
         DataContext="{Binding Editor}"
         VerticalAlignment="Center"
@@ -523,6 +572,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="92"/>
           </Grid.ColumnDefinitions>
           <TextBlock Grid.Column="0" Text="{Binding Status}"
                      TextTrimming="CharacterEllipsis" ToolTip="{Binding Status}"
@@ -530,14 +580,51 @@
           <TextBlock Grid.Column="1" Text="{Binding ToolInformation}"
                      TextTrimming="CharacterEllipsis" FontSize="13" Opacity="0.7"
                      HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0"/>
-          <!-- Content type toggle -->
-          <TextBlock x:Name="ContentTypeLabel" Grid.Column="2"
+          <!-- Zoom controls -->
+          <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Command="{Binding ZoomOutCommand}" ToolTip="Zoom out (Ctrl+-)"
+                    Style="{StaticResource FooterIconButton}">&#x2212;</Button>
+            <Button x:Name="ZoomLevelButton"
+                    Content="{Binding Settings.AppScale, Converter={StaticResource AppScaleConverter}}"
+                    Click="ZoomLevelButton_Click"
+                    Style="{StaticResource FooterIconButton}"
+                    MinWidth="44"
+                    ToolTip="Select zoom level"/>
+            <Button Command="{Binding ZoomInCommand}" ToolTip="Zoom in (Ctrl++)"
+                    Style="{StaticResource FooterIconButton}">+</Button>
+          </StackPanel>
+          <!-- Content type toggle — fixed-width column so zoom controls don't shift -->
+          <TextBlock x:Name="ContentTypeLabel" Grid.Column="3"
                      Text="XML" FontSize="13" FontWeight="SemiBold"
+                     TextAlignment="Center"
                      Foreground="{DynamicResource AppAccentBrush}" Cursor="Hand" VerticalAlignment="Center"
                      ToolTip="Click to toggle between XML and JSON mode"
                      MouseLeftButtonDown="ContentTypeLabel_Click"/>
         </Grid>
       </Border>
     </Grid>
+
+    <!-- Find overlay — compact-mode only, positioned under the search button via code-behind -->
+    <Border x:Name="FindOverlayPanel"
+            Grid.RowSpan="2"
+            HorizontalAlignment="Left" VerticalAlignment="Top"
+            Margin="0,50,0,0"
+            Visibility="Collapsed"
+            Panel.ZIndex="200"
+            Background="{DynamicResource OverlayBackgroundBrush}"
+            BorderBrush="{DynamicResource BlackBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="8,6">
+      <Border.Effect>
+        <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="270" Opacity="0.5" Color="Black"/>
+      </Border.Effect>
+      <views:EditorFindView
+        x:Name="FindBarInOverlay"
+        DataContext="{Binding Editor}"/>
+    </Border>
+
+    <!-- Host for ContentDialog overlays — must be last child so it covers everything -->
+    <ui:ContentDialogHost x:Name="RootContentDialogPresenter" Grid.RowSpan="2" Panel.ZIndex="500"/>
   </Grid>
 </ui:FluentWindow>

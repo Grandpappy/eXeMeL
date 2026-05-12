@@ -33,6 +33,7 @@ namespace eXeMeL.Model
     private double _windowWidth = 800;
     private double _windowHeight = 600;
     private int _windowState;
+    private double _appScale = 1.0;
 
     private Brush _editorBrush;
     private Brush _elementBrush;
@@ -183,6 +184,12 @@ namespace eXeMeL.Model
       set => SetProperty(ref _windowState, value);
     }
 
+    public double AppScale
+    {
+      get => _appScale;
+      set => SetProperty(ref _appScale, value);
+    }
+
 
     [JsonIgnore]
     public Brush EditorBrush
@@ -257,6 +264,7 @@ namespace eXeMeL.Model
       UseBuiltInSearch = false;
       OpaqueEditorBackground = false;
       EditorBackgroundColor = null;
+      AppScale = 1.0;
     }
 
 

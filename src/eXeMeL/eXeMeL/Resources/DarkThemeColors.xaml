@@ -19,6 +19,7 @@
   <!-- Chrome tint (transparent for non-tinted themes) -->
   <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="Transparent"/>
   <SolidColorBrush x:Key="EditorTintOverlayBrush" Color="#FF252525"/>
+  <SolidColorBrush x:Key="OverlayBackgroundBrush" Color="#FF2D2D2D"/>
   <SolidColorBrush x:Key="AppTextBrush" Color="#FFFFFF"/>
   <SolidColorBrush x:Key="AppAccentBrush" Color="#D4AA00"/>
 

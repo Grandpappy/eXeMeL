@@ -29,6 +29,9 @@ namespace eXeMeL.ViewModel
     private string _FilePath;
     private string _FileName;
     private DocumentContentType _contentType = DocumentContentType.Xml;
+    private string _lastRawText;
+    private string _lastCleanedText;
+    private string _lastSavedText;
 
     private readonly List<XmlCleanerBase> XmlCleaners;
     private readonly List<JsonCleanerBase> JsonCleaners;
@@ -81,6 +84,14 @@ namespace eXeMeL.ViewModel
       get { return _FileName; }
       private set { SetProperty(ref _FileName, value); }
     }
+
+    public string OriginalRawText => _lastRawText;
+
+    public bool HasDocumentBeenEditedSinceLoad =>
+      _lastCleanedText != null && Document?.Text != _lastCleanedText;
+
+    public bool HasUnsavedFileChanges =>
+      IsContentFromFile && _lastSavedText != null && Document?.Text != _lastSavedText;
 
 
 
@@ -174,6 +185,39 @@ namespace eXeMeL.ViewModel
         DocumentContentType.Markdown => await CleanTextAsync(text), // No cleaning for Markdown
         _ => await CleanXmlAsync(text)
       };
+    }
+
+
+
+    private async Task<string> CleanContentAsTypeAsync(string text, DocumentContentType contentType)
+    {
+      ContentType = contentType;
+
+      return contentType switch
+      {
+        DocumentContentType.Json => await CleanJsonAsync(text),
+        DocumentContentType.Yaml => await CleanYamlAsync(text),
+        DocumentContentType.Text => await CleanTextAsync(text),
+        DocumentContentType.Markdown => await CleanTextAsync(text),
+        _ => await CleanXmlAsync(text)
+      };
+    }
+
+
+
+    public async Task ReprocessAsContentTypeAsync(DocumentContentType contentType, string sourceText = null)
+    {
+      var source = sourceText ?? _lastRawText ?? this.Document.Text;
+      var cleaned = await CleanContentAsTypeAsync(source, contentType);
+      _lastCleanedText = cleaned;
+
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+      ReplaceOldDocumentWithNewDocument(cleaned);
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
+      WeakReferenceMessenger.Default.Send(new DocumentRefreshCompleted(cleaned));
+
+      var handler = this.RefreshComplete;
+      handler?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -297,8 +341,10 @@ namespace eXeMeL.ViewModel
 
     private async Task SetDocumentTextFromClipboardAsync()
     {
+      _lastRawText = Clipboard.GetText();
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
-      var text = await CleanContentAsync(Clipboard.GetText());
+      var text = await CleanContentAsync(_lastRawText);
+      _lastCleanedText = text;
 
       this.IsContentFromFile = false;
       this.FilePath = null;
@@ -406,6 +452,9 @@ namespace eXeMeL.ViewModel
           return;
 
         var fileContents = await LoadFileContentsAsync(filePath);
+        _lastRawText = fileContents;
+        _lastCleanedText = fileContents;
+        _lastSavedText = fileContents;
 
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
@@ -457,11 +506,14 @@ namespace eXeMeL.ViewModel
 
 
 
-    private async void SaveCommand_Execute()
+    private async void SaveCommand_Execute() => await SaveAsync();
+
+    public async Task SaveAsync()
     {
       if (this.IsContentFromFile)
       {
         await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
+        _lastSavedText = this.Document.Text;
       }
       else
       {
@@ -485,6 +537,7 @@ namespace eXeMeL.ViewModel
           this.FilePath = saveDialog.FileName;
           this.FileName = Path.GetFileName(this.FilePath);
           this.IsContentFromFile = true;
+          _lastSavedText = this.Document.Text;
 
           await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
         }

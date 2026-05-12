@@ -13,6 +13,7 @@ using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using System.Threading.Tasks;
 using Wpf.Ui.Controls;
 
 namespace eXeMeL
@@ -37,6 +38,7 @@ namespace eXeMeL
 
     private bool _isSettingsOpen;
     private bool _isPreviewPinned;
+    private bool _confirmClose;
     private System.Windows.Threading.DispatcherTimer _previewDebounce;
 
 
@@ -50,6 +52,7 @@ namespace eXeMeL
       this.StateChanged += MainWindow_StateChanged;
       this.AllowDrop = true;
       this.Drop += MainWindow_Drop;
+      this.SizeChanged += (s, e) => UpdateFindBarMode();
       this.FocusOnFindControlCommand = new RelayCommand(FocusOnFindControlCommand_Executed);
       this.ResetFocusCommand = new RelayCommand(ResetFocusCommand_Executed);
       this.FoldLevelCommand = new RelayCommand<string>(l => FoldSections(l, true));
@@ -71,6 +74,7 @@ namespace eXeMeL
         ApplyWindowChrome();
         UpdateCurrentLineHighlight();
         CheckForUpdatesOnStartup();
+        UpdateFindBarMode();
       };
 
       this.AvalonEditor.PreviewKeyDown += AvalonEditor_PreviewKeyDown;
@@ -145,6 +149,8 @@ namespace eXeMeL
       {
         if (e.PropertyName == "HighlightCurrentLine")
           UpdateCurrentLineHighlight();
+        if (e.PropertyName == nameof(Settings.AppScale))
+          UpdateFindBarMode();
       };
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
@@ -408,10 +414,45 @@ namespace eXeMeL
 
 
 
-    private void MainWindow_Closing(object sender, CancelEventArgs e)
+    private async void MainWindow_Closing(object sender, CancelEventArgs e)
     {
+      if (_confirmClose)
+      {
+        SaveWindowPosition();
+        WeakReferenceMessenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
+        return;
+      }
+
+      if (ViewModel?.Editor?.HasUnsavedFileChanges == true)
+      {
+        e.Cancel = true;
+        await PromptSaveOnCloseAsync();
+        return;
+      }
+
       SaveWindowPosition();
       WeakReferenceMessenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
+    }
+
+    private async Task PromptSaveOnCloseAsync()
+    {
+      var fileName = ViewModel.Editor.FileName ?? "This file";
+      var result = await AppDialog.ShowAsync(
+        host: RootContentDialogPresenter,
+        title: "Unsaved changes",
+        message: $"{fileName} has been modified. Save before closing?",
+        primaryText: "Save",
+        secondaryText: "Don't save",
+        closeText: "Cancel");
+
+      if (result == ContentDialogResult.None)
+        return;
+
+      if (result == ContentDialogResult.Primary)
+        await ViewModel.Editor.SaveAsync();
+
+      _confirmClose = true;
+      this.Close();
     }
 
 
@@ -463,18 +504,90 @@ namespace eXeMeL
     private void FocusOnFindControlCommand_Executed()
     {
       if (!string.IsNullOrEmpty(this.AvalonEditor.SelectedText))
-      {
         WeakReferenceMessenger.Default.Send<SetSearchTextMessage>(new SetSearchTextMessage(this.AvalonEditor.SelectedText));
-      }
 
-      this.EditorFindControl.Focus();
+      if (this.FindBarInHeader.Visibility == Visibility.Visible)
+      {
+        this.FindBarInHeader.Focus();
+      }
+      else
+      {
+        ShowFindOverlay();
+      }
     }
 
 
 
     private void ResetFocusCommand_Executed()
     {
+      HideFindOverlay();
       this.AvalonEditor.Focus();
+    }
+
+
+
+    private void FindButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (this.FindOverlayPanel.Visibility == Visibility.Visible)
+        HideFindOverlay();
+      else
+        FocusOnFindControlCommand_Executed();
+    }
+
+
+
+    private void ShowFindOverlay()
+    {
+      var outerGrid = (System.Windows.UIElement)this.Content;
+      var pt = this.FindHeaderSearchButton.TranslatePoint(new System.Windows.Point(0, 0), outerGrid);
+      this.FindOverlayPanel.Margin = new Thickness(pt.X, 50, 0, 0);
+      this.FindOverlayPanel.Visibility = Visibility.Visible;
+      this.FindBarInOverlay.Focus();
+    }
+
+
+
+    private void HideFindOverlay()
+    {
+      this.FindOverlayPanel.Visibility = Visibility.Collapsed;
+    }
+
+
+
+    private void UpdateFindBarMode()
+    {
+      if (this.ViewModel?.Settings == null || this.ActualWidth <= 0) return;
+
+      // Find bar needs ~900 logical px: left (280) + find bar (440) + chrome (184)
+      var logicalWidth = this.ActualWidth / this.ViewModel.Settings.AppScale;
+      bool findBarFits = logicalWidth >= 900;
+
+      this.FindBarInHeader.Visibility = findBarFits ? Visibility.Visible : Visibility.Collapsed;
+      this.FindHeaderSearchButton.Visibility = findBarFits ? Visibility.Collapsed : Visibility.Visible;
+
+      if (findBarFits && this.FindOverlayPanel.Visibility == Visibility.Visible)
+        HideFindOverlay();
+    }
+
+
+
+    private void ZoomLevelButton_Click(object sender, RoutedEventArgs e)
+    {
+      var menu = new System.Windows.Controls.ContextMenu();
+      foreach (var level in this.ViewModel.ZoomLevels)
+      {
+        var item = new System.Windows.Controls.MenuItem
+        {
+          Header = $"{(int)Math.Round(level * 100)}%",
+          IsChecked = Math.Abs(this.ViewModel.Settings.AppScale - level) < 0.001
+        };
+        var capturedLevel = level;
+        item.Click += (s, args) => this.ViewModel.Settings.AppScale = capturedLevel;
+        menu.Items.Add(item);
+      }
+      menu.PlacementTarget = sender as System.Windows.UIElement;
+      menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Top;
+      menu.IsOpen = true;
     }
 
 
@@ -673,13 +786,44 @@ namespace eXeMeL
           IsChecked = (this.ViewModel.Editor.ContentType == type)
         };
         var capturedType = type;
-        item.Click += (s, args) => this.ViewModel.Editor.ContentType = capturedType;
+        item.Click += async (s, args) => await ChangeContentTypeAsync(capturedType);
         menu.Items.Add(item);
       }
       menu.PlacementTarget = sender as System.Windows.UIElement;
       menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Top;
       menu.IsOpen = true;
     }
+
+    private async Task ChangeContentTypeAsync(DocumentContentType contentType)
+    {
+      string sourceText;
+
+      if (ViewModel.Editor.HasDocumentBeenEditedSinceLoad)
+      {
+        var result = await AppDialog.ShowAsync(
+          host: RootContentDialogPresenter,
+          title: "Reprocess document",
+          message: $"The editor has been modified since it was loaded. Which text should be reprocessed as {contentType.ToString().ToUpper()}?",
+          primaryText: "Original input",
+          secondaryText: "Current editor content",
+          closeText: "Cancel");
+
+        if (result == ContentDialogResult.None)
+          return;
+
+        sourceText = result == ContentDialogResult.Primary
+          ? ViewModel.Editor.OriginalRawText
+          : ViewModel.Editor.Document.Text;
+      }
+      else
+      {
+        sourceText = ViewModel.Editor.OriginalRawText ?? ViewModel.Editor.Document.Text;
+      }
+
+      await ViewModel.Editor.ReprocessAsContentTypeAsync(contentType, sourceText);
+    }
+
+
 
     private void HandleContentTypeChanged(ContentTypeChangedMessage message)
     {
@@ -955,7 +1099,7 @@ namespace eXeMeL
     private async void CheckForUpdatesOnStartup()
     {
       // Delay update check so it doesn't compete with initial content load
-      await System.Threading.Tasks.Task.Delay(5000);
+      await Task.Delay(5000);
 
 #if DEBUG
       this.UpdateToastMessage.Text = "eXeMeL 2.99.0 is available! (DEBUG)";
@@ -977,7 +1121,7 @@ namespace eXeMeL
     {
 #if DEBUG
       this.UpdateToastMessage.Text = "Downloading update... (DEBUG - no actual update)";
-      await System.Threading.Tasks.Task.Delay(2000);
+      await Task.Delay(2000);
       this.UpdateToast.Visibility = Visibility.Collapsed;
       return;
 #endif
