@@ -11,6 +11,8 @@ namespace eXeMeL.Model
     private static readonly Regex MarkdownImagePattern = new(@"!\[[^\]]+\]\([^\)]+\)", RegexOptions.Compiled);
     private static readonly Regex MarkdownStrikePattern = new(@"~~[^~]+~~", RegexOptions.Compiled);
     private static readonly Regex MarkdownHeadingPattern = new(@"(?m)^#{1,6}\s", RegexOptions.Compiled);
+    // Standalone --- lines: in Markdown these are horizontal rules; YAML only ever has one at the document start
+    private static readonly Regex MarkdownHorizontalRulePattern = new(@"(?m)^---\s*$", RegexOptions.Compiled);
 
     // YAML structural signals — indented key:value nesting is the strongest indicator
     private static readonly Regex YamlRootKeyValuePattern = new(@"(?m)^[\w][\w.\-]*\s*:", RegexOptions.Compiled);
@@ -45,7 +47,7 @@ namespace eXeMeL.Model
       var markdownScore = ScoreMarkdown(sample);
       var yamlScore = ScoreYaml(sample);
 
-      if (markdownScore >= 2 && markdownScore > yamlScore)
+      if (markdownScore >= 2 && markdownScore >= yamlScore)
         return DocumentContentType.Markdown;
 
       if (yamlScore >= 2)
@@ -73,6 +75,10 @@ namespace eXeMeL.Model
       // Multiple headings strengthen the signal (capped at 3).
       var headingCount = MarkdownHeadingPattern.Matches(sample).Count;
       score += Math.Min(headingCount, 3);
+
+      // Multiple standalone --- lines are horizontal rules — YAML only ever has one at the document start.
+      var hrCount = MarkdownHorizontalRulePattern.Matches(sample).Count;
+      if (hrCount >= 2) score += 3;
 
       return score;
     }
