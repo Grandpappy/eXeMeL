@@ -1,4 +1,10 @@
-﻿*5/12/2026 - Confirm on exit, app zooming, improve content type changes
+﻿*5/12/2026 - Editor tab indicator, Markdown detection and preview improvements
+
+- Unsaved file indicator: a dot now appears next to the filename in the editor tab when the file has been modified but not saved.  The dot disappears after saving.
+- Fixed an issue where Markdown content was being incorrectly detected as YAML when the document used headings and indented bullet lists without bold text, links, or code blocks.
+- Markdown preview heading sizes have been scaled down for a better visual balance between heading levels.
+
+*5/12/2026 - Confirm on exit, app zooming, improve content type changes
 
 - App will now ask for confirmation when closed and there is an open file with unsaved changes
 - When changing content type, the original (unedited) version of the content will now be used, so it can be cleaned correctly based on the new content type.  User is asked what to use if they edited the content.
