@@ -31,6 +31,7 @@ namespace eXeMeL.ViewModel
     private DocumentContentType _contentType = DocumentContentType.Xml;
     private string _lastRawText;
     private string _lastCleanedText;
+    private string _lastSavedText;
 
     private readonly List<XmlCleanerBase> XmlCleaners;
     private readonly List<JsonCleanerBase> JsonCleaners;
@@ -88,6 +89,9 @@ namespace eXeMeL.ViewModel
 
     public bool HasDocumentBeenEditedSinceLoad =>
       _lastCleanedText != null && Document?.Text != _lastCleanedText;
+
+    public bool HasUnsavedFileChanges =>
+      IsContentFromFile && _lastSavedText != null && Document?.Text != _lastSavedText;
 
 
 
@@ -450,6 +454,7 @@ namespace eXeMeL.ViewModel
         var fileContents = await LoadFileContentsAsync(filePath);
         _lastRawText = fileContents;
         _lastCleanedText = fileContents;
+        _lastSavedText = fileContents;
 
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
@@ -501,11 +506,14 @@ namespace eXeMeL.ViewModel
 
 
 
-    private async void SaveCommand_Execute()
+    private async void SaveCommand_Execute() => await SaveAsync();
+
+    public async Task SaveAsync()
     {
       if (this.IsContentFromFile)
       {
         await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
+        _lastSavedText = this.Document.Text;
       }
       else
       {
@@ -529,6 +537,7 @@ namespace eXeMeL.ViewModel
           this.FilePath = saveDialog.FileName;
           this.FileName = Path.GetFileName(this.FilePath);
           this.IsContentFromFile = true;
+          _lastSavedText = this.Document.Text;
 
           await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
         }

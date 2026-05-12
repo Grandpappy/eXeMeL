@@ -38,6 +38,7 @@ namespace eXeMeL
 
     private bool _isSettingsOpen;
     private bool _isPreviewPinned;
+    private bool _confirmClose;
     private System.Windows.Threading.DispatcherTimer _previewDebounce;
 
 
@@ -413,10 +414,45 @@ namespace eXeMeL
 
 
 
-    private void MainWindow_Closing(object sender, CancelEventArgs e)
+    private async void MainWindow_Closing(object sender, CancelEventArgs e)
     {
+      if (_confirmClose)
+      {
+        SaveWindowPosition();
+        WeakReferenceMessenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
+        return;
+      }
+
+      if (ViewModel?.Editor?.HasUnsavedFileChanges == true)
+      {
+        e.Cancel = true;
+        await PromptSaveOnCloseAsync();
+        return;
+      }
+
       SaveWindowPosition();
       WeakReferenceMessenger.Default.Send<ApplicationClosingMessage>(new ApplicationClosingMessage());
+    }
+
+    private async Task PromptSaveOnCloseAsync()
+    {
+      var fileName = ViewModel.Editor.FileName ?? "This file";
+      var result = await AppDialog.ShowAsync(
+        host: RootContentDialogPresenter,
+        title: "Unsaved changes",
+        message: $"{fileName} has been modified. Save before closing?",
+        primaryText: "Save",
+        secondaryText: "Don't save",
+        closeText: "Cancel");
+
+      if (result == ContentDialogResult.None)
+        return;
+
+      if (result == ContentDialogResult.Primary)
+        await ViewModel.Editor.SaveAsync();
+
+      _confirmClose = true;
+      this.Close();
     }
 
 
