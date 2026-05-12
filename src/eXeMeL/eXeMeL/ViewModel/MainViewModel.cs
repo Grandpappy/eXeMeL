@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 using eXeMeL.Messages;
 using eXeMeL.Model;
@@ -12,6 +14,9 @@ namespace eXeMeL.ViewModel
 {
   public class MainViewModel : ObservableObject
   {
+    private static readonly double[] ScaleLevels = { 0.75, 0.80, 0.90, 1.00, 1.10, 1.20, 1.25, 1.30, 1.40, 1.50, 1.60, 1.70, 1.75, 1.80, 1.90, 2.00 };
+    public IReadOnlyList<double> ZoomLevels { get; } = ScaleLevels;
+
     private string _status;
     private SyntaxHighlightingManager _highlightingManager;
     private ApplicationThemeManager _applicationThemeManager;
@@ -30,6 +35,9 @@ namespace eXeMeL.ViewModel
     public SyntaxHighlightingManager HighlightingManager { get { return this._highlightingManager; } private set { SetProperty(ref this._highlightingManager, value); } }
     public ApplicationThemeManager ApplicationThemeManager { get { return this._applicationThemeManager; } private set { SetProperty(ref this._applicationThemeManager, value); } }
     public ICommand ToggleEditorModeCommand { get; private set; }
+    public ICommand ZoomInCommand { get; private set; }
+    public ICommand ZoomOutCommand { get; private set; }
+    public ICommand ResetZoomCommand { get; private set; }
     public EditorMode EditorMode { get { return this._editorMode; } private set { SetProperty(ref this._editorMode, value); } }
 
 
@@ -46,12 +54,40 @@ namespace eXeMeL.ViewModel
       this.YamlUtility = new YamlUtilityViewModel(this.Settings);
       this.MarkdownUtility = new MarkdownUtilityViewModel(this.Settings);
       this.ToggleEditorModeCommand = new RelayCommand(ToggleEditorModeCommand_Execute);
+      this.ZoomInCommand = new RelayCommand(ZoomIn_Execute, () => Settings.AppScale < ScaleLevels[ScaleLevels.Length - 1]);
+      this.ZoomOutCommand = new RelayCommand(ZoomOut_Execute, () => Settings.AppScale > ScaleLevels[0]);
+      this.ResetZoomCommand = new RelayCommand(() => Settings.AppScale = 1.0);
+      Settings.PropertyChanged += Settings_PropertyChanged;
       WeakReferenceMessenger.Default.Register<ApplicationClosingMessage>(this, (r, m) => HandleApplicationClosingMessage(m));
       WeakReferenceMessenger.Default.Register<DisplayApplicationStatusMessage>(this, (r, m) => HandleDisplayApplicationStatusMessage(m));
       WeakReferenceMessenger.Default.Register<DisplayToolInformationMessage>(this, (r, m) => HandleDisplayToolInformationMessage(m));
       WeakReferenceMessenger.Default.Register<DocumentRefreshCompleted>(this, (r, m) => HandleDocumentRefreshCompletedMessage(m));
     }
 
+
+
+    private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(Settings.AppScale))
+      {
+        ((RelayCommand)ZoomInCommand).NotifyCanExecuteChanged();
+        ((RelayCommand)ZoomOutCommand).NotifyCanExecuteChanged();
+      }
+    }
+
+    private void ZoomIn_Execute()
+    {
+      int idx = Array.FindLastIndex(ScaleLevels, l => l <= Settings.AppScale + 0.001);
+      if (idx < ScaleLevels.Length - 1)
+        Settings.AppScale = ScaleLevels[idx + 1];
+    }
+
+    private void ZoomOut_Execute()
+    {
+      int idx = Array.FindIndex(ScaleLevels, l => l >= Settings.AppScale - 0.001);
+      if (idx > 0)
+        Settings.AppScale = ScaleLevels[idx - 1];
+    }
 
 
     private void HandleDocumentRefreshCompletedMessage(DocumentRefreshCompleted message)

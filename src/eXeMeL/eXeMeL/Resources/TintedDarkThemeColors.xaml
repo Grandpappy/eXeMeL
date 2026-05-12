@@ -16,6 +16,7 @@
   <!-- Tinted: opaque chrome tint (will be overridden at runtime with user color) -->
   <SolidColorBrush x:Key="ChromeTintOverlayBrush" Color="#CC3366CC"/>
   <SolidColorBrush x:Key="EditorTintOverlayBrush" Color="#403366CC"/>
+  <SolidColorBrush x:Key="OverlayBackgroundBrush" Color="#FF1A2A3D"/>
   <SolidColorBrush x:Key="AppTextBrush" Color="#FFFFFF"/>
   <SolidColorBrush x:Key="AppAccentBrush" Color="#D4AA00"/>
 
