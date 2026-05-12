@@ -323,6 +323,19 @@
                 </ui:SymbolIcon.Style>
               </ui:SymbolIcon>
               <TextBlock x:Name="EditorTabLabel" Text="Clipboard Content" VerticalAlignment="Center" FontSize="13"/>
+              <Ellipse Width="6" Height="6" Fill="{DynamicResource AppAccentBrush}"
+                       VerticalAlignment="Center" Margin="5,0,0,0">
+                <Ellipse.Style>
+                  <Style TargetType="Ellipse">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding Editor.HasUnsavedFileChanges}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Ellipse.Style>
+              </Ellipse>
             </StackPanel>
           </Border>
 

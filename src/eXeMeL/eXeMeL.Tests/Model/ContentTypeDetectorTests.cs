@@ -114,6 +114,25 @@ namespace eXeMeL.Tests.Model
       Assert.Equal(DocumentContentType.Markdown, ContentTypeDetector.Detect(content));
     }
 
+    [Fact]
+    public void Detect_MarkdownWithHeadingsAndIndentedBulletsOnly_ReturnsMarkdown()
+    {
+      // Heading-only Markdown (no bold/links/code) with indented bullet lists.
+      // Indented bullets look like YAML sequences, so this used to score as a tie
+      // and fall through to YAML. Multiple --- HR lines break the tie decisively.
+      var content =
+        "# Section One\n\n" +
+        "- Top item\n  - Nested item\n  - Another nested\n\n" +
+        "---\n\n" +
+        "# Section Two\n\n" +
+        "## Subsection\n\n" +
+        "- Item\n  - Child\n\n" +
+        "---\n\n" +
+        "# Section Three\n\n" +
+        "- More items\n  - Indented\n";
+      Assert.Equal(DocumentContentType.Markdown, ContentTypeDetector.Detect(content));
+    }
+
     // --- Edge cases ---
 
     [Fact]
