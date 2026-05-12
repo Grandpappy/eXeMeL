@@ -1,8 +1,8 @@
-﻿*5/12/2026 - Editor tab indicator, Markdown detection and preview improvements
+﻿*5/12/2026 - Editor tab indicator, Markdown improvements
 
-- Unsaved file indicator: a dot now appears next to the filename in the editor tab when the file has been modified but not saved.  The dot disappears after saving.
-- Fixed an issue where Markdown content was being incorrectly detected as YAML when the document used headings and indented bullet lists without bold text, links, or code blocks.
-- Markdown preview heading sizes have been scaled down for a better visual balance between heading levels.
+- A dot now appears in the editor tab when the open file has unsaved changes.
+- Fixed Markdown content being misdetected as YAML for heading-heavy documents.
+- Markdown preview heading sizes scaled down for better visual balance.
 
 *5/12/2026 - Confirm on exit, app zooming, improve content type changes
 
