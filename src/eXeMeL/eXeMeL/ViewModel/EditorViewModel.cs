@@ -30,6 +30,7 @@ namespace eXeMeL.ViewModel
     private string _FileName;
     private DocumentContentType _contentType = DocumentContentType.Xml;
     private string _lastRawText;
+    private string _lastCleanedText;
 
     private readonly List<XmlCleanerBase> XmlCleaners;
     private readonly List<JsonCleanerBase> JsonCleaners;
@@ -82,6 +83,11 @@ namespace eXeMeL.ViewModel
       get { return _FileName; }
       private set { SetProperty(ref _FileName, value); }
     }
+
+    public string OriginalRawText => _lastRawText;
+
+    public bool HasDocumentBeenEditedSinceLoad =>
+      _lastCleanedText != null && Document?.Text != _lastCleanedText;
 
 
 
@@ -195,10 +201,11 @@ namespace eXeMeL.ViewModel
 
 
 
-    public async Task ReprocessAsContentTypeAsync(DocumentContentType contentType)
+    public async Task ReprocessAsContentTypeAsync(DocumentContentType contentType, string sourceText = null)
     {
-      var source = _lastRawText ?? this.Document.Text;
+      var source = sourceText ?? _lastRawText ?? this.Document.Text;
       var cleaned = await CleanContentAsTypeAsync(source, contentType);
+      _lastCleanedText = cleaned;
 
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
       ReplaceOldDocumentWithNewDocument(cleaned);
@@ -333,6 +340,7 @@ namespace eXeMeL.ViewModel
       _lastRawText = Clipboard.GetText();
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
       var text = await CleanContentAsync(_lastRawText);
+      _lastCleanedText = text;
 
       this.IsContentFromFile = false;
       this.FilePath = null;
@@ -441,6 +449,7 @@ namespace eXeMeL.ViewModel
 
         var fileContents = await LoadFileContentsAsync(filePath);
         _lastRawText = fileContents;
+        _lastCleanedText = fileContents;
 
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 

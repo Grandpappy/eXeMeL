@@ -623,5 +623,8 @@
         x:Name="FindBarInOverlay"
         DataContext="{Binding Editor}"/>
     </Border>
+
+    <!-- Host for ContentDialog overlays — must be last child so it covers everything -->
+    <ui:ContentDialogHost x:Name="RootContentDialogPresenter" Grid.RowSpan="2" Panel.ZIndex="500"/>
   </Grid>
 </ui:FluentWindow>

@@ -13,6 +13,7 @@ using eXeMeL.View.ChangeLog;
 using eXeMeL.Model;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using System.Threading.Tasks;
 using Wpf.Ui.Controls;
 
 namespace eXeMeL
@@ -749,13 +750,47 @@ namespace eXeMeL
           IsChecked = (this.ViewModel.Editor.ContentType == type)
         };
         var capturedType = type;
-        item.Click += async (s, args) => await ViewModel.Editor.ReprocessAsContentTypeAsync(capturedType);
+        item.Click += async (s, args) => await ChangeContentTypeAsync(capturedType);
         menu.Items.Add(item);
       }
       menu.PlacementTarget = sender as System.Windows.UIElement;
       menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Top;
       menu.IsOpen = true;
     }
+
+    private async Task ChangeContentTypeAsync(DocumentContentType contentType)
+    {
+      string sourceText;
+
+      if (ViewModel.Editor.HasDocumentBeenEditedSinceLoad)
+      {
+        var dialog = new ContentDialog(RootContentDialogPresenter)
+        {
+          Title = "Reprocess document",
+          Content = $"The editor has been modified since it was loaded. Which text should be reprocessed as {contentType.ToString().ToUpper()}?",
+          PrimaryButtonText = "Original input",
+          SecondaryButtonText = "Current editor content",
+          CloseButtonText = "Cancel"
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.None)
+          return;
+
+        sourceText = result == ContentDialogResult.Primary
+          ? ViewModel.Editor.OriginalRawText
+          : ViewModel.Editor.Document.Text;
+      }
+      else
+      {
+        sourceText = ViewModel.Editor.OriginalRawText ?? ViewModel.Editor.Document.Text;
+      }
+
+      await ViewModel.Editor.ReprocessAsContentTypeAsync(contentType, sourceText);
+    }
+
+
 
     private void HandleContentTypeChanged(ContentTypeChangedMessage message)
     {
@@ -1031,7 +1066,7 @@ namespace eXeMeL
     private async void CheckForUpdatesOnStartup()
     {
       // Delay update check so it doesn't compete with initial content load
-      await System.Threading.Tasks.Task.Delay(5000);
+      await Task.Delay(5000);
 
 #if DEBUG
       this.UpdateToastMessage.Text = "eXeMeL 2.99.0 is available! (DEBUG)";
@@ -1053,7 +1088,7 @@ namespace eXeMeL
     {
 #if DEBUG
       this.UpdateToastMessage.Text = "Downloading update... (DEBUG - no actual update)";
-      await System.Threading.Tasks.Task.Delay(2000);
+      await Task.Delay(2000);
       this.UpdateToast.Visibility = Visibility.Collapsed;
       return;
 #endif
