@@ -29,6 +29,7 @@ namespace eXeMeL.ViewModel
     private string _FilePath;
     private string _FileName;
     private DocumentContentType _contentType = DocumentContentType.Xml;
+    private string _lastRawText;
 
     private readonly List<XmlCleanerBase> XmlCleaners;
     private readonly List<JsonCleanerBase> JsonCleaners;
@@ -178,6 +179,38 @@ namespace eXeMeL.ViewModel
 
 
 
+    private async Task<string> CleanContentAsTypeAsync(string text, DocumentContentType contentType)
+    {
+      ContentType = contentType;
+
+      return contentType switch
+      {
+        DocumentContentType.Json => await CleanJsonAsync(text),
+        DocumentContentType.Yaml => await CleanYamlAsync(text),
+        DocumentContentType.Text => await CleanTextAsync(text),
+        DocumentContentType.Markdown => await CleanTextAsync(text),
+        _ => await CleanXmlAsync(text)
+      };
+    }
+
+
+
+    public async Task ReprocessAsContentTypeAsync(DocumentContentType contentType)
+    {
+      var source = _lastRawText ?? this.Document.Text;
+      var cleaned = await CleanContentAsTypeAsync(source, contentType);
+
+      WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
+      ReplaceOldDocumentWithNewDocument(cleaned);
+      WeakReferenceMessenger.Default.Send(new DisplayToolInformationMessage(string.Empty));
+      WeakReferenceMessenger.Default.Send(new DocumentRefreshCompleted(cleaned));
+
+      var handler = this.RefreshComplete;
+      handler?.Invoke(this, EventArgs.Empty);
+    }
+
+
+
     private async Task<string> CleanXmlAsync(string xml)
     {
       if (!XmlShouldBeCleaned(xml))
@@ -297,8 +330,9 @@ namespace eXeMeL.ViewModel
 
     private async Task SetDocumentTextFromClipboardAsync()
     {
+      _lastRawText = Clipboard.GetText();
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
-      var text = await CleanContentAsync(Clipboard.GetText());
+      var text = await CleanContentAsync(_lastRawText);
 
       this.IsContentFromFile = false;
       this.FilePath = null;
@@ -406,6 +440,7 @@ namespace eXeMeL.ViewModel
           return;
 
         var fileContents = await LoadFileContentsAsync(filePath);
+        _lastRawText = fileContents;
 
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 

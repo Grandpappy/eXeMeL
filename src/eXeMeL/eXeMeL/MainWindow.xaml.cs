@@ -749,7 +749,7 @@ namespace eXeMeL
           IsChecked = (this.ViewModel.Editor.ContentType == type)
         };
         var capturedType = type;
-        item.Click += (s, args) => this.ViewModel.Editor.ContentType = capturedType;
+        item.Click += async (s, args) => await ViewModel.Editor.ReprocessAsContentTypeAsync(capturedType);
         menu.Items.Add(item);
       }
       menu.PlacementTarget = sender as System.Windows.UIElement;
