@@ -44,10 +44,17 @@ namespace eXeMeL.ViewModel
       get { return _Document; }
       private set
       {
+        if (_Document != null)
+          _Document.TextChanged -= Document_TextChanged;
         SetProperty(ref _Document, value);
         this.FindViewModel.Document = this.Document;
+        if (_Document != null)
+          _Document.TextChanged += Document_TextChanged;
+        UpdateUnsavedFileState();
       }
     }
+
+    private void Document_TextChanged(object sender, EventArgs e) => UpdateUnsavedFileState();
 
 
     public DocumentContentType ContentType
@@ -66,7 +73,11 @@ namespace eXeMeL.ViewModel
     public bool IsContentFromFile
     {
       get { return _IsContentFromFile; }
-      private set { SetProperty(ref _IsContentFromFile, value); }
+      private set
+      {
+        if (SetProperty(ref _IsContentFromFile, value))
+          UpdateUnsavedFileState();
+      }
     }
 
 
@@ -90,8 +101,17 @@ namespace eXeMeL.ViewModel
     public bool HasDocumentBeenEditedSinceLoad =>
       _lastCleanedText != null && Document?.Text != _lastCleanedText;
 
-    public bool HasUnsavedFileChanges =>
-      IsContentFromFile && _lastSavedText != null && Document?.Text != _lastSavedText;
+    private bool _hasUnsavedFileChanges;
+    public bool HasUnsavedFileChanges
+    {
+      get => _hasUnsavedFileChanges;
+      private set => SetProperty(ref _hasUnsavedFileChanges, value);
+    }
+
+    private void UpdateUnsavedFileState()
+    {
+      HasUnsavedFileChanges = IsContentFromFile && _lastSavedText != null && Document?.Text != _lastSavedText;
+    }
 
 
 
@@ -455,6 +475,7 @@ namespace eXeMeL.ViewModel
         _lastRawText = fileContents;
         _lastCleanedText = fileContents;
         _lastSavedText = fileContents;
+        UpdateUnsavedFileState();
 
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
@@ -514,6 +535,7 @@ namespace eXeMeL.ViewModel
       {
         await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
         _lastSavedText = this.Document.Text;
+        UpdateUnsavedFileState();
       }
       else
       {
@@ -538,6 +560,7 @@ namespace eXeMeL.ViewModel
           this.FileName = Path.GetFileName(this.FilePath);
           this.IsContentFromFile = true;
           _lastSavedText = this.Document.Text;
+          UpdateUnsavedFileState();
 
           await File.WriteAllTextAsync(this.FilePath, this.Document.Text);
         }
