@@ -139,6 +139,7 @@ namespace eXeMeL
       WeakReferenceMessenger.Default.Register<SetKeyboardFocusToEditor>(this, (r, m) => HandleSetKeyboardFocusToEditorMessage(m));
       WeakReferenceMessenger.Default.Register<EditorModeChangedMessage>(this, (r, m) => HandleEditorModeChangedMessage(m));
       WeakReferenceMessenger.Default.Register<ContentTypeChangedMessage>(this, (r, m) => HandleContentTypeChanged(m));
+      WeakReferenceMessenger.Default.Register<PreviewScrolledToLineMessage>(this, (r, m) => HandlePreviewScrolledToLineMessage(m));
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
@@ -396,9 +397,32 @@ namespace eXeMeL
 
 
 
+    private int _lastBroadcastCaretLine;
+
     private void AvalonEditor_CaretPositionChanged(object sender, EventArgs e)
     {
-      this.ViewModel.Editor.CaretPosition = this.AvalonEditor.TextArea.Caret.Position;
+      var caret = this.AvalonEditor.TextArea.Caret.Position;
+      this.ViewModel.Editor.CaretPosition = caret;
+
+      // Drive Markdown preview scroll sync. Broadcast only when the source line actually
+      // changes (caret moves within a single line happen on every keystroke).
+      if (_currentContentType == DocumentContentType.Markdown &&
+          caret.Line > 0 &&
+          caret.Line != _lastBroadcastCaretLine)
+      {
+        _lastBroadcastCaretLine = caret.Line;
+        WeakReferenceMessenger.Default.Send(new EditorCaretLineChangedMessage(caret.Line));
+      }
+    }
+
+    private void HandlePreviewScrolledToLineMessage(PreviewScrolledToLineMessage message)
+    {
+      // Preview -> editor scroll sync. Scroll the editor to the line the preview is showing
+      // without moving the caret (so no echo back via the caret-changed handler).
+      if (_currentContentType != DocumentContentType.Markdown) return;
+      if (message.Line <= 0 || message.Line > this.AvalonEditor.Document.LineCount) return;
+
+      this.AvalonEditor.ScrollTo(message.Line, 0);
     }
 
 

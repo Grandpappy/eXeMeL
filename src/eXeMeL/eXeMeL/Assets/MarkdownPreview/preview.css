@@ -1,0 +1,367 @@
+/* eXeMeL Markdown preview styles
+   Theme switching is driven by [data-theme] on <html>.
+   Base palette: light. Dark and solarized-dark override via attribute selectors. */
+
+:root {
+  --md-bg: transparent;
+  --md-text: #222222;
+  --md-text-muted: #6a6a6a;
+  --md-heading: #0e0e0e;
+  --md-link: #0451A5;
+  --md-link-hover: #0066cc;
+  --md-border: #d0d7de;
+  --md-rule: #d8dee4;
+
+  --md-code-text: #1f1f1f;
+  --md-code-bg: rgba(175, 184, 193, 0.2);
+  --md-code-block-bg: #f6f8fa;
+  --md-code-block-border: #d0d7de;
+
+  --md-blockquote-text: #57606a;
+  --md-blockquote-border: #d0d7de;
+
+  --md-table-border: #d0d7de;
+  --md-table-header-bg: #f1f3f5;
+  --md-table-row-even: #ffffff;
+  --md-table-row-odd: #f8f9fa;
+
+  --md-line-highlight: rgba(255, 200, 0, 0.18);
+
+  /* Syntax tokens (ColorCode HtmlClassFormatter emits ScopeName as the CSS class) */
+  --tok-comment: #6a737d;
+  --tok-string: #032f62;
+  --tok-keyword: #d73a49;
+  --tok-preproc: #d73a49;
+  --tok-type: #6f42c1;
+  --tok-name: #24292f;
+  --tok-attr: #6f42c1;
+  --tok-attr-val: #032f62;
+  --tok-attr-quotes: #032f62;
+  --tok-number: #005cc5;
+  --tok-operator: #24292f;
+  --tok-delimiter: #6e7781;
+}
+
+[data-theme="dark"] {
+  --md-bg: transparent;
+  --md-text: #e0e0e0;
+  --md-text-muted: #a8a8a8;
+  --md-heading: #ffffff;
+  --md-link: #9CDCFE;
+  --md-link-hover: #b5e4ff;
+  --md-border: #444444;
+  --md-rule: #3a3a3a;
+
+  --md-code-text: #d4d4d4;
+  --md-code-bg: rgba(110, 118, 129, 0.4);
+  --md-code-block-bg: #1e1e1e;
+  --md-code-block-border: #333333;
+
+  --md-blockquote-text: #a6a6a6;
+  --md-blockquote-border: #444444;
+
+  --md-table-border: #444444;
+  --md-table-header-bg: #2a2a2a;
+  --md-table-row-even: #1f1f1f;
+  --md-table-row-odd: #262626;
+
+  --md-line-highlight: rgba(255, 200, 0, 0.12);
+
+  --tok-comment: #6a9955;
+  --tok-string: #ce9178;
+  --tok-keyword: #569cd6;
+  --tok-preproc: #c586c0;
+  --tok-type: #4ec9b0;
+  --tok-name: #9cdcfe;
+  --tok-attr: #9cdcfe;
+  --tok-attr-val: #ce9178;
+  --tok-attr-quotes: #ce9178;
+  --tok-number: #b5cea8;
+  --tok-operator: #d4d4d4;
+  --tok-delimiter: #808080;
+}
+
+[data-theme="solarized-dark"] {
+  --md-bg: transparent;
+  --md-text: #93a1a1;
+  --md-text-muted: #586e75;
+  --md-heading: #eee8d5;
+  --md-link: #268bd2;
+  --md-link-hover: #b58900;
+  --md-border: #073642;
+  --md-rule: #073642;
+
+  --md-code-text: #93a1a1;
+  --md-code-bg: rgba(7, 54, 66, 0.5);
+  --md-code-block-bg: #073642;
+  --md-code-block-border: #0d4654;
+
+  --md-blockquote-text: #839496;
+  --md-blockquote-border: #586e75;
+
+  --md-table-border: #073642;
+  --md-table-header-bg: #0a3f4d;
+  --md-table-row-even: #002b36;
+  --md-table-row-odd: #053948;
+
+  --md-line-highlight: rgba(181, 137, 0, 0.18);
+
+  --tok-comment: #586e75;
+  --tok-string: #2aa198;
+  --tok-keyword: #859900;
+  --tok-preproc: #cb4b16;
+  --tok-type: #b58900;
+  --tok-name: #268bd2;
+  --tok-attr: #93a1a1;
+  --tok-attr-val: #2aa198;
+  --tok-attr-quotes: #2aa198;
+  --tok-number: #d33682;
+  --tok-operator: #93a1a1;
+  --tok-delimiter: #93a1a1;
+}
+
+/* ---------- Layout ---------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--md-bg);
+  color: var(--md-text);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+body {
+  padding: 16px 24px 64px 24px;
+}
+
+.markdown-body {
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+/* Empty state */
+.empty-state {
+  position: fixed;
+  top: 30px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-style: italic;
+  font-size: 26.667px;
+  opacity: 0.8;
+  color: var(--md-text-muted);
+  pointer-events: none;
+  display: none;
+}
+body.empty .empty-state { display: block; }
+body.empty .markdown-body { display: none; }
+
+/* ---------- Typography ---------- */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: var(--md-heading);
+  font-weight: 600;
+  margin: 1.2em 0 0.5em 0;
+  line-height: 1.25;
+}
+
+.markdown-body h1 { font-size: 1.6em; padding-bottom: 0.3em; border-bottom: 1px solid var(--md-rule); }
+.markdown-body h2 { font-size: 1.35em; padding-bottom: 0.25em; border-bottom: 1px solid var(--md-rule); }
+.markdown-body h3 { font-size: 1.15em; }
+.markdown-body h4 { font-size: 1.0em; }
+.markdown-body h5 { font-size: 0.95em; }
+.markdown-body h6 { font-size: 0.9em; color: var(--md-text-muted); }
+
+.markdown-body p {
+  margin: 0.5em 0 0.8em 0;
+}
+
+.markdown-body a {
+  color: var(--md-link);
+  text-decoration: none;
+}
+.markdown-body a:hover { color: var(--md-link-hover); text-decoration: underline; }
+
+.markdown-body strong { font-weight: 600; }
+.markdown-body em { font-style: italic; }
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--md-rule);
+  margin: 1.5em 0;
+}
+
+/* ---------- Lists ---------- */
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.4em 0 0.8em 0;
+  padding-left: 1.8em;
+}
+
+.markdown-body li { margin: 0.15em 0; }
+.markdown-body li > ul,
+.markdown-body li > ol { margin: 0.15em 0; }
+
+.markdown-body ul.contains-task-list { padding-left: 1em; list-style: none; }
+.markdown-body ul.contains-task-list li.task-list-item input[type="checkbox"] { margin-right: 0.4em; }
+
+/* ---------- Blockquote ---------- */
+.markdown-body blockquote {
+  margin: 0.5em 0;
+  padding: 0.2em 0 0.2em 1em;
+  border-left: 3px solid var(--md-blockquote-border);
+  color: var(--md-blockquote-text);
+  font-style: italic;
+}
+.markdown-body blockquote > :first-child { margin-top: 0; }
+.markdown-body blockquote > :last-child { margin-bottom: 0; }
+
+/* ---------- Code ---------- */
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre {
+  font-family: "Cascadia Code", "Consolas", "SF Mono", "Menlo", "Monaco", monospace;
+  font-size: 0.92em;
+}
+
+/* Inline code */
+.markdown-body :not(pre) > code {
+  padding: 0.15em 0.35em;
+  background: var(--md-code-bg);
+  color: var(--md-code-text);
+  border-radius: 4px;
+}
+
+/* Code blocks */
+.markdown-body pre {
+  margin: 0.6em 0;
+  padding: 12px 14px;
+  background: var(--md-code-block-bg);
+  border: 1px solid var(--md-code-block-border);
+  border-radius: 6px;
+  overflow-x: auto;
+  line-height: 1.45;
+}
+
+.markdown-body pre code {
+  display: block;
+  background: transparent;
+  padding: 0;
+  color: var(--md-code-text);
+  font-size: inherit;
+  white-space: pre;
+}
+
+/* ---------- Tables ---------- */
+.markdown-body table {
+  border-collapse: collapse;
+  margin: 0.7em 0;
+  border: 1px solid var(--md-table-border);
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 6px 12px;
+  border: 1px solid var(--md-table-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown-body th {
+  background: var(--md-table-header-bg);
+  font-weight: 600;
+}
+
+.markdown-body tr:nth-child(even) td { background: var(--md-table-row-even); }
+.markdown-body tr:nth-child(odd) td { background: var(--md-table-row-odd); }
+
+/* ---------- Images ---------- */
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- ColorCode syntax tokens
+   ColorCode's HTML formatter emits ScopeName as a camelCase CSS class.
+   Wrapper structure: <div class="<lang>"><pre>...<span class="<token>">...</span>...</pre></div>
+   See ColorCode-Universal/source/ColorCode.Core/ScopeName.cs for the canonical list. */
+.markdown-body pre .comment,
+.markdown-body pre .xmlComment,
+.markdown-body pre .xmlDocComment,
+.markdown-body pre .xmlDocTag,
+.markdown-body pre .cssComment       { color: var(--tok-comment); font-style: italic; }
+
+.markdown-body pre .string,
+.markdown-body pre .stringCSharpVerbatim,
+.markdown-body pre .stringEscape,
+.markdown-body pre .cssString        { color: var(--tok-string); }
+
+.markdown-body pre .keyword,
+.markdown-body pre .htmlOperator     { color: var(--tok-keyword); }
+
+.markdown-body pre .preprocessorKeyword { color: var(--tok-preproc); }
+
+.markdown-body pre .type,
+.markdown-body pre .typeVariable,
+.markdown-body pre .className        { color: var(--tok-type); }
+
+.markdown-body pre .xmlName,
+.markdown-body pre .htmlElementName  { color: var(--tok-keyword); }
+
+.markdown-body pre .xmlAttribute,
+.markdown-body pre .htmlAttributeName,
+.markdown-body pre .cssPropertyName  { color: var(--tok-attr); }
+
+.markdown-body pre .xmlAttributeValue,
+.markdown-body pre .htmlAttributeValue,
+.markdown-body pre .cssPropertyValue,
+.markdown-body pre .cssValue         { color: var(--tok-attr-val); }
+
+.markdown-body pre .xmlAttributeQuotes { color: var(--tok-attr-quotes); }
+
+.markdown-body pre .xmlDelimiter,
+.markdown-body pre .xmlCDataSection,
+.markdown-body pre .htmlTagDelimiter,
+.markdown-body pre .htmlEntity       { color: var(--tok-delimiter); }
+
+.markdown-body pre .cssID,
+.markdown-body pre .cssClass,
+.markdown-body pre .cssSelector      { color: var(--tok-type); }
+
+.markdown-body pre .powerShellAttribute,
+.markdown-body pre .powerShellCommand,
+.markdown-body pre .powerShellVariable { color: var(--tok-name); }
+
+/* ColorCode wraps fenced code in <div class="<lang>"><pre>...</pre></div>.
+   Reset the wrapper so it doesn't double up margins/borders from our base <pre> rule. */
+.markdown-body > div[class] > pre {
+  margin: 0;
+}
+.markdown-body > div[class]:has(> pre) {
+  margin: 0.6em 0;
+}
+
+/* ---------- Scroll-sync line highlight (driven by JS) ---------- */
+.markdown-body [data-line].active-line {
+  background: var(--md-line-highlight);
+  border-radius: 3px;
+}
+
+/* ---------- Scrollbars (subtle) ---------- */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--md-border);
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-text-muted);
+  background-clip: padding-box;
+}
