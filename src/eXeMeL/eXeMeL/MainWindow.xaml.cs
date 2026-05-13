@@ -1186,17 +1186,63 @@ namespace eXeMeL
 
       var settings = this.ViewModel.Settings;
 
-      if (!double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0)
-        this.Width = settings.WindowWidth;
-      if (!double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0)
-        this.Height = settings.WindowHeight;
-      if (!double.IsNaN(settings.WindowLeft))
-        this.Left = settings.WindowLeft;
-      if (!double.IsNaN(settings.WindowTop))
-        this.Top = settings.WindowTop;
+      var haveFullRect =
+        !double.IsNaN(settings.WindowLeft) &&
+        !double.IsNaN(settings.WindowTop) &&
+        !double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0 &&
+        !double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0;
+
+      if (haveFullRect)
+      {
+        var saved = new Rect(settings.WindowLeft, settings.WindowTop, settings.WindowWidth, settings.WindowHeight);
+        var visible = EnsureRectIsVisible(saved);
+        this.Left = visible.Left;
+        this.Top = visible.Top;
+        this.Width = visible.Width;
+        this.Height = visible.Height;
+      }
+      else
+      {
+        // Partial settings — fall back to per-property restore with NaN guards.
+        if (!double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0)
+          this.Width = settings.WindowWidth;
+        if (!double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0)
+          this.Height = settings.WindowHeight;
+        if (!double.IsNaN(settings.WindowLeft))
+          this.Left = settings.WindowLeft;
+        if (!double.IsNaN(settings.WindowTop))
+          this.Top = settings.WindowTop;
+      }
 
       if (settings.WindowState == (int)WindowState.Maximized)
         this.WindowState = WindowState.Maximized;
+    }
+
+    /// <summary>
+    /// Returns <paramref name="saved"/> if the window's title bar would land on a currently connected
+    /// monitor; otherwise returns a rect centered on the primary monitor's work area.
+    /// Guards against the "opened on a now-disconnected monitor" scenario.
+    /// </summary>
+    private static Rect EnsureRectIsVisible(Rect saved)
+    {
+      var virtualScreen = new Rect(
+        SystemParameters.VirtualScreenLeft,
+        SystemParameters.VirtualScreenTop,
+        SystemParameters.VirtualScreenWidth,
+        SystemParameters.VirtualScreenHeight);
+
+      // Require a 200x40 portion of the title bar to remain reachable.
+      var probe = new Rect(saved.Left, saved.Top, Math.Min(saved.Width, 200), 40);
+      probe.Intersect(virtualScreen);
+      if (probe.Width >= 200 && probe.Height >= 40)
+        return saved;
+
+      var work = SystemParameters.WorkArea;
+      var width = Math.Min(saved.Width, work.Width);
+      var height = Math.Min(saved.Height, work.Height);
+      var left = work.Left + (work.Width - width) / 2;
+      var top = work.Top + (work.Height - height) / 2;
+      return new Rect(left, top, width, height);
     }
 
     #endregion
