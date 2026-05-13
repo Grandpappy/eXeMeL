@@ -414,8 +414,33 @@ namespace eXeMeL
           caret.Line != _lastBroadcastCaretLine)
       {
         _lastBroadcastCaretLine = caret.Line;
-        WeakReferenceMessenger.Default.Send(new EditorCaretChangedMessage(caret.Line));
+        var hint = ComputeCaretViewportProportion(caret.Line);
+        WeakReferenceMessenger.Default.Send(new EditorCaretChangedMessage(caret.Line, hint));
       }
+    }
+
+    /// <summary>Returns a value in [0, 1] indicating where the given source line sits in the
+    /// editor's current viewport (0 = top, 1 = bottom). Used as a hint so the preview can
+    /// place the corresponding line at approximately the same proportional position when it
+    /// has to scroll to bring the line into view.</summary>
+    private double ComputeCaretViewportProportion(int caretLine)
+    {
+      const double defaultHint = 0.30;
+      var tv = this.AvalonEditor?.TextArea?.TextView;
+      if (tv == null || tv.ActualHeight <= 0) return defaultHint;
+
+      var topY = tv.ScrollOffset.Y;
+      var bottomY = topY + tv.ActualHeight;
+      var firstDocLine = tv.GetDocumentLineByVisualTop(topY);
+      var lastDocLine = tv.GetDocumentLineByVisualTop(bottomY);
+      if (firstDocLine == null || lastDocLine == null) return defaultHint;
+
+      var firstLine = firstDocLine.LineNumber;
+      var lastLine = lastDocLine.LineNumber;
+      if (lastLine <= firstLine) return defaultHint;
+
+      var raw = (double)(caretLine - firstLine) / (lastLine - firstLine);
+      return Math.Clamp(raw, 0.0, 1.0);
     }
 
     private int _lastBroadcastTopLine;

@@ -29,7 +29,7 @@ namespace eXeMeL.View
     // Pending state — applied as soon as the WebView is ready.
     private string _pendingContent;
     private string _pendingTheme;
-    private int? _pendingHighlightLine;
+    private (int line, double scrollHint)? _pendingHighlight;
     private int? _pendingScrollLine;
 
     private MarkdownUtilityViewModel _attachedViewModel;
@@ -285,10 +285,10 @@ namespace eXeMeL.View
       }
     }
 
-    private void PushHighlightLine(int line)
+    private void PushHighlightLine(int line, double scrollHint)
     {
-      if (!_webViewReady) { _pendingHighlightLine = line; return; }
-      PostMessage(new { type = "highlightLine", line });
+      if (!_webViewReady) { _pendingHighlight = (line, scrollHint); return; }
+      PostMessage(new { type = "highlightLine", line, scrollHint });
     }
 
     private void PushScrollToLine(int line)
@@ -316,10 +316,11 @@ namespace eXeMeL.View
           PostMessage(new { type = "setContent", html = _renderer.ToHtml(current) });
       }
 
-      if (_pendingHighlightLine.HasValue)
+      if (_pendingHighlight.HasValue)
       {
-        PostMessage(new { type = "highlightLine", line = _pendingHighlightLine.Value });
-        _pendingHighlightLine = null;
+        var ph = _pendingHighlight.Value;
+        PostMessage(new { type = "highlightLine", line = ph.line, scrollHint = ph.scrollHint });
+        _pendingHighlight = null;
       }
       if (_pendingScrollLine.HasValue)
       {
@@ -374,7 +375,7 @@ namespace eXeMeL.View
       m.Register<MarkdownUtilityView, ApplicationThemeUpdatedMessage>(this, (r, _) =>
         r.Dispatcher.BeginInvoke(new Action(r.PushTheme)));
       m.Register<MarkdownUtilityView, EditorCaretChangedMessage>(this, (r, msg) =>
-        r.Dispatcher.BeginInvoke(new Action(() => r.PushHighlightLine(msg.Line))));
+        r.Dispatcher.BeginInvoke(new Action(() => r.PushHighlightLine(msg.Line, msg.ScrollHint))));
       m.Register<MarkdownUtilityView, EditorScrolledToLineMessage>(this, (r, msg) =>
         r.Dispatcher.BeginInvoke(new Action(() => r.PushScrollToLine(msg.Line))));
     }

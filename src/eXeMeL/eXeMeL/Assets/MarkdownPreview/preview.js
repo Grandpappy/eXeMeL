@@ -5,7 +5,9 @@
 //   { type: 'setContent', html: '<...>' }
 //   { type: 'setTheme', theme: 'light' | 'dark' | 'solarized-dark',
 //                       accentRgba: 'rgba(r, g, b, a)' }  // both optional after first send
-//   { type: 'highlightLine', line: <int> }  // flash a highlight, no scroll
+//   { type: 'highlightLine', line: <int>, scrollHint: <0..1> }
+//                        flash a highlight; scroll only if line is off-screen, in which
+//                        case place the line at scrollHint*viewportHeight from the top
 //   { type: 'scrollToLine', line: <int> }   // scroll to line, no persistent highlight
 //
 // Outbound (page -> host) shapes (sent via chrome.webview.postMessage):
@@ -35,7 +37,7 @@
     switch (msg.type) {
       case 'setContent': setContent(msg.html); break;
       case 'setTheme': setTheme(msg.theme, msg.accentRgba); break;
-      case 'highlightLine': highlightLineAt(msg.line); break;
+      case 'highlightLine': highlightLineAt(msg.line, msg.scrollHint); break;
       case 'scrollToLine': scrollToLineAt(msg.line); break;
     }
   }
@@ -59,11 +61,31 @@
     }
   }
 
-  // Flash a brief highlight on the matching line without scrolling — used for caret click.
-  function highlightLineAt(line) {
+  // Flash a brief highlight on the matching line. Scroll the line into view ONLY if it's
+  // currently off-screen — in that case, place it at the same proportional position the
+  // editor's caret occupies in its own viewport (scrollHint, 0..1 from top).
+  function highlightLineAt(line, scrollHint) {
     if (typeof line !== 'number' || line < 0) return;
     const target = findElementForLine(line);
-    if (target) highlightLine(target);
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+    const viewportH = globalThis.innerHeight;
+    const edgeMargin = 24;
+    const inView = rect.top < viewportH - edgeMargin && rect.bottom > edgeMargin;
+
+    if (!inView) {
+      const hint = (typeof scrollHint === 'number' && scrollHint >= 0 && scrollHint <= 1)
+        ? scrollHint
+        : 0.30;
+      const desiredFromTop = viewportH * hint;
+      const delta = rect.top - desiredFromTop;
+      withSuppressedScroll(() => {
+        globalThis.scrollBy({ top: delta, left: 0, behavior: 'auto' });
+      });
+    }
+
+    highlightLine(target);
   }
 
   // Scroll the matching line into view without leaving a persistent highlight —
