@@ -346,13 +346,17 @@ body.empty .markdown-body { display: none; }
   margin: 0.6em 0;
 }
 
-/* ---------- Click-driven line highlight (set by preview.js, fades out via transition) ---------- */
+/* ---------- Click-driven line highlight (set by preview.js)
+   Asymmetric transition: fast fade-IN, slow fade-OUT. CSS resolves the active
+   transition from the currently-applied selector, so transitions live on the
+   .active-line selector for the IN direction and on the base selector for OUT. */
 .markdown-body [data-line] {
   transition: background-color 700ms ease-out, box-shadow 700ms ease-out;
 }
 .markdown-body [data-line].active-line {
   background-color: var(--md-line-highlight);
   border-radius: 3px;
+  transition: background-color 80ms ease-out, box-shadow 80ms ease-out;
 }
 
 /* Tables: the <table> background is hidden by cell backgrounds, and rows are similar.
@@ -362,10 +366,14 @@ body.empty .markdown-body { display: none; }
   background-color: transparent;
   box-shadow: 0 0 0 3px var(--md-line-highlight);
 }
+.markdown-body tr[data-line] > td,
+.markdown-body tr[data-line] > th {
+  transition: background-color 700ms ease-out;
+}
 .markdown-body tr[data-line].active-line > td,
 .markdown-body tr[data-line].active-line > th {
   background-color: var(--md-line-highlight);
-  transition: background-color 700ms ease-out;
+  transition: background-color 80ms ease-out;
 }
 
 /* ---------- Scrollbars (subtle) ---------- */
