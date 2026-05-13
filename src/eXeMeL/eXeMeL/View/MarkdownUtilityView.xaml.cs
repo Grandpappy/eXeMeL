@@ -238,8 +238,26 @@ namespace eXeMeL.View
     private void PushTheme()
     {
       var theme = ResolveCssTheme();
+      var accentRgba = ResolveAccentRgba(0.30);
       if (!_webViewReady) { _pendingTheme = theme; return; }
-      PostMessage(new { type = "setTheme", theme });
+      PostMessage(new { type = "setTheme", theme, accentRgba });
+    }
+
+    /// <summary>Converts the user's accent color (e.g. #D4AA00) to an rgba() string
+    /// at the given alpha, for use as the line-highlight background in the preview.</summary>
+    private string ResolveAccentRgba(double alpha)
+    {
+      var hex = this.Settings?.AccentColor;
+      if (string.IsNullOrWhiteSpace(hex)) hex = "#D4AA00";
+      try
+      {
+        var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+        return $"rgba({color.R}, {color.G}, {color.B}, {alpha.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})";
+      }
+      catch
+      {
+        return $"rgba(212, 170, 0, {alpha.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})";
+      }
     }
 
     private void PushHighlightLine(int line)
@@ -257,7 +275,7 @@ namespace eXeMeL.View
     private void FlushPending()
     {
       if (_pendingTheme == null) _pendingTheme = ResolveCssTheme();
-      PostMessage(new { type = "setTheme", theme = _pendingTheme });
+      PostMessage(new { type = "setTheme", theme = _pendingTheme, accentRgba = ResolveAccentRgba(0.30) });
       _pendingTheme = null;
 
       if (_pendingContent != null)

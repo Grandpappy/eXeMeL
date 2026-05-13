@@ -3,7 +3,8 @@
 //
 // Inbound (host -> page) message shapes (JSON, sent via PostWebMessageAsJson):
 //   { type: 'setContent', html: '<...>' }
-//   { type: 'setTheme', theme: 'light' | 'dark' | 'solarized-dark' }
+//   { type: 'setTheme', theme: 'light' | 'dark' | 'solarized-dark',
+//                       accentRgba: 'rgba(r, g, b, a)' }  // both optional after first send
 //   { type: 'highlightLine', line: <int> }  // flash a highlight, no scroll
 //   { type: 'scrollToLine', line: <int> }   // scroll to line, no persistent highlight
 //
@@ -33,7 +34,7 @@
     if (!msg || typeof msg !== 'object') return;
     switch (msg.type) {
       case 'setContent': setContent(msg.html); break;
-      case 'setTheme': setTheme(msg.theme); break;
+      case 'setTheme': setTheme(msg.theme, msg.accentRgba); break;
       case 'highlightLine': highlightLineAt(msg.line); break;
       case 'scrollToLine': scrollToLineAt(msg.line); break;
     }
@@ -50,9 +51,12 @@
     });
   }
 
-  function setTheme(theme) {
+  function setTheme(theme, accentRgba) {
     const valid = ['light', 'dark', 'solarized-dark'];
-    document.documentElement.dataset.theme = valid.indexOf(theme) >= 0 ? theme : 'light';
+    document.documentElement.dataset.theme = valid.includes(theme) ? theme : 'light';
+    if (typeof accentRgba === 'string' && accentRgba.length > 0) {
+      document.documentElement.style.setProperty('--md-line-highlight', accentRgba);
+    }
   }
 
   // Flash a brief highlight on the matching line without scrolling — used for caret click.

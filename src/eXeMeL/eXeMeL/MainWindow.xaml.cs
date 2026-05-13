@@ -925,6 +925,10 @@ namespace eXeMeL
       this.YamlTreeTabHeader.Visibility = Visibility.Collapsed;
       this.MarkdownPreviewTabHeader.Visibility = Visibility.Collapsed;
 
+      // Linked-scrolling toggle is only meaningful for Markdown.
+      this.LinkedScrollingToggle.Visibility =
+        message.ContentType == DocumentContentType.Markdown ? Visibility.Visible : Visibility.Collapsed;
+
       switch (message.ContentType)
       {
         case DocumentContentType.Xml:
