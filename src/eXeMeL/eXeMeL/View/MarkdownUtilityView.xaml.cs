@@ -33,6 +33,7 @@ namespace eXeMeL.View
     private int? _pendingScrollLine;
 
     private MarkdownUtilityViewModel _attachedViewModel;
+    private Settings _attachedSettings;
 
     public MarkdownUtilityView()
     {
@@ -94,11 +95,16 @@ namespace eXeMeL.View
     {
       if (_attachedViewModel != null)
         _attachedViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+      if (_attachedSettings != null)
+        _attachedSettings.PropertyChanged -= OnSettingsPropertyChanged;
 
       _attachedViewModel = this.ViewModel;
+      _attachedSettings = _attachedViewModel?.Settings;
 
       if (_attachedViewModel != null)
         _attachedViewModel.PropertyChanged += OnViewModelPropertyChanged;
+      if (_attachedSettings != null)
+        _attachedSettings.PropertyChanged += OnSettingsPropertyChanged;
 
       OnPropertyChanged(nameof(ViewModel));
       OnPropertyChanged(nameof(Settings));
@@ -106,12 +112,28 @@ namespace eXeMeL.View
       // Push current content as soon as DataContext arrives.
       PushContent(_attachedViewModel?.DocumentText);
       PushTheme();
+      ApplyZoomFactor();
     }
 
     private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       if (e.PropertyName == nameof(MarkdownUtilityViewModel.DocumentText))
         PushContent(_attachedViewModel?.DocumentText);
+    }
+
+    private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(Settings.AppScale))
+        ApplyZoomFactor();
+    }
+
+    /// <summary>Mirrors the app's zoom level into the preview's WebView2 so the
+    /// preview text scales together with the rest of the UI (Ctrl + / -).</summary>
+    private void ApplyZoomFactor()
+    {
+      if (this.PreviewWebView?.CoreWebView2 == null) return;
+      var scale = _attachedSettings?.AppScale ?? 1.0;
+      try { this.PreviewWebView.ZoomFactor = scale; } catch { /* not yet ready */ }
     }
 
     // ---------- WebView2 init ----------
@@ -163,6 +185,9 @@ namespace eXeMeL.View
         CoreWebView2HostResourceAccessKind.DenyCors);
 
       this.PreviewWebView.Source = new Uri($"https://{PreviewVirtualHost}/preview.html");
+
+      // Apply the current app zoom now that CoreWebView2 exists.
+      ApplyZoomFactor();
     }
 
     // ---------- Inbound from page (preview.js) ----------

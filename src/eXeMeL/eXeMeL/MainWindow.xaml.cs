@@ -153,6 +153,8 @@ namespace eXeMeL
           UpdateCurrentLineHighlight();
         if (e.PropertyName == nameof(Settings.AppScale))
           UpdateFindBarMode();
+        if (e.PropertyName == nameof(Settings.MarkdownPreviewLinkedScrolling))
+          OnLinkedScrollingChanged();
       };
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
@@ -439,6 +441,22 @@ namespace eXeMeL
 
       _lastBroadcastTopLine = line;
       WeakReferenceMessenger.Default.Send(new EditorScrolledToLineMessage(line));
+    }
+
+    /// <summary>Called when the user toggles linked scrolling on or off. When turning ON,
+    /// pushes the editor's current top line to the preview so the two halves snap into
+    /// sync (editor is the source of truth).</summary>
+    private void OnLinkedScrollingChanged()
+    {
+      if (this.ViewModel?.Settings?.MarkdownPreviewLinkedScrolling != true) return;
+      if (_currentContentType != DocumentContentType.Markdown) return;
+      if (this.AvalonEditor == null) return;
+
+      var tv = this.AvalonEditor.TextArea.TextView;
+      var docLine = tv.GetDocumentLineByVisualTop(tv.ScrollOffset.Y);
+      if (docLine == null) return;
+
+      WeakReferenceMessenger.Default.Send(new EditorScrolledToLineMessage(docLine.LineNumber));
     }
 
     private void HandlePreviewScrolledToLineMessage(PreviewScrolledToLineMessage message)
