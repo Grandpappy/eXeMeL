@@ -401,6 +401,7 @@ namespace eXeMeL
 
 
     private int _lastBroadcastCaretLine;
+    private DateTime _suppressLinkedScrollUntilUtc = DateTime.MinValue;
 
     private void AvalonEditor_CaretPositionChanged(object sender, EventArgs e)
     {
@@ -415,6 +416,11 @@ namespace eXeMeL
       {
         _lastBroadcastCaretLine = caret.Line;
         var hint = ComputeCaretViewportProportion(caret.Line);
+        // Caret-driven scroll is authoritative for a brief window. AvalonEdit's
+        // BringCaretToView fires ScrollOffsetChanged right after this; without
+        // suppression, linked-scrolling would race and snap the preview back to a
+        // different position based on the editor's new top line.
+        _suppressLinkedScrollUntilUtc = DateTime.UtcNow.AddMilliseconds(250);
         WeakReferenceMessenger.Default.Send(new EditorCaretChangedMessage(caret.Line, hint));
       }
     }
@@ -456,6 +462,9 @@ namespace eXeMeL
         _suppressNextEditorScrollBroadcast = false;
         return;
       }
+
+      // Recent caret-driven scroll takes priority — don't fight it with a linked-scroll echo.
+      if (DateTime.UtcNow < _suppressLinkedScrollUntilUtc) return;
 
       var tv = this.AvalonEditor.TextArea.TextView;
       var docLine = tv.GetDocumentLineByVisualTop(tv.ScrollOffset.Y);
