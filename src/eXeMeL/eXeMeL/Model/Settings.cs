@@ -35,6 +35,7 @@ namespace eXeMeL.Model
     private int _windowState;
     private double _appScale = 1.0;
     private bool _markdownPreviewPinned;
+    private bool _markdownPreviewLinkedScrolling;
 
     private Brush _editorBrush;
     private Brush _elementBrush;
@@ -189,6 +190,12 @@ namespace eXeMeL.Model
     {
       get => _markdownPreviewPinned;
       set => SetProperty(ref _markdownPreviewPinned, value);
+    }
+
+    public bool MarkdownPreviewLinkedScrolling
+    {
+      get => _markdownPreviewLinkedScrolling;
+      set => SetProperty(ref _markdownPreviewLinkedScrolling, value);
     }
 
     public double AppScale

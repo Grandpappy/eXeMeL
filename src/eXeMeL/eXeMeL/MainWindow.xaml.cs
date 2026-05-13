@@ -398,20 +398,40 @@ namespace eXeMeL
 
 
 
+    private int _lastBroadcastCaretLine;
+
     private void AvalonEditor_CaretPositionChanged(object sender, EventArgs e)
     {
-      this.ViewModel.Editor.CaretPosition = this.AvalonEditor.TextArea.Caret.Position;
+      var caret = this.AvalonEditor.TextArea.Caret.Position;
+      this.ViewModel.Editor.CaretPosition = caret;
+
+      // Drive preview line-highlight on caret change. Only broadcast when the source line
+      // actually changes (caret moves within a line shouldn't re-flash the highlight).
+      if (_currentContentType == DocumentContentType.Markdown &&
+          caret.Line > 0 &&
+          caret.Line != _lastBroadcastCaretLine)
+      {
+        _lastBroadcastCaretLine = caret.Line;
+        WeakReferenceMessenger.Default.Send(new EditorCaretChangedMessage(caret.Line));
+      }
     }
 
     private int _lastBroadcastTopLine;
+    private bool _suppressNextEditorScrollBroadcast;
 
     private void AvalonEditor_TextViewScrollOffsetChanged(object sender, EventArgs e)
     {
       if (_currentContentType != DocumentContentType.Markdown) return;
+      if (this.ViewModel?.Settings?.MarkdownPreviewLinkedScrolling != true) return;
+
+      if (_suppressNextEditorScrollBroadcast)
+      {
+        _suppressNextEditorScrollBroadcast = false;
+        return;
+      }
 
       var tv = this.AvalonEditor.TextArea.TextView;
-      var topY = tv.ScrollOffset.Y;
-      var docLine = tv.GetDocumentLineByVisualTop(topY);
+      var docLine = tv.GetDocumentLineByVisualTop(tv.ScrollOffset.Y);
       if (docLine == null) return;
 
       var line = docLine.LineNumber;
@@ -423,11 +443,13 @@ namespace eXeMeL
 
     private void HandlePreviewScrolledToLineMessage(PreviewScrolledToLineMessage message)
     {
-      // Preview -> editor scroll sync. Scroll the editor to the line the preview is showing
-      // without moving the caret (so no echo back via the caret-changed handler).
       if (_currentContentType != DocumentContentType.Markdown) return;
+      if (this.ViewModel?.Settings?.MarkdownPreviewLinkedScrolling != true) return;
       if (message.Line <= 0 || message.Line > this.AvalonEditor.Document.LineCount) return;
 
+      // Suppress the scroll-broadcast that the next ScrollOffsetChanged will trigger,
+      // otherwise we'd echo this scroll right back to the preview.
+      _suppressNextEditorScrollBroadcast = true;
       this.AvalonEditor.ScrollTo(message.Line, 0);
     }
 

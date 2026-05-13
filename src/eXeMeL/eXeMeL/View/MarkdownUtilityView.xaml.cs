@@ -29,7 +29,8 @@ namespace eXeMeL.View
     // Pending state — applied as soon as the WebView is ready.
     private string _pendingContent;
     private string _pendingTheme;
-    private int? _pendingRevealLine;
+    private int? _pendingHighlightLine;
+    private int? _pendingScrollLine;
 
     private MarkdownUtilityViewModel _attachedViewModel;
 
@@ -241,10 +242,16 @@ namespace eXeMeL.View
       PostMessage(new { type = "setTheme", theme });
     }
 
-    private void PushRevealLine(int line)
+    private void PushHighlightLine(int line)
     {
-      if (!_webViewReady) { _pendingRevealLine = line; return; }
-      PostMessage(new { type = "revealLine", line });
+      if (!_webViewReady) { _pendingHighlightLine = line; return; }
+      PostMessage(new { type = "highlightLine", line });
+    }
+
+    private void PushScrollToLine(int line)
+    {
+      if (!_webViewReady) { _pendingScrollLine = line; return; }
+      PostMessage(new { type = "scrollToLine", line });
     }
 
     private void FlushPending()
@@ -266,10 +273,15 @@ namespace eXeMeL.View
           PostMessage(new { type = "setContent", html = _renderer.ToHtml(current) });
       }
 
-      if (_pendingRevealLine.HasValue)
+      if (_pendingHighlightLine.HasValue)
       {
-        PostMessage(new { type = "revealLine", line = _pendingRevealLine.Value });
-        _pendingRevealLine = null;
+        PostMessage(new { type = "highlightLine", line = _pendingHighlightLine.Value });
+        _pendingHighlightLine = null;
+      }
+      if (_pendingScrollLine.HasValue)
+      {
+        PostMessage(new { type = "scrollToLine", line = _pendingScrollLine.Value });
+        _pendingScrollLine = null;
       }
     }
 
@@ -318,8 +330,10 @@ namespace eXeMeL.View
       var m = WeakReferenceMessenger.Default;
       m.Register<MarkdownUtilityView, ApplicationThemeUpdatedMessage>(this, (r, _) =>
         r.Dispatcher.BeginInvoke(new Action(r.PushTheme)));
+      m.Register<MarkdownUtilityView, EditorCaretChangedMessage>(this, (r, msg) =>
+        r.Dispatcher.BeginInvoke(new Action(() => r.PushHighlightLine(msg.Line))));
       m.Register<MarkdownUtilityView, EditorScrolledToLineMessage>(this, (r, msg) =>
-        r.Dispatcher.BeginInvoke(new Action(() => r.PushRevealLine(msg.Line))));
+        r.Dispatcher.BeginInvoke(new Action(() => r.PushScrollToLine(msg.Line))));
     }
 
     private void UnsubscribeMessages()

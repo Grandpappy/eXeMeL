@@ -4,7 +4,8 @@
 // Inbound (host -> page) message shapes (JSON, sent via PostWebMessageAsJson):
 //   { type: 'setContent', html: '<...>' }
 //   { type: 'setTheme', theme: 'light' | 'dark' | 'solarized-dark' }
-//   { type: 'revealLine', line: <int> }
+//   { type: 'highlightLine', line: <int> }  // flash a highlight, no scroll
+//   { type: 'scrollToLine', line: <int> }   // scroll to line, no persistent highlight
 //
 // Outbound (page -> host) shapes (sent via chrome.webview.postMessage):
 //   { type: 'scroll', line: <int> }
@@ -33,7 +34,8 @@
     switch (msg.type) {
       case 'setContent': setContent(msg.html); break;
       case 'setTheme': setTheme(msg.theme); break;
-      case 'revealLine': revealLine(msg.line); break;
+      case 'highlightLine': highlightLineAt(msg.line); break;
+      case 'scrollToLine': scrollToLineAt(msg.line); break;
     }
   }
 
@@ -53,18 +55,25 @@
     document.documentElement.dataset.theme = valid.indexOf(theme) >= 0 ? theme : 'light';
   }
 
-  function revealLine(line) {
+  // Flash a brief highlight on the matching line without scrolling — used for caret click.
+  function highlightLineAt(line) {
+    if (typeof line !== 'number' || line < 0) return;
+    const target = findElementForLine(line);
+    if (target) highlightLine(target);
+  }
+
+  // Scroll the matching line into view without leaving a persistent highlight —
+  // used by linked scroll sync.
+  function scrollToLineAt(line) {
     if (typeof line !== 'number' || line < 0) return;
     const target = findElementForLine(line);
     if (!target) return;
     withSuppressedScroll(() => {
-      // Center the target line near the top third of the viewport.
       const rect = target.getBoundingClientRect();
       const desiredFromTop = Math.max(0, window.innerHeight * 0.25);
       const delta = rect.top - desiredFromTop;
       window.scrollBy({ top: delta, left: 0, behavior: 'auto' });
     });
-    highlightLine(target);
   }
 
   // ---------- Line/anchor helpers ----------
