@@ -82,6 +82,7 @@ namespace eXeMeL
       this.AvalonEditor.TextArea.TextView.LineTransformers.Add(new AllSelectionColorizer(this.AvalonEditor, this.ViewModel.Settings));
       this.AvalonEditor.TextArea.SelectionChanged += (sender, args) => this.AvalonEditor.TextArea.TextView.Redraw();
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
+      this.AvalonEditor.TextArea.TextView.ScrollOffsetChanged += AvalonEditor_TextViewScrollOffsetChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
 
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
@@ -397,22 +398,27 @@ namespace eXeMeL
 
 
 
-    private int _lastBroadcastCaretLine;
-
     private void AvalonEditor_CaretPositionChanged(object sender, EventArgs e)
     {
-      var caret = this.AvalonEditor.TextArea.Caret.Position;
-      this.ViewModel.Editor.CaretPosition = caret;
+      this.ViewModel.Editor.CaretPosition = this.AvalonEditor.TextArea.Caret.Position;
+    }
 
-      // Drive Markdown preview scroll sync. Broadcast only when the source line actually
-      // changes (caret moves within a single line happen on every keystroke).
-      if (_currentContentType == DocumentContentType.Markdown &&
-          caret.Line > 0 &&
-          caret.Line != _lastBroadcastCaretLine)
-      {
-        _lastBroadcastCaretLine = caret.Line;
-        WeakReferenceMessenger.Default.Send(new EditorCaretLineChangedMessage(caret.Line));
-      }
+    private int _lastBroadcastTopLine;
+
+    private void AvalonEditor_TextViewScrollOffsetChanged(object sender, EventArgs e)
+    {
+      if (_currentContentType != DocumentContentType.Markdown) return;
+
+      var tv = this.AvalonEditor.TextArea.TextView;
+      var topY = tv.ScrollOffset.Y;
+      var docLine = tv.GetDocumentLineByVisualTop(topY);
+      if (docLine == null) return;
+
+      var line = docLine.LineNumber;
+      if (line == _lastBroadcastTopLine) return;
+
+      _lastBroadcastTopLine = line;
+      WeakReferenceMessenger.Default.Send(new EditorScrolledToLineMessage(line));
     }
 
     private void HandlePreviewScrolledToLineMessage(PreviewScrolledToLineMessage message)
@@ -711,7 +717,7 @@ namespace eXeMeL
       // If pinned, clicking the tab header unpins
       if (_isPreviewPinned)
       {
-        UnpinPreview();
+        UnpinPreview(persistToSettings: true);
         return;
       }
 
@@ -722,14 +728,16 @@ namespace eXeMeL
     private void PinPreviewButton_Click(object sender, RoutedEventArgs e)
     {
       if (_isPreviewPinned)
-        UnpinPreview();
+        UnpinPreview(persistToSettings: true);
       else
-        PinPreview();
+        PinPreview(persistToSettings: true);
     }
 
-    private void PinPreview()
+    private void PinPreview(bool persistToSettings = false)
     {
       _isPreviewPinned = true;
+      if (persistToSettings && this.ViewModel?.Settings != null)
+        this.ViewModel.Settings.MarkdownPreviewPinned = true;
 
       // Feed current editor text to the preview
       this.ViewModel.MarkdownUtility.DocumentText = this.AvalonEditor.Text;
@@ -770,9 +778,11 @@ namespace eXeMeL
       this.AvalonEditor.TextChanged += PinnedPreview_TextChanged;
     }
 
-    private void UnpinPreview()
+    private void UnpinPreview(bool persistToSettings = false)
     {
       _isPreviewPinned = false;
+      if (persistToSettings && this.ViewModel?.Settings != null)
+        this.ViewModel.Settings.MarkdownPreviewPinned = false;
 
       // Stop live updates
       this.AvalonEditor.TextChanged -= PinnedPreview_TextChanged;
@@ -873,9 +883,19 @@ namespace eXeMeL
       // Update window/taskbar title
       UpdateWindowTitle();
 
-      // Auto-unpin if switching away from Markdown
+      // Auto-unpin if switching away from Markdown. Don't persist — keep the user's
+      // explicit pin preference intact for next time they open Markdown content.
       if (_isPreviewPinned && message.ContentType != DocumentContentType.Markdown)
-        UnpinPreview();
+        UnpinPreview(persistToSettings: false);
+
+      // When switching to Markdown: pre-init the WebView2 in the background (warms up
+      // ~½ sec of Chromium startup) and auto-pin if the user had it pinned previously.
+      if (message.ContentType == DocumentContentType.Markdown)
+      {
+        _ = this.MarkdownUtilityView?.BeginInitializationAsync();
+        if (!_isPreviewPinned && this.ViewModel?.Settings?.MarkdownPreviewPinned == true)
+          PinPreview(persistToSettings: false);
+      }
 
       // Show/hide appropriate utility tabs
       this.XPathTabHeader.Visibility = Visibility.Collapsed;

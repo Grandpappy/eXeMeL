@@ -55,7 +55,16 @@ namespace eXeMeL.View
     {
       // Resubscribe (handles unload/reload cycles, e.g. tab switching).
       SubscribeMessages();
+      await BeginInitializationAsync();
+    }
 
+    /// <summary>
+    /// Kicks off WebView2 initialization on a background-friendly path so callers can warm the
+    /// preview before it becomes visible (e.g. as soon as content is detected as Markdown).
+    /// Safe to call repeatedly — the underlying init only runs once.
+    /// </summary>
+    public async Task BeginInitializationAsync()
+    {
       if (_webViewInitStarted) return;
       _webViewInitStarted = true;
 
@@ -133,6 +142,11 @@ namespace eXeMeL.View
 
       var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder, null);
       await this.PreviewWebView.EnsureCoreWebView2Async(env);
+
+      // Make the WebView2 itself transparent so the theme/glass chrome behind it shows through
+      // (the default is opaque white, which made dark-theme text unreadable against the white
+      // backdrop bleeding through transparent CSS).
+      this.PreviewWebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 
       var core = this.PreviewWebView.CoreWebView2;
       core.Settings.AreDevToolsEnabled = Debugger.IsAttached;
@@ -304,7 +318,7 @@ namespace eXeMeL.View
       var m = WeakReferenceMessenger.Default;
       m.Register<MarkdownUtilityView, ApplicationThemeUpdatedMessage>(this, (r, _) =>
         r.Dispatcher.BeginInvoke(new Action(r.PushTheme)));
-      m.Register<MarkdownUtilityView, EditorCaretLineChangedMessage>(this, (r, msg) =>
+      m.Register<MarkdownUtilityView, EditorScrolledToLineMessage>(this, (r, msg) =>
         r.Dispatcher.BeginInvoke(new Action(() => r.PushRevealLine(msg.Line))));
     }
 

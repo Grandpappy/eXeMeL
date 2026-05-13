@@ -34,6 +34,7 @@ namespace eXeMeL.Model
     private double _windowHeight = 600;
     private int _windowState;
     private double _appScale = 1.0;
+    private bool _markdownPreviewPinned;
 
     private Brush _editorBrush;
     private Brush _elementBrush;
@@ -182,6 +183,12 @@ namespace eXeMeL.Model
     {
       get => _windowState;
       set => SetProperty(ref _windowState, value);
+    }
+
+    public bool MarkdownPreviewPinned
+    {
+      get => _markdownPreviewPinned;
+      set => SetProperty(ref _markdownPreviewPinned, value);
     }
 
     public double AppScale
