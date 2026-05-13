@@ -1,4 +1,13 @@
-﻿*5/12/2026 - Editor tab indicator, Markdown improvements
+﻿*5/13/2026 - Markdown preview overhaul, window recovery
+
+- Markdown preview rewritten with much better rendering: syntax-highlighted code blocks, proper tables, footnotes, task lists, and full theme support.
+- Clicking a line in the editor highlights the matching line in the preview and scrolls it into view if needed.
+- Optional Linked Scrolling: scroll the editor and the preview together. Toggle from the status bar or Settings.
+- Pin Preview state is remembered between app runs.
+- Ctrl+/-/0 zoom now scales the preview too.
+- Recovers the app window when its saved position is on a disconnected monitor.
+
+*5/12/2026 - Editor tab indicator, Markdown improvements
 
 - A dot now appears in the editor tab when the open file has unsaved changes.
 - Fixed Markdown content being misdetected as YAML for heading-heavy documents.

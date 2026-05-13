@@ -585,6 +585,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="92"/>
           </Grid.ColumnDefinitions>
           <TextBlock Grid.Column="0" Text="{Binding Status}"
@@ -606,8 +607,31 @@
             <Button Command="{Binding ZoomInCommand}" ToolTip="Zoom in (Ctrl++)"
                     Style="{StaticResource FooterIconButton}">+</Button>
           </StackPanel>
+          <!-- Linked-scrolling toggle (visible only for Markdown content). Bound to the same
+               Settings property the SettingsView toggle uses. -->
+          <ToggleButton x:Name="LinkedScrollingToggle" Grid.Column="3"
+                        IsChecked="{Binding Settings.MarkdownPreviewLinkedScrolling, Mode=TwoWay}"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center" Margin="6,0,12,0"
+                        Background="Transparent" BorderThickness="0" Padding="4"
+                        Cursor="Hand" Focusable="False"
+                        ToolTip="Linked scrolling: scroll editor and preview together">
+            <ui:SymbolIcon Symbol="Link24" FontSize="16">
+              <ui:SymbolIcon.Style>
+                <Style TargetType="ui:SymbolIcon">
+                  <Setter Property="Opacity" Value="0.4"/>
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                      <Setter Property="Opacity" Value="1.0"/>
+                      <Setter Property="Foreground" Value="{DynamicResource AppAccentBrush}"/>
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </ui:SymbolIcon.Style>
+            </ui:SymbolIcon>
+          </ToggleButton>
           <!-- Content type toggle — fixed-width column so zoom controls don't shift -->
-          <TextBlock x:Name="ContentTypeLabel" Grid.Column="3"
+          <TextBlock x:Name="ContentTypeLabel" Grid.Column="4"
                      Text="XML" FontSize="13" FontWeight="SemiBold"
                      TextAlignment="Center"
                      Foreground="{DynamicResource AppAccentBrush}" Cursor="Hand" VerticalAlignment="Center"

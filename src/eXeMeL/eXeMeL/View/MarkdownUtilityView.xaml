@@ -3,44 +3,57 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mdxaml="clr-namespace:MdXaml;assembly=MdXaml"
+  xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
   xmlns:vm="clr-namespace:eXeMeL.ViewModel.MarkdownUtility"
   x:Class="eXeMeL.View.MarkdownUtilityView"
   mc:Ignorable="d"
   Name="ControlRoot"
   d:DesignHeight="300" d:DesignWidth="400"
   d:DataContext="{d:DesignInstance vm:MarkdownUtilityViewModel}"
-  >
+  Background="Transparent">
 
   <Grid>
-    <mdxaml:MarkdownScrollViewer
-      x:Name="MarkdownViewer"
-      Markdown="{Binding DocumentText}"
-      Background="Transparent"
-      Foreground="{DynamicResource AppTextBrush}"
-      VerticalScrollBarVisibility="Auto"
-      HorizontalScrollBarVisibility="Disabled"
-      Padding="16,12"
-      PreviewMouseWheel="MarkdownViewer_PreviewMouseWheel"/>
+    <wv2:WebView2 x:Name="PreviewWebView" />
 
-    <TextBlock Text="No Markdown content"
+    <!-- Runtime-missing fallback shown only when WebView2 Runtime is not installed. -->
+    <Border x:Name="RuntimeMissingPanel"
+            Visibility="Collapsed"
+            Background="{DynamicResource ApplicationBackgroundBrush}"
+            Padding="24">
+      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="500">
+        <TextBlock Text="Markdown preview unavailable"
+                   FontSize="20" FontWeight="SemiBold"
+                   Foreground="{DynamicResource AppTextBrush}"
+                   Margin="0,0,0,12"/>
+        <TextBlock TextWrapping="Wrap"
+                   Foreground="{DynamicResource AppTextBrush}"
+                   Opacity="0.85"
+                   Margin="0,0,0,16">
+          eXeMeL uses the Microsoft Edge WebView2 Runtime to render Markdown previews.
+          The runtime is not installed on this machine.
+        </TextBlock>
+        <TextBlock Margin="0,0,0,4"
+                   Foreground="{DynamicResource AppTextBrush}"
+                   Opacity="0.85">
+          Download from Microsoft:
+        </TextBlock>
+        <TextBox x:Name="RuntimeDownloadUrl"
+                 Text="https://go.microsoft.com/fwlink/p/?LinkId=2124703"
+                 IsReadOnly="True"
+                 Background="Transparent"
+                 Foreground="{DynamicResource AppTextBrush}"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Empty-state hint, shown only before any content has been pushed. The WebView2 itself
+         renders its own empty state via preview.html; this label exists for design-time only. -->
+    <TextBlock d:IsHidden="False"
+               Text="No Markdown content"
                HorizontalAlignment="Center" VerticalAlignment="Top"
                Margin="0,30,0,0"
                Foreground="{DynamicResource LabelTextBrush}"
-               FontSize="26.667" FontStyle="Italic" Opacity="0.8" FontFamily="Segoe UI">
-      <TextBlock.Style>
-        <Style TargetType="TextBlock">
-          <Setter Property="Visibility" Value="Collapsed"/>
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding DocumentText}" Value="{x:Null}">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding DocumentText}" Value="">
-              <Setter Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </TextBlock.Style>
-    </TextBlock>
+               FontSize="26.667" FontStyle="Italic" Opacity="0.8"
+               FontFamily="Segoe UI"
+               Visibility="Collapsed"/>
   </Grid>
 </UserControl>

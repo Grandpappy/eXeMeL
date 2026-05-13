@@ -11,6 +11,8 @@
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <FileVersion>2.0.0.0</FileVersion>
     <StartupObject>eXeMeL.App</StartupObject>
+    <!-- Required for reliable WebView2 single-file publish (avoids WebView2Loader.dll resolution edge cases) -->
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <!-- Velopack requires App.xaml as Page, not ApplicationDefinition -->
@@ -32,9 +34,11 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="MdXaml" Version="1.27.0" />
+    <PackageReference Include="Markdig" Version="1.2.0" />
+    <PackageReference Include="Markdown.ColorCode" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3967.48" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
     <PackageReference Include="Velopack" Version="0.0.1298" />
     <PackageReference Include="WPF-UI" Version="4.2.0" />
@@ -195,6 +199,13 @@
   <ItemGroup>
     <Resource Include="Assets\eXeMeL Icon.ico" />
     <Content Include="Assets\FileIcon.ico" />
+  </ItemGroup>
+
+  <!-- Markdown preview assets (HTML shell + CSS + JS) loaded by WebView2 via SetVirtualHostNameToFolderMapping -->
+  <ItemGroup>
+    <Content Include="Assets\MarkdownPreview\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

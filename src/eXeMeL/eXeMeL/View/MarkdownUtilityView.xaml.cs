@@ -1,272 +1,388 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using CommunityToolkit.Mvvm.Messaging;
 using eXeMeL.Messages;
 using eXeMeL.Model;
 using eXeMeL.ViewModel.MarkdownUtility;
+using Microsoft.Web.WebView2.Core;
 
 namespace eXeMeL.View
 {
   public partial class MarkdownUtilityView : UserControl, INotifyPropertyChanged
   {
+    private const string PreviewVirtualHost = "preview.example";
+    private const string AppDataFolderName = "eXeMeL2";
+
+    private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    private readonly MarkdownPreviewRenderer _renderer = new();
+
+    private bool _webViewInitStarted;
+    private bool _webViewReady;          // JS has signalled 'ready'
+
+    // Pending state — applied as soon as the WebView is ready.
+    private string _pendingContent;
+    private string _pendingTheme;
+    private (int line, double scrollHint)? _pendingHighlight;
+    private int? _pendingScrollLine;
+
+    private MarkdownUtilityViewModel _attachedViewModel;
+    private Settings _attachedSettings;
+
     public MarkdownUtilityView()
     {
       InitializeComponent();
-      this.DataContextChanged += (s, e) =>
-      {
-        OnPropertyChanged("ViewModel");
-        OnPropertyChanged("Settings");
-      };
 
-      // Watch for when MdXaml sets/replaces the FlowDocument after rendering
-      var dpd = DependencyPropertyDescriptor.FromProperty(
-        FlowDocumentScrollViewer.DocumentProperty,
-        typeof(FlowDocumentScrollViewer));
-      dpd.AddValueChanged(this.MarkdownViewer, (s, e) => ApplyThemeToDocument());
-
-      // Re-theme when application theme changes
-      WeakReferenceMessenger.Default.Register<ApplicationThemeUpdatedMessage>(this, (r, m) =>
-        Dispatcher.BeginInvoke(new Action(ApplyThemeToDocument)));
-
-      // Re-theme when syntax highlighting style changes (triggers re-load of .xshd colors)
-      WeakReferenceMessenger.Default.Register<ContentTypeChangedMessage>(this, (r, m) =>
-        Dispatcher.BeginInvoke(new Action(ApplyThemeToDocument)));
+      this.DataContextChanged += OnDataContextChanged;
+      this.Loaded += OnLoaded;
+      this.Unloaded += OnUnloaded;
     }
 
     public MarkdownUtilityViewModel ViewModel => this.DataContext as MarkdownUtilityViewModel;
     public Settings Settings => this.ViewModel?.Settings;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    protected virtual void OnPropertyChanged(string propertyName)
-    {
+    protected virtual void OnPropertyChanged(string propertyName) =>
       this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    // ---------- Lifecycle ----------
+
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+      // Resubscribe (handles unload/reload cycles, e.g. tab switching).
+      SubscribeMessages();
+      await BeginInitializationAsync();
     }
 
-    private void ApplyThemeToDocument()
+    /// <summary>
+    /// Kicks off WebView2 initialization on a background-friendly path so callers can warm the
+    /// preview before it becomes visible (e.g. as soon as content is detected as Markdown).
+    /// Safe to call repeatedly — the underlying init only runs once.
+    /// </summary>
+    public async Task BeginInitializationAsync()
     {
-      var doc = this.MarkdownViewer.Document;
-      if (doc == null) return;
+      if (_webViewInitStarted) return;
+      _webViewInitStarted = true;
 
-      bool isLight = IsLightTheme();
-
-      // Colors matching MarkdownLight.xshd / MarkdownDark.xshd
-      var textBrush = FrozenBrush(isLight ? "#222222" : "#E0E0E0");
-      var headingBrush = FrozenBrush(isLight ? "#0000FF" : "#569CD6");
-      var codeBrush = FrozenBrush(isLight ? "#A31515" : "#CE9178");
-      var linkBrush = FrozenBrush(isLight ? "#0451A5" : "#9CDCFE");
-      var blockquoteBrush = FrozenBrush(isLight ? "#008000" : "#6A9955");
-      var codeBlockBg = FrozenBrush(isLight ? "#F0F0F0" : "#1E1E1E");
-      var inlineCodeBg = FrozenBrush(isLight ? "#E8E8E8" : "#2D2D30");
-
-      // Table colors — explicit for both dark and light to prevent MdXaml defaults
-      var tableBorderBrush = FrozenBrush(isLight ? "#D0D0D0" : "#555555");
-      var tableHeaderBg = FrozenBrush(isLight ? "#E0E0E0" : "#333333");
-      var tableHeaderFg = FrozenBrush(isLight ? "#111111" : "#E0E0E0");
-      var tableEvenRowBg = FrozenBrush(isLight ? "#F8F8F8" : "#2A2A2A");
-      var tableOddRowBg = FrozenBrush(isLight ? "#FFFFFF" : "#222222");
-      var tableCellFg = textBrush;
-
-      // Set document-level defaults
-      doc.Foreground = textBrush;
-      doc.Background = Brushes.Transparent;
-      doc.FontFamily = new FontFamily("Segoe UI");
-      doc.FontSize = 14;
-      doc.PagePadding = new Thickness(16);
-
-      var ctx = new ThemeContext(headingBrush, codeBrush, linkBrush, blockquoteBrush,
-        codeBlockBg, inlineCodeBg, tableBorderBrush, tableHeaderBg, tableHeaderFg,
-        tableEvenRowBg, tableOddRowBg, tableCellFg);
-
-      foreach (var block in doc.Blocks)
-        ApplyThemeToBlock(block, ctx);
-    }
-
-    private static void ApplyThemeToBlock(Block block, ThemeContext ctx)
-    {
-      if (block is Paragraph p)
+      if (!IsWebView2RuntimeInstalled())
       {
-        // Headings: MdXaml sets larger FontSize on heading paragraphs.
-        // Compress the size range toward the 14px baseline so H1 is less
-        // extreme while the H1 > H2 > H3 hierarchy is still visible.
-        if (p.FontSize > 15)
-        {
-          p.Foreground = ctx.HeadingBrush;
-          p.FontWeight = FontWeights.Bold;
-          p.FontSize = Math.Round(14 + (p.FontSize - 14) * 0.70);
-        }
-
-        // Code blocks: paragraphs with monospace font
-        if (IsMonospaceFont(p.FontFamily))
-        {
-          p.Foreground = ctx.CodeBrush;
-          p.Background = ctx.CodeBlockBg;
-          p.Padding = new Thickness(10, 8, 10, 8);
-          p.Margin = new Thickness(0, 6, 0, 6);
-        }
-
-        ApplyThemeToInlines(p.Inlines, ctx);
+        ShowRuntimeMissing();
+        return;
       }
-      else if (block is Section section)
-      {
-        // Blockquotes: MdXaml wraps them in a Section, often with left border/margin
-        if (section.BorderThickness.Left > 0 || section.Padding.Left > 5)
-        {
-          section.Foreground = ctx.BlockquoteBrush;
-          section.FontStyle = FontStyles.Italic;
-          section.BorderBrush = ctx.BlockquoteBrush;
-          section.BorderThickness = new Thickness(3, 0, 0, 0);
-          section.Padding = new Thickness(12, 4, 0, 4);
-        }
 
-        foreach (var innerBlock in section.Blocks)
-          ApplyThemeToBlock(innerBlock, ctx);
-      }
-      else if (block is Table table)
+      try
       {
-        ApplyThemeToTable(table, ctx);
+        await InitializeWebViewAsync();
       }
-      else if (block is List list)
+      catch (Exception)
       {
-        foreach (var item in list.ListItems)
-          foreach (var itemBlock in item.Blocks)
-            ApplyThemeToBlock(itemBlock, ctx);
+        ShowRuntimeMissing();
       }
     }
 
-    private static void ApplyThemeToTable(Table table, ThemeContext ctx)
+    private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-      table.BorderBrush = ctx.TableBorderBrush;
-      table.BorderThickness = new Thickness(1);
-      table.CellSpacing = 0;
+      UnsubscribeMessages();
+    }
 
-      for (int g = 0; g < table.RowGroups.Count; g++)
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+      if (_attachedViewModel != null)
+        _attachedViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+      if (_attachedSettings != null)
+        _attachedSettings.PropertyChanged -= OnSettingsPropertyChanged;
+
+      _attachedViewModel = this.ViewModel;
+      _attachedSettings = _attachedViewModel?.Settings;
+
+      if (_attachedViewModel != null)
+        _attachedViewModel.PropertyChanged += OnViewModelPropertyChanged;
+      if (_attachedSettings != null)
+        _attachedSettings.PropertyChanged += OnSettingsPropertyChanged;
+
+      OnPropertyChanged(nameof(ViewModel));
+      OnPropertyChanged(nameof(Settings));
+
+      // Push current content as soon as DataContext arrives.
+      PushContent(_attachedViewModel?.DocumentText);
+      PushTheme();
+      ApplyZoomFactor();
+    }
+
+    private void OnViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(MarkdownUtilityViewModel.DocumentText))
+        PushContent(_attachedViewModel?.DocumentText);
+    }
+
+    private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(Settings.AppScale))
+        ApplyZoomFactor();
+    }
+
+    /// <summary>Mirrors the app's zoom level into the preview's WebView2 so the
+    /// preview text scales together with the rest of the UI (Ctrl + / -).</summary>
+    private void ApplyZoomFactor()
+    {
+      if (this.PreviewWebView?.CoreWebView2 == null) return;
+      var scale = _attachedSettings?.AppScale ?? 1.0;
+      try { this.PreviewWebView.ZoomFactor = scale; } catch { /* not yet ready */ }
+    }
+
+    // ---------- WebView2 init ----------
+
+    private static bool IsWebView2RuntimeInstalled()
+    {
+      try
       {
-        var rowGroup = table.RowGroups[g];
-        bool isHeaderGroup = (g == 0 && table.RowGroups.Count > 1);
+        var version = CoreWebView2Environment.GetAvailableBrowserVersionString(null);
+        return !string.IsNullOrEmpty(version);
+      }
+      catch
+      {
+        return false;
+      }
+    }
 
-        // Clear any MdXaml-set background on the group itself
-        rowGroup.Background = null;
-        rowGroup.Foreground = ctx.TableCellFg;
+    private void ShowRuntimeMissing()
+    {
+      this.RuntimeMissingPanel.Visibility = Visibility.Visible;
+      this.PreviewWebView.Visibility = Visibility.Collapsed;
+    }
 
-        for (int r = 0; r < rowGroup.Rows.Count; r++)
+    private async Task InitializeWebViewAsync()
+    {
+      var userDataFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        AppDataFolderName, "WebView2");
+
+      var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder, null);
+      await this.PreviewWebView.EnsureCoreWebView2Async(env);
+
+      // Make the WebView2 itself transparent so the theme/glass chrome behind it shows through
+      // (the default is opaque white, which made dark-theme text unreadable against the white
+      // backdrop bleeding through transparent CSS).
+      this.PreviewWebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+
+      var core = this.PreviewWebView.CoreWebView2;
+      core.Settings.AreDevToolsEnabled = Debugger.IsAttached;
+      core.Settings.AreDefaultContextMenusEnabled = Debugger.IsAttached;
+      core.Settings.IsStatusBarEnabled = false;
+      core.Settings.IsGeneralAutofillEnabled = false;
+      core.Settings.IsPasswordAutosaveEnabled = false;
+      core.WebMessageReceived += OnWebMessageReceived;
+
+      var assetsPath = Path.Combine(AppContext.BaseDirectory, "Assets", "MarkdownPreview");
+      core.SetVirtualHostNameToFolderMapping(
+        PreviewVirtualHost, assetsPath,
+        CoreWebView2HostResourceAccessKind.DenyCors);
+
+      this.PreviewWebView.Source = new Uri($"https://{PreviewVirtualHost}/preview.html");
+
+      // Apply the current app zoom now that CoreWebView2 exists.
+      ApplyZoomFactor();
+    }
+
+    // ---------- Inbound from page (preview.js) ----------
+
+    private void OnWebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs args)
+    {
+      string json = null;
+      try { json = args.WebMessageAsJson; }
+      catch { return; }
+      if (string.IsNullOrEmpty(json)) return;
+
+      try
+      {
+        using var doc = JsonDocument.Parse(json);
+        if (!doc.RootElement.TryGetProperty("type", out var typeProp)) return;
+        var type = typeProp.GetString();
+
+        switch (type)
         {
-          var row = rowGroup.Rows[r];
+          case "ready":
+            _webViewReady = true;
+            FlushPending();
+            break;
 
-          if (isHeaderGroup)
-          {
-            row.Background = ctx.TableHeaderBg;
-            row.Foreground = ctx.TableHeaderFg;
-            row.FontWeight = FontWeights.SemiBold;
-          }
-          else
-          {
-            // Alternating body rows — explicit backgrounds to override MdXaml defaults
-            row.Background = (r % 2 == 0) ? ctx.TableEvenRowBg : ctx.TableOddRowBg;
-            row.Foreground = ctx.TableCellFg;
-            row.FontWeight = FontWeights.Normal;
-          }
-
-          foreach (var cell in row.Cells)
-          {
-            // Override any cell-level background MdXaml may have set
-            cell.Background = null;
-            cell.BorderBrush = ctx.TableBorderBrush;
-            cell.BorderThickness = new Thickness(0.5);
-            cell.Padding = new Thickness(8, 4, 8, 4);
-
-            foreach (var cellBlock in cell.Blocks)
+          case "scroll":
+            if (doc.RootElement.TryGetProperty("line", out var lineProp) &&
+                lineProp.TryGetInt32(out var line) && line > 0)
             {
-              if (cellBlock is Paragraph cellPara)
-              {
-                cellPara.Background = null;
-                ApplyThemeToInlines(cellPara.Inlines, ctx);
-              }
+              WeakReferenceMessenger.Default.Send(new PreviewScrolledToLineMessage(line));
             }
-          }
+            break;
+
+          case "openExternal":
+            if (doc.RootElement.TryGetProperty("url", out var urlProp))
+              OpenExternal(urlProp.GetString());
+            break;
         }
       }
-    }
-
-    private static void ApplyThemeToInlines(InlineCollection inlines, ThemeContext ctx)
-    {
-      foreach (var inline in inlines)
+      catch (JsonException)
       {
-        if (inline is Hyperlink link)
-        {
-          link.Foreground = ctx.LinkBrush;
-        }
-        else if (inline is Run run && IsMonospaceFont(run.FontFamily))
-        {
-          run.Foreground = ctx.CodeBrush;
-          run.Background = ctx.InlineCodeBg;
-        }
-        else if (inline is Span span)
-        {
-          if (span is Hyperlink hl)
-            hl.Foreground = ctx.LinkBrush;
-          else
-            ApplyThemeToInlines(span.Inlines, ctx);
-        }
+        // Malformed message — ignore.
       }
     }
 
-    private static bool IsMonospaceFont(FontFamily font)
+    private static void OpenExternal(string url)
     {
-      if (font == null) return false;
-      var name = font.Source?.ToLowerInvariant() ?? "";
-      return name.Contains("courier") || name.Contains("consolas") || name.Contains("mono");
-    }
+      if (string.IsNullOrWhiteSpace(url)) return;
+      if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return;
+      // Only allow http(s) and mailto to avoid launching arbitrary protocol handlers.
+      if (uri.Scheme != Uri.UriSchemeHttp &&
+          uri.Scheme != Uri.UriSchemeHttps &&
+          uri.Scheme != Uri.UriSchemeMailto) return;
 
-    private bool IsLightTheme()
-    {
-      if (Settings == null) return false;
-      return Settings.ApplicationTheme == ApplicationTheme.Light
-             || (Settings.ApplicationTheme.SupportsTint()
-                 && ApplicationThemeExtensions.IsLightColor(Settings.ChromeTintColor));
-    }
-
-    private void MarkdownViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-      // FlowDocumentScrollViewer scrolls too fast (by paragraph, not pixel line).
-      // Override to scroll ~3 lines per notch, matching AvalonEdit.
-      var sv = FindChildScrollViewer(this.MarkdownViewer);
-      if (sv != null)
+      try
       {
-        sv.ScrollToVerticalOffset(sv.VerticalOffset - (e.Delta * 0.6));
-        e.Handled = true;
+        Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
       }
-    }
-
-    private static ScrollViewer FindChildScrollViewer(DependencyObject parent)
-    {
-      for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+      catch
       {
-        var child = VisualTreeHelper.GetChild(parent, i);
-        if (child is ScrollViewer sv) return sv;
-        var result = FindChildScrollViewer(child);
-        if (result != null) return result;
+        // Swallow — failing to launch the OS handler shouldn't crash the app.
       }
-      return null;
     }
 
-    private static SolidColorBrush FrozenBrush(string hex)
+    // ---------- Outbound to page ----------
+
+    private void PushContent(string markdown)
     {
-      var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
-      brush.Freeze();
-      return brush;
+      var html = _renderer.ToHtml(markdown);
+      if (!_webViewReady) { _pendingContent = html; return; }
+      PostMessage(new { type = "setContent", html });
     }
 
-    /// <summary>Carries all theme colors through the recursive tree walk.</summary>
-    private record ThemeContext(
-      Brush HeadingBrush, Brush CodeBrush, Brush LinkBrush, Brush BlockquoteBrush,
-      Brush CodeBlockBg, Brush InlineCodeBg,
-      Brush TableBorderBrush, Brush TableHeaderBg, Brush TableHeaderFg,
-      Brush TableEvenRowBg, Brush TableOddRowBg, Brush TableCellFg);
+    private void PushTheme()
+    {
+      var theme = ResolveCssTheme();
+      var accentRgba = ResolveAccentRgba(0.30);
+      if (!_webViewReady) { _pendingTheme = theme; return; }
+      PostMessage(new { type = "setTheme", theme, accentRgba });
+    }
+
+    /// <summary>Converts the user's accent color (e.g. #D4AA00) to an rgba() string
+    /// at the given alpha, for use as the line-highlight background in the preview.</summary>
+    private string ResolveAccentRgba(double alpha)
+    {
+      var hex = this.Settings?.AccentColor;
+      if (string.IsNullOrWhiteSpace(hex)) hex = "#D4AA00";
+      try
+      {
+        var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+        return $"rgba({color.R}, {color.G}, {color.B}, {alpha.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})";
+      }
+      catch
+      {
+        return $"rgba(212, 170, 0, {alpha.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})";
+      }
+    }
+
+    private void PushHighlightLine(int line, double scrollHint)
+    {
+      if (!_webViewReady) { _pendingHighlight = (line, scrollHint); return; }
+      PostMessage(new { type = "highlightLine", line, scrollHint });
+    }
+
+    private void PushScrollToLine(int line)
+    {
+      if (!_webViewReady) { _pendingScrollLine = line; return; }
+      PostMessage(new { type = "scrollToLine", line });
+    }
+
+    private void FlushPending()
+    {
+      if (_pendingTheme == null) _pendingTheme = ResolveCssTheme();
+      PostMessage(new { type = "setTheme", theme = _pendingTheme, accentRgba = ResolveAccentRgba(0.30) });
+      _pendingTheme = null;
+
+      if (_pendingContent != null)
+      {
+        PostMessage(new { type = "setContent", html = _pendingContent });
+        _pendingContent = null;
+      }
+      else
+      {
+        // No queued content but DataContext may have arrived after init — push current value.
+        var current = _attachedViewModel?.DocumentText;
+        if (!string.IsNullOrEmpty(current))
+          PostMessage(new { type = "setContent", html = _renderer.ToHtml(current) });
+      }
+
+      if (_pendingHighlight.HasValue)
+      {
+        var ph = _pendingHighlight.Value;
+        PostMessage(new { type = "highlightLine", line = ph.line, scrollHint = ph.scrollHint });
+        _pendingHighlight = null;
+      }
+      if (_pendingScrollLine.HasValue)
+      {
+        PostMessage(new { type = "scrollToLine", line = _pendingScrollLine.Value });
+        _pendingScrollLine = null;
+      }
+    }
+
+    private void PostMessage(object payload)
+    {
+      var core = this.PreviewWebView?.CoreWebView2;
+      if (core == null) return;
+      try
+      {
+        var json = JsonSerializer.Serialize(payload, JsonOpts);
+        core.PostWebMessageAsJson(json);
+      }
+      catch
+      {
+        // Swallow — a single failed post shouldn't break the preview.
+      }
+    }
+
+    // ---------- Theme resolution ----------
+
+    private string ResolveCssTheme()
+    {
+      var settings = this.Settings;
+      if (settings == null) return "light";
+
+      switch (settings.ApplicationTheme)
+      {
+        case ApplicationTheme.Light:
+          return "light";
+        case ApplicationTheme.Dark:
+          return "dark";
+        case ApplicationTheme.SolarizedDark:
+          return "solarized-dark";
+        case ApplicationTheme.Glass:
+        case ApplicationTheme.Tinted:
+          return ApplicationThemeExtensions.IsLightColor(settings.ChromeTintColor) ? "light" : "dark";
+        default:
+          return "light";
+      }
+    }
+
+    // ---------- Messenger subscriptions ----------
+
+    private void SubscribeMessages()
+    {
+      var m = WeakReferenceMessenger.Default;
+      m.Register<MarkdownUtilityView, ApplicationThemeUpdatedMessage>(this, (r, _) =>
+        r.Dispatcher.BeginInvoke(new Action(r.PushTheme)));
+      m.Register<MarkdownUtilityView, EditorCaretChangedMessage>(this, (r, msg) =>
+        r.Dispatcher.BeginInvoke(new Action(() => r.PushHighlightLine(msg.Line, msg.ScrollHint))));
+      m.Register<MarkdownUtilityView, EditorScrolledToLineMessage>(this, (r, msg) =>
+        r.Dispatcher.BeginInvoke(new Action(() => r.PushScrollToLine(msg.Line))));
+    }
+
+    private void UnsubscribeMessages()
+    {
+      WeakReferenceMessenger.Default.UnregisterAll(this);
+    }
   }
 }

@@ -82,6 +82,7 @@ namespace eXeMeL
       this.AvalonEditor.TextArea.TextView.LineTransformers.Add(new AllSelectionColorizer(this.AvalonEditor, this.ViewModel.Settings));
       this.AvalonEditor.TextArea.SelectionChanged += (sender, args) => this.AvalonEditor.TextArea.TextView.Redraw();
       this.AvalonEditor.TextArea.Caret.PositionChanged += AvalonEditor_CaretPositionChanged;
+      this.AvalonEditor.TextArea.TextView.ScrollOffsetChanged += AvalonEditor_TextViewScrollOffsetChanged;
       this.AvalonEditor.TextChanged += AvalonEditor_TextChanged;
 
       this.FoldingManager = FoldingManager.Install(this.AvalonEditor.TextArea);
@@ -139,6 +140,7 @@ namespace eXeMeL
       WeakReferenceMessenger.Default.Register<SetKeyboardFocusToEditor>(this, (r, m) => HandleSetKeyboardFocusToEditorMessage(m));
       WeakReferenceMessenger.Default.Register<EditorModeChangedMessage>(this, (r, m) => HandleEditorModeChangedMessage(m));
       WeakReferenceMessenger.Default.Register<ContentTypeChangedMessage>(this, (r, m) => HandleContentTypeChanged(m));
+      WeakReferenceMessenger.Default.Register<PreviewScrolledToLineMessage>(this, (r, m) => HandlePreviewScrolledToLineMessage(m));
 
       this.ViewModel.Editor.RefreshComplete += Editor_RefreshComplete;
       this.ViewModel.Editor.PropertyChanging += Editor_PropertyChanging;
@@ -151,6 +153,8 @@ namespace eXeMeL
           UpdateCurrentLineHighlight();
         if (e.PropertyName == nameof(Settings.AppScale))
           UpdateFindBarMode();
+        if (e.PropertyName == nameof(Settings.MarkdownPreviewLinkedScrolling))
+          OnLinkedScrollingChanged();
       };
 
       HandleChangedDocumentText(this.ViewModel.Editor.Document);
@@ -396,9 +400,109 @@ namespace eXeMeL
 
 
 
+    private int _lastBroadcastCaretLine;
+    private DateTime _suppressLinkedScrollUntilUtc = DateTime.MinValue;
+
     private void AvalonEditor_CaretPositionChanged(object sender, EventArgs e)
     {
-      this.ViewModel.Editor.CaretPosition = this.AvalonEditor.TextArea.Caret.Position;
+      var caret = this.AvalonEditor.TextArea.Caret.Position;
+      this.ViewModel.Editor.CaretPosition = caret;
+
+      // Drive preview line-highlight on caret change. Only broadcast when the source line
+      // actually changes (caret moves within a line shouldn't re-flash the highlight).
+      if (_currentContentType == DocumentContentType.Markdown &&
+          caret.Line > 0 &&
+          caret.Line != _lastBroadcastCaretLine)
+      {
+        _lastBroadcastCaretLine = caret.Line;
+        var hint = ComputeCaretViewportProportion(caret.Line);
+        // Caret-driven scroll is authoritative for a brief window. AvalonEdit's
+        // BringCaretToView fires ScrollOffsetChanged right after this; without
+        // suppression, linked-scrolling would race and snap the preview back to a
+        // different position based on the editor's new top line.
+        _suppressLinkedScrollUntilUtc = DateTime.UtcNow.AddMilliseconds(250);
+        WeakReferenceMessenger.Default.Send(new EditorCaretChangedMessage(caret.Line, hint));
+      }
+    }
+
+    /// <summary>Returns a value in [0, 1] indicating where the given source line sits in the
+    /// editor's current viewport (0 = top, 1 = bottom). Used as a hint so the preview can
+    /// place the corresponding line at approximately the same proportional position when it
+    /// has to scroll to bring the line into view.</summary>
+    private double ComputeCaretViewportProportion(int caretLine)
+    {
+      const double defaultHint = 0.30;
+      var tv = this.AvalonEditor?.TextArea?.TextView;
+      if (tv == null || tv.ActualHeight <= 0) return defaultHint;
+
+      var topY = tv.ScrollOffset.Y;
+      var bottomY = topY + tv.ActualHeight;
+      var firstDocLine = tv.GetDocumentLineByVisualTop(topY);
+      var lastDocLine = tv.GetDocumentLineByVisualTop(bottomY);
+      if (firstDocLine == null || lastDocLine == null) return defaultHint;
+
+      var firstLine = firstDocLine.LineNumber;
+      var lastLine = lastDocLine.LineNumber;
+      if (lastLine <= firstLine) return defaultHint;
+
+      var raw = (double)(caretLine - firstLine) / (lastLine - firstLine);
+      return Math.Clamp(raw, 0.0, 1.0);
+    }
+
+    private int _lastBroadcastTopLine;
+    private bool _suppressNextEditorScrollBroadcast;
+
+    private void AvalonEditor_TextViewScrollOffsetChanged(object sender, EventArgs e)
+    {
+      if (_currentContentType != DocumentContentType.Markdown) return;
+      if (this.ViewModel?.Settings?.MarkdownPreviewLinkedScrolling != true) return;
+
+      if (_suppressNextEditorScrollBroadcast)
+      {
+        _suppressNextEditorScrollBroadcast = false;
+        return;
+      }
+
+      // Recent caret-driven scroll takes priority — don't fight it with a linked-scroll echo.
+      if (DateTime.UtcNow < _suppressLinkedScrollUntilUtc) return;
+
+      var tv = this.AvalonEditor.TextArea.TextView;
+      var docLine = tv.GetDocumentLineByVisualTop(tv.ScrollOffset.Y);
+      if (docLine == null) return;
+
+      var line = docLine.LineNumber;
+      if (line == _lastBroadcastTopLine) return;
+
+      _lastBroadcastTopLine = line;
+      WeakReferenceMessenger.Default.Send(new EditorScrolledToLineMessage(line));
+    }
+
+    /// <summary>Called when the user toggles linked scrolling on or off. When turning ON,
+    /// pushes the editor's current top line to the preview so the two halves snap into
+    /// sync (editor is the source of truth).</summary>
+    private void OnLinkedScrollingChanged()
+    {
+      if (this.ViewModel?.Settings?.MarkdownPreviewLinkedScrolling != true) return;
+      if (_currentContentType != DocumentContentType.Markdown) return;
+      if (this.AvalonEditor == null) return;
+
+      var tv = this.AvalonEditor.TextArea.TextView;
+      var docLine = tv.GetDocumentLineByVisualTop(tv.ScrollOffset.Y);
+      if (docLine == null) return;
+
+      WeakReferenceMessenger.Default.Send(new EditorScrolledToLineMessage(docLine.LineNumber));
+    }
+
+    private void HandlePreviewScrolledToLineMessage(PreviewScrolledToLineMessage message)
+    {
+      if (_currentContentType != DocumentContentType.Markdown) return;
+      if (this.ViewModel?.Settings?.MarkdownPreviewLinkedScrolling != true) return;
+      if (message.Line <= 0 || message.Line > this.AvalonEditor.Document.LineCount) return;
+
+      // Suppress the scroll-broadcast that the next ScrollOffsetChanged will trigger,
+      // otherwise we'd echo this scroll right back to the preview.
+      _suppressNextEditorScrollBroadcast = true;
+      this.AvalonEditor.ScrollTo(message.Line, 0);
     }
 
 
@@ -687,7 +791,7 @@ namespace eXeMeL
       // If pinned, clicking the tab header unpins
       if (_isPreviewPinned)
       {
-        UnpinPreview();
+        UnpinPreview(persistToSettings: true);
         return;
       }
 
@@ -698,14 +802,16 @@ namespace eXeMeL
     private void PinPreviewButton_Click(object sender, RoutedEventArgs e)
     {
       if (_isPreviewPinned)
-        UnpinPreview();
+        UnpinPreview(persistToSettings: true);
       else
-        PinPreview();
+        PinPreview(persistToSettings: true);
     }
 
-    private void PinPreview()
+    private void PinPreview(bool persistToSettings = false)
     {
       _isPreviewPinned = true;
+      if (persistToSettings && this.ViewModel?.Settings != null)
+        this.ViewModel.Settings.MarkdownPreviewPinned = true;
 
       // Feed current editor text to the preview
       this.ViewModel.MarkdownUtility.DocumentText = this.AvalonEditor.Text;
@@ -746,9 +852,11 @@ namespace eXeMeL
       this.AvalonEditor.TextChanged += PinnedPreview_TextChanged;
     }
 
-    private void UnpinPreview()
+    private void UnpinPreview(bool persistToSettings = false)
     {
       _isPreviewPinned = false;
+      if (persistToSettings && this.ViewModel?.Settings != null)
+        this.ViewModel.Settings.MarkdownPreviewPinned = false;
 
       // Stop live updates
       this.AvalonEditor.TextChanged -= PinnedPreview_TextChanged;
@@ -849,15 +957,29 @@ namespace eXeMeL
       // Update window/taskbar title
       UpdateWindowTitle();
 
-      // Auto-unpin if switching away from Markdown
+      // Auto-unpin if switching away from Markdown. Don't persist — keep the user's
+      // explicit pin preference intact for next time they open Markdown content.
       if (_isPreviewPinned && message.ContentType != DocumentContentType.Markdown)
-        UnpinPreview();
+        UnpinPreview(persistToSettings: false);
+
+      // When switching to Markdown: pre-init the WebView2 in the background (warms up
+      // ~½ sec of Chromium startup) and auto-pin if the user had it pinned previously.
+      if (message.ContentType == DocumentContentType.Markdown)
+      {
+        _ = this.MarkdownUtilityView?.BeginInitializationAsync();
+        if (!_isPreviewPinned && this.ViewModel?.Settings?.MarkdownPreviewPinned == true)
+          PinPreview(persistToSettings: false);
+      }
 
       // Show/hide appropriate utility tabs
       this.XPathTabHeader.Visibility = Visibility.Collapsed;
       this.JsonTreeTabHeader.Visibility = Visibility.Collapsed;
       this.YamlTreeTabHeader.Visibility = Visibility.Collapsed;
       this.MarkdownPreviewTabHeader.Visibility = Visibility.Collapsed;
+
+      // Linked-scrolling toggle is only meaningful for Markdown.
+      this.LinkedScrollingToggle.Visibility =
+        message.ContentType == DocumentContentType.Markdown ? Visibility.Visible : Visibility.Collapsed;
 
       switch (message.ContentType)
       {
@@ -1186,17 +1308,63 @@ namespace eXeMeL
 
       var settings = this.ViewModel.Settings;
 
-      if (!double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0)
-        this.Width = settings.WindowWidth;
-      if (!double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0)
-        this.Height = settings.WindowHeight;
-      if (!double.IsNaN(settings.WindowLeft))
-        this.Left = settings.WindowLeft;
-      if (!double.IsNaN(settings.WindowTop))
-        this.Top = settings.WindowTop;
+      var haveFullRect =
+        !double.IsNaN(settings.WindowLeft) &&
+        !double.IsNaN(settings.WindowTop) &&
+        !double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0 &&
+        !double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0;
+
+      if (haveFullRect)
+      {
+        var saved = new Rect(settings.WindowLeft, settings.WindowTop, settings.WindowWidth, settings.WindowHeight);
+        var visible = EnsureRectIsVisible(saved);
+        this.Left = visible.Left;
+        this.Top = visible.Top;
+        this.Width = visible.Width;
+        this.Height = visible.Height;
+      }
+      else
+      {
+        // Partial settings — fall back to per-property restore with NaN guards.
+        if (!double.IsNaN(settings.WindowWidth) && settings.WindowWidth > 0)
+          this.Width = settings.WindowWidth;
+        if (!double.IsNaN(settings.WindowHeight) && settings.WindowHeight > 0)
+          this.Height = settings.WindowHeight;
+        if (!double.IsNaN(settings.WindowLeft))
+          this.Left = settings.WindowLeft;
+        if (!double.IsNaN(settings.WindowTop))
+          this.Top = settings.WindowTop;
+      }
 
       if (settings.WindowState == (int)WindowState.Maximized)
         this.WindowState = WindowState.Maximized;
+    }
+
+    /// <summary>
+    /// Returns <paramref name="saved"/> if the window's title bar would land on a currently connected
+    /// monitor; otherwise returns a rect centered on the primary monitor's work area.
+    /// Guards against the "opened on a now-disconnected monitor" scenario.
+    /// </summary>
+    private static Rect EnsureRectIsVisible(Rect saved)
+    {
+      var virtualScreen = new Rect(
+        SystemParameters.VirtualScreenLeft,
+        SystemParameters.VirtualScreenTop,
+        SystemParameters.VirtualScreenWidth,
+        SystemParameters.VirtualScreenHeight);
+
+      // Require a 200x40 portion of the title bar to remain reachable.
+      var probe = new Rect(saved.Left, saved.Top, Math.Min(saved.Width, 200), 40);
+      probe.Intersect(virtualScreen);
+      if (probe.Width >= 200 && probe.Height >= 40)
+        return saved;
+
+      var work = SystemParameters.WorkArea;
+      var width = Math.Min(saved.Width, work.Width);
+      var height = Math.Min(saved.Height, work.Height);
+      var left = work.Left + (work.Width - width) / 2;
+      var top = work.Top + (work.Height - height) / 2;
+      return new Rect(left, top, width, height);
     }
 
     #endregion

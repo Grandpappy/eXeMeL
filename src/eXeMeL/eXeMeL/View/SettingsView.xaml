@@ -59,6 +59,16 @@
       <ui:ToggleSwitch IsChecked="{Binding HighlightCurrentLine}"/>
     </ui:CardControl>
 
+    <ui:CardControl Margin="0,0,0,4">
+      <ui:CardControl.Header>
+        <StackPanel>
+          <TextBlock Text="Markdown Preview Linked Scrolling" FontSize="14"/>
+          <TextBlock Text="When the editor or preview is scrolled, the other panel follows" FontSize="12" Opacity="0.5"/>
+        </StackPanel>
+      </ui:CardControl.Header>
+      <ui:ToggleSwitch IsChecked="{Binding MarkdownPreviewLinkedScrolling}"/>
+    </ui:CardControl>
+
 
 
     <!-- ═══════════════ THEME &amp; FONTS ═══════════════ -->
