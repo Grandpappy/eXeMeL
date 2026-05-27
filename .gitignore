@@ -168,3 +168,5 @@ pip-log.txt
 *.ide
 
 src/eXeMeL/.vs/
+
+*.lscache
