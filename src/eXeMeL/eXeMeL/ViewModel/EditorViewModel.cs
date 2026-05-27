@@ -362,6 +362,31 @@ namespace eXeMeL.ViewModel
     private async Task SetDocumentTextFromClipboardAsync()
     {
       _lastRawText = Clipboard.GetText();
+
+      // Before processing as content, check if the clipboard holds a file path
+      var filePath = TryExtractFilePath(_lastRawText);
+      if (filePath != null && File.Exists(filePath))
+      {
+        var detectedType = ContentTypeDetector.DetectFromFileExtension(filePath);
+        var ext = Path.GetExtension(filePath).ToLowerInvariant();
+
+        if (detectedType != null)
+        {
+          // Known extension (XML, JSON, YAML, MD, TXT, etc.) → open the file
+          OpenFileAsync(filePath, fromClipboardPath: true);
+          return;
+        }
+
+        if (string.IsNullOrEmpty(ext))
+        {
+          // No extension (e.g. hosts, Makefile) → open as plain text
+          OpenFileAsync(filePath, fromClipboardPath: true, overrideContentType: DocumentContentType.Text);
+          return;
+        }
+
+        // Unsupported extension (e.g. .dll) → fall through to normal clipboard processing
+      }
+
       WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
       var text = await CleanContentAsync(_lastRawText);
       _lastCleanedText = text;
@@ -377,6 +402,46 @@ namespace eXeMeL.ViewModel
 
       var handler = this.RefreshComplete;
       handler?.Invoke(this, EventArgs.Empty);
+    }
+
+
+
+    private static string TryExtractFilePath(string text)
+    {
+      if (string.IsNullOrWhiteSpace(text))
+        return null;
+
+      // Strip surrounding whitespace and common wrapper characters (quotes, angle brackets, backticks, parens)
+      var candidate = text.Trim().Trim('"', '\'', '<', '>', '`', '(', ')');
+
+      // A standalone file path must be a single line — rejects large documents with a path buried inside
+      if (candidate.Contains('\n') || candidate.Contains('\r'))
+        return null;
+
+      // Generous but bounded: Windows MAX_PATH is 260; extended paths can exceed that, 300 is a safe cap
+      if (candidate.Length > 300)
+        return null;
+
+      // Must look like a Windows absolute path
+      if (!LooksLikeWindowsAbsolutePath(candidate))
+        return null;
+
+      return candidate;
+    }
+
+
+
+    private static bool LooksLikeWindowsAbsolutePath(string path)
+    {
+      // Drive letter path: C:\ or C:/
+      if (path.Length >= 3 && char.IsLetter(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+        return true;
+
+      // UNC path: \\server\share
+      if (path.StartsWith(@"\\") && path.Length > 3)
+        return true;
+
+      return false;
     }
 
 
@@ -464,7 +529,7 @@ namespace eXeMeL.ViewModel
 
 
 
-    public async void OpenFileAsync(string filePath)
+    public async void OpenFileAsync(string filePath, bool fromClipboardPath = false, DocumentContentType? overrideContentType = null)
     {
       try
       {
@@ -479,8 +544,9 @@ namespace eXeMeL.ViewModel
 
         WeakReferenceMessenger.Default.Send(new UnselectTextInEditorMessage());
 
-        // Detect content type from file extension first, fall back to content detection
-        ContentType = ContentTypeDetector.DetectFromFileExtension(filePath)
+        // Detect content type: explicit override takes priority, then extension, then content
+        ContentType = overrideContentType
+                      ?? ContentTypeDetector.DetectFromFileExtension(filePath)
                       ?? ContentTypeDetector.Detect(fileContents);
 
         this.IsContentFromFile = true;
@@ -491,7 +557,10 @@ namespace eXeMeL.ViewModel
 
         RaiseRefreshComplete();
 
-        WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage("File opened: " + Path.GetFileName(filePath)));
+        var statusMsg = fromClipboardPath
+          ? $"Opened from clipboard path: {Path.GetFileName(filePath)}"
+          : "File opened: " + Path.GetFileName(filePath);
+        WeakReferenceMessenger.Default.Send(new DisplayApplicationStatusMessage(statusMsg));
       }
       catch (Exception ex)
       {

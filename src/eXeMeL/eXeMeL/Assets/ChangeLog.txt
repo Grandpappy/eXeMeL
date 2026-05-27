@@ -1,4 +1,8 @@
-﻿*5/13/2026 - Markdown preview overhaul, window recovery
+﻿*5/27/2026 - Auto open of filepath in clipboard
+
+- When launching the app, if the clipboard contains a file path that exists, the app will automatically open that file instead of just displaying the file path in the editor.
+
+*5/13/2026 - Markdown preview overhaul, window recovery
 
 - Markdown preview rewritten with much better rendering: syntax-highlighted code blocks, proper tables, footnotes, task lists, and full theme support.
 - Clicking a line in the editor highlights the matching line in the preview and scrolls it into view if needed.

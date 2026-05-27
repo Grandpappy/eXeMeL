@@ -120,7 +120,8 @@ namespace eXeMeL.Model
           or ".props" or ".proj" => DocumentContentType.Xml,
         ".yaml" or ".yml" => DocumentContentType.Yaml,
         ".md" or ".markdown" => DocumentContentType.Markdown,
-        ".txt" or ".log" => DocumentContentType.Text,
+        ".txt" or ".log" or ".ini" or ".cfg" or ".properties" or ".env"
+          or ".csv" or ".tsv" or ".sh" or ".bat" or ".cmd" or ".ps1" => DocumentContentType.Text,
         _ => null
       };
     }
